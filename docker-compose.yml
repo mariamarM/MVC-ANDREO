@@ -1,0 +1,16 @@
+app:
+ build: .
+ ports:
+ - "8080:80"
+ volumes:
+ - ./:/var/www/html
+ db:
+ image: mysql:8
+ environment:
+ - MYSQL_DATABASE=blog_db
+ - MYSQL_USER=blog_user
+ - MYSQL_PASSWORD=blog_pass
+n8n:
+ image: n8nio/n8n
+ ports:
+ - "5678:5678"
