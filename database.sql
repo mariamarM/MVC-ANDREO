@@ -63,7 +63,7 @@ CREATE TABLE favorites (
     FOREIGN KEY (song_id) REFERENCES canciones(id) ON DELETE CASCADE
 );
 
-CREATE TABLE reviews (
+CREATE TABLE reviews ( /* reemplazan esto los comentarios y supongo que los posts tmb */
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     song_id INT NOT NULL,
