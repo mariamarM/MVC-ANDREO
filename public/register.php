@@ -7,14 +7,20 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>Welcome to the Home Page</h1>
-    </header>
-    <main>
-        <p>This is the main content of the home page.</p>
-    </main>
-    <footer>
-        <p>&copy; 2024 My Website</p>
-    </footer>  
+    <form method="post" action="../views/auth/register.php">
+        <h2>Register</h2>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        
+        <label for="music_genre">Favorite Music Genre:</label>
+        <input type="text" id="music_genre" name="music_genre">
+        
+        <button type="submit">Register</button>
 </body>
 </html>
