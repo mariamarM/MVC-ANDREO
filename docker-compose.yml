@@ -1,19 +1,24 @@
-  services:
+
+services:
   app:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8081:80"
     volumes:
       - ./:/var/www/html
+    networks:
+      - mvc_net
+    depends_on:
+      - db
 
   db:
     image: mysql:8
     environment:
-      - MYSQL_DATABASE=blog_db
-      - MYSQL_USER=blog_user
-      - MYSQL_PASSWORD=blog_pass
+      MYSQL_DATABASE: blog_db
+      MYSQL_USER: blog_user
+      MYSQL_PASSWORD: blog_pass
     ports:
       - "3306:3306"
     volumes:
@@ -21,18 +26,31 @@
       - ./database.sql:/docker-entrypoint-initdb.d/01-database.sql:ro
     networks:
       - mvc_net
+    
   n8n:
     image: n8nio/n8n
     container_name: mvc_n8n
     restart: unless-stopped
     ports:
-        - "5678:5678"   
+      - "5678:5678"
     environment:
-      - GENERIC_TIMEZONE=Europe/Madrid
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=admin
-      - N8N_BASIC_AUTH_PASSWORD=admin123
+      GENERIC_TIMEZONE: Europe/Madrid
+      N8N_BASIC_AUTH_ACTIVE: true
+      N8N_BASIC_AUTH_USER: admin
+      N8N_BASIC_AUTH_PASSWORD: admin123
+    
     volumes:
       - n8n_data:/home/node/.n8n
     networks:
-      - mvc_net 
+      - mvc_net
+    depends_on:
+      db:
+        condition: service_healthy  # Si agregas healthcheck
+
+networks:
+  mvc_net:
+    driver: bridge
+
+volumes:
+  db_data:
+  n8n_data:
