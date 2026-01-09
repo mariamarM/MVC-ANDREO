@@ -2,6 +2,9 @@
 require_once '../views/layout/header.php';
 require_once '../views/layout/nav.php';
 require_once '../views/layout/footer.php';
+function renderNav() {
+    include '../views/layout/nav.php';
+}       
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,7 +15,7 @@ require_once '../views/layout/footer.php';
     <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-    
+    <?php renderNav(); ?>
     <main>
         <p>This is the main content of the home page.</p>
         <button onclick="location.href='login.php'">Go to Login</button>
