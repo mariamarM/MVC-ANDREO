@@ -2,7 +2,7 @@
 
 class Admin extends Model
 {
-    
+
     public function getAll()
     {
         $sql = "SELECT id, username, email, role, created_at 
@@ -19,4 +19,6 @@ class Admin extends Model
         return $stmt->execute([$username, $email, $hash, $role]);
     }
 
-} ?>
+} 
+
+?>

@@ -2,6 +2,7 @@
 require_once '../views/layout/header.php';
 require_once '../views/layout/nav.php';
 require_once '../views/layout/footer.php';
+
 function renderNav() {
     include '../views/layout/nav.php';
 }       
@@ -15,13 +16,21 @@ function renderNav() {
     <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-    <?php renderNav(); ?>
     <main>
-        <p>This is the main content of the home page.</p>
-        <button onclick="location.href='login.php'">Go to Login</button>
-        <button onclick="location.href='register.php'">Go to Register</button>
-        
+        <div class="musicTop">
+            <img src="">
+            <div class="song">
+               <p class="song-title">   </p> 
+               <p class="song-artist"></p>
+               <p class="song-ranking"></p>
+               <p class="song-timer"></p>
+            </div>
+        </div>
+        <article>
+            
+        </article>
     </main>
-    
+        <?php renderNav(); ?>
+
 </body>
 </html>
