@@ -4,7 +4,7 @@ namespace App\Controllers;
 abstract class Controller {
     
     // Renderizar vista
-    protected function render($view, $data = []) {
+    private function render($view, $data = []) {
         extract($data);
         
         $viewPath = __DIR__ . '/../views/' . $view;
@@ -18,7 +18,7 @@ abstract class Controller {
         require_once __DIR__ . '/../views/layout/footer.php';
     }
     //esto es lo que hace que lo reedirige en plan segun la variable del url donde este
-    protected function redirect($url) {
+    private function redirect($url) {
         header("Location: " . $url);
         exit;
     }
