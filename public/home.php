@@ -18,6 +18,7 @@ function renderNav() {
 <body>
     <main>
         <div class="musicTop">
+            hola
             <img src="">
             <div class="song">
                <p class="song-title">   </p> 
@@ -27,10 +28,9 @@ function renderNav() {
             </div>
         </div>
         <article>
-            
+
         </article>
     </main>
-        <?php renderNav(); ?>
 
 </body>
 </html>
