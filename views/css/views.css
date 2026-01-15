@@ -1,6 +1,6 @@
 ::root {
   --color-primary: #121212;
-  --color-secondary: #ffffff;
+  --color-secondary: #484848;
   --color-borders: #989898;
   --color-accent: #f05454;
   --color-accent-2: #30475e;
@@ -43,6 +43,16 @@ nav {
   border-radius: 15px;
   border: 1px solid #989898;
 }
-ul{
+ul , li{
     text-decoration: none;
+    list-style: none;
+}
+li , a {
+    color: var(--color-secondary);
+font-family: var(--font-primary);
+font-size: 34px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+text-transform: uppercase;
 }
