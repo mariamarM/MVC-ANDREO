@@ -11,10 +11,10 @@ class UserController extends Controller {
             return;
         }
         
-        
+        // Datos del usuario desde sesión
         $userData = [
-            'name' => $_SESSION['username'] ?? 'Usuario',
-            'email' => 'usuario@ejemplo.com'
+            'name' => $_SESSION['username'],
+            'email' => $_SESSION['user_email'] ?? 'usuario@ejemplo.com'
         ];
         
         $this->render('user/profile.php', [
@@ -22,32 +22,41 @@ class UserController extends Controller {
         ]);
     }
     
+    // Mostrar formulario de login
     public function login() {
+        // Si ya está logueado, ir a home
         if (isset($_SESSION['user_id'])) {
             $this->redirect('/home');
             return;
         }
         
+        // Si es POST, procesar login
         if ($this->isPost()) {
             $email = $this->getPost('email');
             $password = $this->getPost('password');
-        
+            
+            // **SOLO UN EJEMPLO** - Para probar
+            // Usa: email = test@test.com, password = 123456
             if ($email === 'test@test.com' && $password === '123456') {
                 $_SESSION['user_id'] = 1;
-                $_SESSION['username'] = 'Usuario Test';
+                $_SESSION['username'] = 'Usuario Demo';
+                $_SESSION['user_email'] = 'test@test.com';
                 $this->redirect('/home');
                 return;
             } else {
-                $error = "Email o contraseña incorrectos";
+                $error = "Email o contraseña incorrectos. Prueba con: test@test.com / 123456";
                 $this->render('auth/login.php', ['error' => $error]);
                 return;
             }
         }
         
+        // Si es GET, mostrar formulario
         $this->render('auth/login.php');
     }
     
+    // Mostrar formulario de registro
     public function register() {
+        // Si es POST, procesar registro
         if ($this->isPost()) {
             $username = $this->getPost('username');
             $email = $this->getPost('email');
@@ -56,6 +65,7 @@ class UserController extends Controller {
             
             $errors = [];
             
+            // Validaciones simples
             if (empty($username)) {
                 $errors[] = "El nombre de usuario es requerido";
             }
@@ -69,24 +79,28 @@ class UserController extends Controller {
                 $errors[] = "Las contraseñas no coinciden";
             }
             
-            // Si no hay errores, "registrar" (en realidad solo simular)
+            // Si no hay errores, "registrar"
             if (empty($errors)) {
                 // En un caso real, aquí guardarías en la base de datos
-                $_SESSION['user_id'] = 2;
+                // Por ahora solo simulamos
+                $_SESSION['user_id'] = rand(100, 999); // ID aleatorio
                 $_SESSION['username'] = $username;
+                $_SESSION['user_email'] = $email;
+                
                 $this->redirect('/home');
                 return;
             }
             
-           //que te enseñe los errores como super basico
+            // Si hay errores, mostrar formulario con errores
             $this->render('auth/register.php', ['errors' => $errors]);
             return;
         }
         
-        // cuando le das a enviar te enseña en plan vacio el formulario
+        // Si es GET, mostrar formulario vacío
         $this->render('auth/register.php');
     }
     
+    // Cerrar sesión
     public function logout() {
         session_destroy();
         $this->redirect('/home');
