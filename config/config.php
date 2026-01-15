@@ -1,11 +1,11 @@
 <?php
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'musica_db');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_NAME', 'db');
+define('DB_USER', 'blog_user');
+define('DB_PASS', 'blos_pass');
 
 define('BASE_URL', 'http://localhost:8081/');
-define('SITE_NAME', 'Música App');
+define('SITE_NAME', 'MVC-ANDREO');
 
 session_start();
 ?>
