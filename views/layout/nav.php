@@ -1,15 +1,17 @@
 <?php
 
 ?>
-
+<head>
+    <link rel="stylesheet" href="css/views.css">
+</head>
 <nav>
     <div class="containerNav">
         <div class="userCon">
             <div class="btnLog">
-                log in
+                <a href="./public/login.php">log in</a>
             </div>
-            <div class="btnReg">
-                sign up   
+            <div class="btnLog">
+              <a href="./public/register.php">sign up</a>
             </div>
         </div>
         <ul class="nav-list">

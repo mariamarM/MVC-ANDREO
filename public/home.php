@@ -30,7 +30,7 @@ function renderNav() {
         <article>
 
         </article>
-    </main>
+ </main>
 
 </body>
 </html>

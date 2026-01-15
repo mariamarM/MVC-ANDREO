@@ -1,0 +1,48 @@
+::root {
+  --color-primary: #121212;
+  --color-secondary: #ffffff;
+  --color-borders: #989898;
+  --color-accent: #f05454;
+  --color-accent-2: #30475e;
+  --font-primary: "Konkhmer Sleokchher", sans-serif;
+}
+nav {
+  display: flex;
+  position: absolute;
+  width: 100%;
+  bottom:50px;
+}
+.containerNav {
+  display: inline-flex;
+  padding: 4px 0;
+  align-items: center;
+  gap: 15px;
+}
+.userCon {
+  display: flex;
+  width: 137px;
+  padding: 9px 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+}
+.btnLog {
+  height: 43px;
+  align-self: stretch;
+  border-radius: 7px;
+  border: 1px solid #989898;
+}
+.nav-list {
+  display: flex;
+  width: 1039px;
+  height: 108px;
+  padding: 10px;
+  justify-content: center;
+  align-items: center;
+  gap: 52px;
+  border-radius: 15px;
+  border: 1px solid #989898;
+}
+ul{
+    text-decoration: none;
+}
