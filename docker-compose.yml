@@ -1,16 +1,71 @@
-app:
- build: .
- ports:
- - "8080:80"
- volumes:
- - ./:/var/www/html
- db:
- image: mysql:8
- environment:
- - MYSQL_DATABASE=blog_db
- - MYSQL_USER=blog_user
- - MYSQL_PASSWORD=blog_pass
-n8n:
- image: n8nio/n8n
- ports:
- - "5678:5678"
+version: '3.8'
+
+services:
+  app-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mvc_andreo
+    ports:
+      - "8081:80"
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - mvc_net
+    # Si necesitas que apunte a la carpeta public, añade esta línea:
+    # command: ["apache2-foreground", "-D", "FOREGROUND"]
+
+  db-1:
+    image: mysql:8
+    container_name: db-1
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: blog_db
+      MYSQL_USER: blog_user
+      MYSQL_PASSWORD: blog_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database.sql:/docker-entrypoint-initdb.d/01-database.sql:ro
+    networks:
+      - mvc_net
+  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: mvc_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8083:80"
+    environment:
+      PMA_HOST: db  # ¡IMPORTANTE! Usa el nombre del servicio, no localhost
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+      UPLOAD_LIMIT: 256M
+    networks:
+      - mvc_net
+    depends_on:
+      - db-1
+  # mvc_n8n:
+  #   image: n8nio/n8n
+  #   container_name: mvc_n8n
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5678:5678"
+  #   environment:
+  #     - GENERIC_TIMEZONE=Europe/Madrid
+  #     - N8N_BASIC_AUTH_ACTIVE=true
+  #     - N8N_BASIC_AUTH_USER=admin
+  #     - N8N_BASIC_AUTH_PASSWORD=admin123
+  #   volumes:
+  #     - n8n_data:/home/node/.n8n
+  #   networks:
+  #     - mvc_net
+
+volumes:
+  db_data:
+  n8n_data:
+
+networks:
+  mvc_net:
+    driver: bridge
