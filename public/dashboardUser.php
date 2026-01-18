@@ -87,12 +87,7 @@ exit;
             list-style: none;
             padding: 0;
         }
-        li {
-            background: #eee;
-            padding: 8px 12px;
-            margin-bottom: 6px;
-            border-radius: 8px;
-        }
+        
     </style>
 </head>
 <body>

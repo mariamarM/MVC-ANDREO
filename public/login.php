@@ -1,3 +1,6 @@
+<?php
+require_once __DIR__ . '/../config/config.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +16,7 @@
             <?php if (isset($_GET['registered'])): ?>
     <p style="color: green;">Account created successfully. Please log in.</p>
 <?php endif; ?>
-            <form action="/public/login.php" method="POST">
+            <form action="/views/auth/login.php" method="POST">
                 <div class="form-group
 ">
                     <label for="username">Username:</label>

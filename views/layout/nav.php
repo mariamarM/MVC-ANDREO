@@ -23,7 +23,7 @@
             <a href="/register.php">Register</a> -->
         
         <?php if (isset($_SESSION['user_id'])): ?>
-    <li><a href="<?= BASE_URL ?>logout.php">Logout</a></li>
+    <li><a href="<?= BASE_URL ?>logout.php"><i class="fa-solid fa-power-off" style="color: #d64000;"></i></a></li>
 
 <?php endif; ?>
 </div>
