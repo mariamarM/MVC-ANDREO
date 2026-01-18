@@ -73,3 +73,5 @@ CREATE TABLE reviews ( /* reemplazan esto los comentarios y supongo que los post
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (song_id) REFERENCES canciones(id) ON DELETE CASCADE
 );
+
+--'admin', 'admin@test.com', 'adminpass'

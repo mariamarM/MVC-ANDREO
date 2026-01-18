@@ -4,7 +4,7 @@ class Database {
     private $pdo;
     
     private function __construct() {
-        $host = getenv('DB_HOST') ?: 'db';
+        $host = getenv('DB_HOST') ?: 'db-1';
         $dbname = getenv('DB_NAME') ?: 'blog_db';
         $user = getenv('DB_USER') ?: 'blog_user';
         $pass = getenv('DB_PASSWORD') ?: 'blog_pass';

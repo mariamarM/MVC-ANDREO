@@ -10,6 +10,9 @@
     <main>
         <div class="login-container">
             <h2>Login to Music Virtual Closet</h2>
+            <?php if (isset($_GET['registered'])): ?>
+    <p style="color: green;">Account created successfully. Please log in.</p>
+<?php endif; ?>
             <form action="/public/login.php" method="POST">
                 <div class="form-group
 ">

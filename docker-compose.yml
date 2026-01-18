@@ -12,8 +12,6 @@ services:
       - ./:/var/www/html
     networks:
       - mvc_net
-    # Si necesitas que apunte a la carpeta public, añade esta línea:
-    # command: ["apache2-foreground", "-D", "FOREGROUND"]
 
   db-1:
     image: mysql:8
@@ -38,7 +36,7 @@ services:
     ports:
       - "8083:80"
     environment:
-      PMA_HOST: db  # ¡IMPORTANTE! Usa el nombre del servicio, no localhost
+      PMA_HOST: db-1  # ¡IMPORTANTE! Usa el nombre del servicio, no localhost
       PMA_PORT: 3306
       PMA_ARBITRARY: 1
       UPLOAD_LIMIT: 256M

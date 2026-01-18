@@ -1,26 +1,40 @@
+<?php
+require_once __DIR__ . '/../config/config.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (isset($_SESSION['user_id'])) {
+    header('Location: ' . BASE_URL . 'dashboardUser.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MVC Register</title>
-    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>css/app.css">
 </head>
 <body>
-    <form method="post" action="../views/auth/register.php">
-        <h2>Register</h2>
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
-        
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        
-        <label for="music_genre">Favorite Music Genre:</label>
-        <input type="text" id="music_genre" name="music_genre">
-        
-        <button type="submit">Register</button>
+
+<form method="post" action="<?= BASE_URL ?>register_action.php">
+    <h2>Register</h2>
+
+    <label>Name</label>
+    <input type="text" name="name" required>
+
+    <label>Email</label>
+    <input type="email" name="email" required>
+
+    <label>Password</label>
+    <input type="password" name="password" required>
+
+    <label>Favorite Music Genre</label>
+    <input type="text" name="music_genre">
+
+    <button type="submit">Register</button>
+</form>
+
 </body>
 </html>
