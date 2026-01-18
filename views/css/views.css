@@ -23,6 +23,32 @@ nav {
     display: flex;
 }
 
+.userCon i {
+display: flex;
+    font-weight: 900;
+    color: #d64000;
+    font-size: 28px;
+    transition: color 0.2s ease;
+}
+
+.userCon i:hover {
+ color: #511a09;
+}
+
+/* Ajustes generales para listas dentro del nav */
+.userCon, .userCon li {
+    list-style: none;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+
+.userCon a {
+    text-decoration: none;
+    display: inline-block;
+    border:none;
+}
+
 /* ===== CONTENEDOR ===== */
 .containerNav {
     display: flex;
@@ -62,7 +88,7 @@ nav {
 .userCon {
     display: flex;
     gap: 12px;
-    margin-right: 24px;
+    margin: 40px 61px;
     flex-direction: column-reverse;
     align-items: center;
     justify-content: center;
@@ -71,7 +97,7 @@ nav {
     right: 8%;
       
 }
-.userCon a {
+/* .userCon a {
     text-decoration: none;
     font-size: 23px;
     font-weight: 600;
@@ -82,7 +108,53 @@ nav {
     transition: all 0.2s ease;
     font-family: var(--font-primary);
     text-transform: uppercase;
+} */
+
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
 }
 
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 400px;
+    position: relative;
+}
 
+.close {
+    position: absolute;
+    right: 15px; top: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
 
+.btn {
+    padding: 8px 12px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #555;
+}
+
+.likeBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 5px;
+}

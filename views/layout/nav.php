@@ -17,13 +17,12 @@
     </div>
 
 </nav>
-<div class="userCon">
-            <!-- <a href="/home.php">MyMusic</a>
-            <a href="/login.php">Login</a>
-            <a href="/register.php">Register</a> -->
-        
-        <?php if (isset($_SESSION['user_id'])): ?>
-    <li><a href="<?= BASE_URL ?>logout.php"><i class="fa-solid fa-power-off" style="color: #d64000;"></i></a></li>
-
-<?php endif; ?>
-</div>
+<?php if (isset($_SESSION['user_id'])): ?>
+    <ul class="userCon">
+        <li>
+            <a href="<?= BASE_URL ?>logout.php" title="Cerrar sesión">
+                <i class="fas fa-power-off"></i>
+            </a>
+        </li>
+    </ul>
+    <?php endif; ?>
