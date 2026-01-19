@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
     <title>Access denied</title>
     <link rel="stylesheet" href="<?= BASE_URL ?>css/app.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>views/css/views.css">
+    <link rel="stylesheet" href="/views/css/views.css">
     <style>
         body {
             font-family: Arial, Helvetica, sans-serif;
@@ -80,7 +80,6 @@ try {
     error_log($error);
 }
 
-// Obtener canciones para el select del modal
 $canciones = [];
 try {
     $stmt = $pdo->query("SELECT id, title, artist FROM canciones ORDER BY title");
@@ -98,196 +97,7 @@ try {
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>css/app.css">
     <link rel="stylesheet" href="/views/css/views.css">
-    <style>
-        /* Estilos del modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: white;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            animation: modalFadeIn 0.3s ease-out;
-        }
-
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px) scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .modal-header {
-            padding: 20px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 12px 12px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .modal-close:hover {
-            transform: scale(1.2);
-        }
-
-        .modal-body {
-            padding: 30px;
-        }
-
-        /* Estilos del formulario dentro del modal */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e1e1;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-            box-sizing: border-box;
-        }
-
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: #667eea;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .form-group textarea {
-            min-height: 120px;
-            resize: vertical;
-            font-family: Arial, sans-serif;
-        }
-
-        .rating-container {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-top: 5px;
-        }
-
-        .rating-star {
-            font-size: 28px;
-            color: #ddd;
-            cursor: pointer;
-            transition: color 0.2s, transform 0.2s;
-        }
-
-        .rating-star:hover,
-        .rating-star.active {
-            color: #ffc107;
-            transform: scale(1.1);
-        }
-
-        .rating-star:hover ~ .rating-star {
-            color: #ddd;
-        }
-
-        .modal-footer {
-            padding: 20px 30px;
-            background-color: #f8f9fa;
-            border-radius: 0 0 12px 12px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        .btn-modal {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-
-        /* Animación para nuevos reviews */
-        .review-added {
-            animation: highlightReview 2s ease-out;
-        }
-
-        @keyframes highlightReview {
-            0% {
-                background-color: rgba(102, 126, 234, 0.1);
-                transform: scale(1);
-            }
-            50% {
-                background-color: rgba(102, 126, 234, 0.3);
-                transform: scale(1.02);
-            }
-            100% {
-                background-color: inherit;
-                transform: scale(1);
-            }
-        }
-    </style>
+    
 </head>
 <body>
 
@@ -407,7 +217,6 @@ try {
     </section>
 </main>
 
-<!-- Modal para crear reviews -->
 <div id="reviewModal" class="modal-overlay">
     <div class="modal-content">
         <div class="modal-header">
@@ -466,22 +275,15 @@ try {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Asegurar que BASE_URL está definida
     const BASE_URL = '<?= BASE_URL ?>';
     
-    // Elementos del modal - ASEGURAR QUE EXISTEN
     const modal = document.getElementById('reviewModal');
     const openBtn = document.getElementById('openReviewModal');
     const closeBtn = document.getElementById('closeReviewModal');
     const cancelBtn = document.getElementById('cancelReviewModal');
     
-    // Verificar que los elementos existen
-    if (!modal || !openBtn || !closeBtn || !cancelBtn) {
-        console.error('Error: No se encontraron elementos del modal');
-        return;
-    }
+  
     
-    // Sistema de rating
     const stars = document.querySelectorAll('.rating-star');
     const ratingInput = document.getElementById('rating');
     const ratingText = document.getElementById('rating-text');
@@ -490,13 +292,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let selectedRating = 0;
     
-    // Abrir modal
     openBtn.addEventListener('click', function() {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
     });
     
-    // Cerrar modal
     function closeModal() {
         modal.style.display = 'none';
         document.body.style.overflow = 'auto';
@@ -506,20 +306,17 @@ document.addEventListener('DOMContentLoaded', function() {
     closeBtn.addEventListener('click', closeModal);
     cancelBtn.addEventListener('click', closeModal);
     
-    // Cerrar al hacer clic fuera del modal
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
             closeModal();
         }
     });
     
-    // Sistema de rating con estrellas
     stars.forEach(star => {
         star.addEventListener('click', function() {
             selectedRating = parseInt(this.dataset.rating);
             ratingInput.value = selectedRating;
             
-            // Actualizar visual de estrellas
             stars.forEach((s, index) => {
                 if (index < selectedRating) {
                     s.classList.add('active');
@@ -528,7 +325,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
             
-            // Actualizar texto
             const ratingTexts = [
                 'Muy mala',
                 'Mala',
@@ -542,7 +338,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Efecto hover
         star.addEventListener('mouseover', function() {
             const hoverRating = parseInt(this.dataset.rating);
             stars.forEach((s, index) => {
@@ -561,14 +356,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Envío del formulario con AJAX - VERSIÓN SIMPLIFICADA
     const reviewForm = document.getElementById('createReviewForm');
     
     if (reviewForm) {
         reviewForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Validación básica
             if (!songSelect || !songSelect.value) {
                 alert('Por favor, selecciona una canción');
                 return;
@@ -586,7 +379,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const formData = new FormData(this);
             
-            // Mostrar loading
             const submitBtn = reviewForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
@@ -600,18 +392,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     body: formData
                 });
                 
-                // Intentar parsear como JSON
+                // SI O SI PARSEAR A JSON SINO NO LO LE
                 const data = await response.json();
                 console.log('Respuesta:', data);
                 
                 if (data.success) {
-                    // Cerrar modal
                     closeModal();
                     
-                    // Mostrar mensaje de éxito
                     alert('✅ Review creada exitosamente!');
                     
-                    // Recargar la página para ver la nueva review
                     setTimeout(() => {
                         window.location.reload();
                     }, 1000);
@@ -630,7 +419,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Función para resetear el formulario
     function resetForm() {
         if (reviewForm) {
             reviewForm.reset();
@@ -647,7 +435,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Cerrar modal con Escape
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && modal.style.display === 'flex') {
             closeModal();
