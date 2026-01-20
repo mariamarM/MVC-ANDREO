@@ -1,5 +1,44 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
+    
+    if (empty($username) || empty($password)) {
+        $error = "Please enter username and password";
+    } else {
+        try {
+            // Buscar usuario con su role
+            $stmt = $pdo->prepare("
+                SELECT id, username, password_hash, role 
+                FROM users 
+                WHERE username = ? OR email = ?
+            ");
+            $stmt->execute([$username, $username]);
+            $user = $stmt->fetch();
+            
+            if ($user && password_verify($password, $user['password_hash'])) {
+                // Iniciar sesión con todos los datos
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_name'] = $user['username'];
+                $_SESSION['user_role'] = $user['role'];
+                $_SESSION['logged_in'] = true;
+                
+                // Redirigir según el role
+                if ($user['role'] === 'admin') {
+                    header('Location: ' . BASE_URL . '/views/admin/dashboard.php');
+                } else {
+                    header('Location: ' . BASE_URL . 'dashboardUser.php');
+                }
+                exit;
+            } else {
+                $error = "Invalid username or password";
+            }
+        } catch (PDOException $e) {
+            $error = "Login error: " . $e->getMessage();
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
