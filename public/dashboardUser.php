@@ -8,9 +8,11 @@ if (!isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <title>Access denied</title>
-    <link rel="stylesheet" href="<?= BASE_URL ?>css/app.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/app.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
     <link rel="stylesheet" href="/views/css/views.css">
+    <script src="<?= BASE_URL ?>js/cursor-effect.js" defer></script>
+
     <style>
         body {
             font-family: Arial, Helvetica, sans-serif;
