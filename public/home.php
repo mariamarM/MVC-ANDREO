@@ -14,50 +14,51 @@ require_once __DIR__ . '/../config/config.php';
     <script src="./js/cursor-effect.js" defer></script>
 
 </head>
+
 <body>
     <?php
     include '../views/layout/nav.php';
     ?>
     <main>
         <div class="containermusic">
-        <div class="musicTop">
-            <img src="">
-            <div class="song">
-                <p class="song-title"> </p>
-                <p class="song-artist"></p>
-                <p class="song-ranking"></p>
-                <p class="song-timer"></p>
+            <div class="musicTop">
+                <img src="">
+                <div class="song">
+                    <p class="song-title"> </p>
+                    <p class="song-artist"></p>
+                    <p class="song-ranking"></p>
+                    <p class="song-timer"></p>
+                </div>
+            </div>
+            <div class="musicTop">
+                <img src="">
+                <div class="song">
+                    <p class="song-title"> </p>
+                    <p class="song-artist"></p>
+                    <p class="song-ranking"></p>
+                    <p class="song-timer"></p>
+                </div>
+            </div>
+            <div class="musicTop">
+                <img src="">
+                <div class="song">
+                    <p class="song-title"> </p>
+                    <p class="song-artist"></p>
+                    <p class="song-ranking"></p>
+                    <p class="song-timer"></p>
+                </div>
+            </div>
+            <div class="musicTop">
+                <img src="">
+                <div class="song">
+                    <p class="song-title"> </p>
+                    <p class="song-artist"></p>
+                    <p class="song-ranking"></p>
+                    <p class="song-timer"></p>
+                </div>
             </div>
         </div>
-         <div class="musicTop">   
-            <img src="">
-            <div class="song">
-                <p class="song-title"> </p>
-                <p class="song-artist"></p>
-                <p class="song-ranking"></p>
-                <p class="song-timer"></p>
-            </div>
-        </div>
-         <div class="musicTop">   
-            <img src="">
-            <div class="song">
-                <p class="song-title"> </p>
-                <p class="song-artist"></p>
-                <p class="song-ranking"></p>
-                <p class="song-timer"></p>
-            </div>
-        </div>
-         <div class="musicTop">     
-            <img src="">
-            <div class="song">
-                <p class="song-title"> </p>
-                <p class="song-artist"></p>
-                <p class="song-ranking"></p>
-                <p class="song-timer"></p>
-            </div>
-        </div>
-        </div>
-        <article>
+        <article class="articlehome">
             <section class="music-section">
                 <h2>ARTISTS</h2>
             </section>
@@ -67,10 +68,10 @@ require_once __DIR__ . '/../config/config.php';
             <section class="music-section">
                 <h2>GENRE</h2>
             </section>
-                <section class="music-section">
+            <section class="music-section">
                 <h2>POPULAR REVIEWS</h2>
             </section>
-            </article>
+        </article>
     </main>
 
 </body>
