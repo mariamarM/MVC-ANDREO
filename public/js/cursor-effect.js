@@ -1,8 +1,6 @@
 // js/simple-red-cross.js
 // Este script NO verifica nada, SIEMPRE se ejecuta
 
-console.log('🟥 CARGANDO CURSOR ROJO SIMPLE');
-
 // 1. Crear estilos
 const style = document.createElement('style');
 style.textContent = `
@@ -70,4 +68,3 @@ document.addEventListener('mousemove', function(e) {
     vLine.style.transform = `translateX(${e.clientX}px)`;
 });
 
-console.log('🟥 CURSOR ROJO ACTIVADO');

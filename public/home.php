@@ -17,7 +17,7 @@ require_once __DIR__ . '/../config/config.php';
 
 <body>
     <?php
-    include '../views/layout/nav.php';
+    require '../views/layout/nav.php';
     ?>
     <main>
         <div class="containermusic">
