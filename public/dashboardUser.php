@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/app.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
     <link rel="stylesheet" href="/views/css/views.css">
-    <script src="<?= BASE_URL ?>js/cursor-effect.js" defer></script>
+    <script src="/js/cursor-effect.js" defer></script>
 
     <style>
         body {
@@ -42,7 +42,7 @@ if (!isset($_SESSION['user_id'])) {
         }
     </style>
 </head>
-<body>
+<body >
     <?php require_once __DIR__ . '/../views/layout/nav.php'; ?>
     <div class="box">
         <h2>Get logged in</h2>
@@ -97,7 +97,7 @@ try {
     <meta charset="UTF-8">
     <title>User Dashboard</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>css/app.css">
+    <link rel="stylesheet" href="/css/app.css">
     <link rel="stylesheet" href="/views/css/views.css">
     
 </head>

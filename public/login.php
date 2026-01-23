@@ -1,74 +1,100 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
+
+// Si ya está logueado
+if (isset($_SESSION['user_id'])) {
+    if ($_SESSION['user_role'] === 'admin') {
+        header('Location: ' . BASE_URL . 'admin/dashboard.php');
+    } else {
+        header('Location: ' . BASE_URL . 'dashboardUser.php');
+    }
+    exit;
+}
+
+$error = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
-    
-    if (empty($username) || empty($password)) {
-        $error = "Please enter username and password";
+
+    if ($username === '' || $password === '') {
+        $error = 'empty';
     } else {
         try {
-            // Buscar usuario con su role
-            $stmt = $pdo->prepare("
-                SELECT id, username, password_hash, role 
-                FROM users 
-                WHERE username = ? OR email = ?
-            ");
-            $stmt->execute([$username, $username]);
-            $user = $stmt->fetch();
-            
+            // Buscar por username o email
+            $stmt = $pdo->prepare(
+                "SELECT id, username, password_hash, role 
+                 FROM users 
+                 WHERE username = :user OR email = :user 
+                 LIMIT 1"
+            );
+            $stmt->execute(['user' => $username]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
             if ($user && password_verify($password, $user['password_hash'])) {
-                // Iniciar sesión con todos los datos
+                // Login OK
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['username'];
                 $_SESSION['user_role'] = $user['role'];
                 $_SESSION['logged_in'] = true;
-                
-                // Redirigir según el role
+
                 if ($user['role'] === 'admin') {
-                    header('Location: ' . BASE_URL . '/views/admin/dashboard.php');
+                    header('Location: ' . BASE_URL . 'admin/dashboard.php');
                 } else {
                     header('Location: ' . BASE_URL . 'dashboardUser.php');
                 }
                 exit;
             } else {
-                $error = "Invalid username or password";
+                $error = 'invalid';
             }
         } catch (PDOException $e) {
-            $error = "Login error: " . $e->getMessage();
+            $error = 'database';
         }
     }
+
+    header('Location: ' . BASE_URL . 'login.php?error=' . $error);
+    exit;
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Music Virtual Closet</title>
-    <link rel="stylesheet" href="/css/app.css">
+    <title>Login</title>
 </head>
 <body>
-    <main>
-        <div class="login-container">
-            <h2>Login to Music Virtual Closet</h2>
-            <?php if (isset($_GET['registered'])): ?>
-    <p style="color: green;">Account created successfully. Please log in.</p>
+
+<h2>Login</h2>
+
+<?php if (!empty($_GET['error'])): ?>
+    <p style="color:red;">
+        <?php
+        switch ($_GET['error']) {
+            case 'empty':
+                echo 'Completa todos los campos';
+                break;
+            case 'invalid':
+                echo 'Usuario o contraseña incorrectos';
+                break;
+            case 'database':
+                echo 'Error de conexión con la base de datos';
+                break;
+            default:
+                // Si viene cualquier cosa rara, no mostramos nada
+                echo '';
+        }
+        ?>
+    </p>
 <?php endif; ?>
-            <form action="/views/auth/login.php" method="POST">
-                <div class="form-group
-">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" required>
-                </div>
-                <div class="form-group
-">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <button type="submit" class="btn-submit">Log In</button>
-            </form>
-        </div>
-    </main>
+
+
+<form method="POST">
+    <input type="text" name="username" placeholder="Usuario o email" required>
+    <br><br>
+    <input type="password" name="password" placeholder="Contraseña" required>
+    <br><br>
+    <button type="submit">Entrar</button>
+</form>
+
 </body>
 </html>

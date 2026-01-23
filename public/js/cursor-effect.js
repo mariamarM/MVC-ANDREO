@@ -1,87 +1,73 @@
+// js/simple-red-cross.js
+// Este script NO verifica nada, SIEMPRE se ejecuta
 
-(function() {
-    // No ejecutar en móviles o admin
-    if (window.innerWidth <= 768 || window.location.pathname.includes('admin')) return;
+console.log('🟥 CARGANDO CURSOR ROJO SIMPLE');
+
+// 1. Crear estilos
+const style = document.createElement('style');
+style.textContent = `
+    /* IMPORTANTE: Esto oculta el cursor normal */
+    body * {
+        cursor: none !important;
+    }
     
-    // Crear líneas
-    const style = document.createElement('style');
-    style.textContent = `
-        body.red-lines-mode * { cursor: none !important; }
-        .red-cross-lines { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            pointer-events: none; 
-            z-index: 9999; 
-            opacity: 0.7;
-        }
-        .red-line { 
-            position: absolute; 
-            background: #ff0000; 
-            box-shadow: 0 0 5px #ff0000;
-            transition: 0.03s linear;
-        }
-        .red-line-h { 
-            width: 100vw; 
-            height: 1px; 
-            left: 0; 
-        }
-        .red-line-v { 
-            width: 1px; 
-            height: 100vh; 
-            top: 0; 
-        }
-        @media (max-width: 768px) {
-            .red-cross-lines { display: none; }
-            body.red-lines-mode * { cursor: auto !important; }
-        }
-    `;
-    document.head.appendChild(style);
+    /* Líneas rojas */
+    .simple-red-cross {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 999999;
+    }
     
-    const container = document.createElement('div');
-    container.className = 'red-cross-lines';
+    .simple-red-line {
+        position: absolute;
+        background: red;
+        box-shadow: 0 0 3px red;
+    }
     
-    const hLine = document.createElement('div');
-    hLine.className = 'red-line red-line-h';
+    .simple-red-h {
+        width: 100vw;
+        height: 2px;
+        left: 0;
+    }
     
-    const vLine = document.createElement('div');
-    vLine.className = 'red-line red-line-v';
+    .simple-red-v {
+        width: 2px;
+        height: 100vh;
+        top: 0;
+    }
     
-    container.appendChild(hLine);
-    container.appendChild(vLine);
-    document.body.appendChild(container);
-    document.body.classList.add('red-lines-mode');
-    
-    // Seguir mouse
-    document.addEventListener('mousemove', e => {
-        hLine.style.top = e.clientY + 'px';
-        vLine.style.left = e.clientX + 'px';
-        container.style.opacity = '0.7';
-    });
-    
-    // Ocultar cuando el mouse sale
-    document.addEventListener('mouseleave', () => {
-        container.style.opacity = '0';
-    });
-    
-    document.addEventListener('mouseenter', () => {
-        container.style.opacity = '0.7';
-    });
-    
-    // Efectos simples
-    document.addEventListener('mouseover', e => {
-        if (e.target.matches('a, button, .btn')) {
-            hLine.style.background = vLine.style.background = '#ff3333';
-            hLine.style.boxShadow = vLine.style.boxShadow = '0 0 10px #ff3333';
-        }
-    });
-    
-    document.addEventListener('mouseout', e => {
-        if (e.target.matches('a, button, .btn')) {
-            hLine.style.background = vLine.style.background = '#ff0000';
-            hLine.style.boxShadow = vLine.style.boxShadow = '0 0 5px #ff0000';
-        }
-    });
-})();
+    /* Para admin pages, podemos desactivarlo con CSS */
+    body.admin-page * {
+        cursor: auto !important;
+    }
+    body.admin-page .simple-red-cross {
+        display: none !important;
+    }
+`;
+document.head.appendChild(style);
+
+// 2. Crear líneas
+const cross = document.createElement('div');
+cross.className = 'simple-red-cross';
+
+const hLine = document.createElement('div');
+hLine.className = 'simple-red-line simple-red-h';
+
+const vLine = document.createElement('div');
+vLine.className = 'simple-red-line simple-red-v';
+
+cross.appendChild(hLine);
+cross.appendChild(vLine);
+document.body.appendChild(cross);
+
+// 3. Mover líneas con el mouse
+document.addEventListener('mousemove', function(e) {
+    hLine.style.transform = `translateY(${e.clientY}px)`;
+    vLine.style.transform = `translateX(${e.clientX}px)`;
+});
+
+console.log('🟥 CURSOR ROJO ACTIVADO');
