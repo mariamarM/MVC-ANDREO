@@ -181,23 +181,7 @@ h2 {
   align-items: center;
   gap: 10px;
 }
-.btn {
-  padding: 10px 20px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 15px;
-}
-.btn:hover {
-  background: #0056b3;
-}
+
 .review-item {
   background: white;
   padding: 15px;
@@ -248,11 +232,23 @@ h2 {
   font-size: 20px;
   color: #ff6b6b;
 }
-.action-buttons {
+.reviewbtn {
+  position: absolute;
+    top: 15%;
+    right: 3%;
+    width: 40%;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
   margin-bottom: 20px;
+  padding: 14px 24px;
+  border-radius: 30px;
+  cursor: pointer;
+}
+.action-buttons {
+  background: #e11d2e;
+  color: white;
+  border: none;
 }
 
 /* views/css/modal.css */
@@ -382,7 +378,9 @@ h2 {
   font-size: 28px;
   color: #ddd;
   cursor: pointer;
-  transition: color 0.2s, transform 0.2s;
+  transition:
+    color 0.2s,
+    transform 0.2s;
 }
 
 .rating-star:hover,
@@ -446,7 +444,6 @@ h2 {
 body {
   font-family: Arial, Helvetica, sans-serif;
   background: #f5f5f5;
-
 }
 .box {
   background: #fff;
@@ -551,9 +548,9 @@ body {
 
 /*HOME TODO SECCION*/
 .containermusic {
-    position:absolute;
-    top: 16%;
-    left: 9%;
+  position: absolute;
+  top: 16%;
+  left: 9%;
   display: flex;
   width: 842px;
   height: 462px;

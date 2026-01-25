@@ -98,7 +98,7 @@ try {
     <meta charset="UTF-8">
     <title>User Dashboard</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
-    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="./css/app.css">
     <script src="/js/cursor-effect.js" defer></script>
 
 </head>
@@ -107,7 +107,22 @@ try {
 * {
     box-sizing: border-box;
 }
-
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+     position:absolute; 
+    top:20% ;
+    right:40%;
+      background: #e11d2e;
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(225,29,46,0.35);
+}
 body {
     margin: 0;
     background: #f2f2f2;
@@ -119,9 +134,7 @@ main {
     max-width: 1300px;
     margin: 40px auto;
     padding: 40px;
-    background: white;
-    border-radius: 40px 60px 45px 35px;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.08);
+ 
 
     display: grid;
     grid-template-columns: 300px 1fr;
@@ -154,21 +167,7 @@ main > h1 i {
     opacity: 0.9;
 }
 
-/* ===== BOTÓN CREAR ===== */
-.action-buttons {
-    grid-column: 2;
-    margin-bottom: 10px;
-}
 
-.action-buttons .btn {
-    background: #e11d2e;
-    color: white;
-    border: none;
-    padding: 14px 24px;
-    border-radius: 30px;
-    cursor: pointer;
-    box-shadow: 0 10px 25px rgba(225,29,46,0.35);
-}
 
 /* ===== ESTADÍSTICAS (última section) ===== */
 main section:last-of-type {
@@ -235,8 +234,8 @@ main section:nth-of-type(1) h2 {
 <main>
    <h1><i class="fas fa-user-circle"></i> Bienvenido, <?= htmlspecialchars($_SESSION['user_name'] ?? 'Usuario') ?>!</h1> 
     
-    <div class="action-buttons">
-        <button id="openReviewModal" class="btn">
+    <div class="reviewbtn">
+        <button id="openReviewModal"  class="action-buttons" >
             <i class="fas fa-plus"></i> Crear una review
         </button>
         
