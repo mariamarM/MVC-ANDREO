@@ -15,7 +15,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
     if ($_SESSION['user_role'] === 'admin') {
         header('Location: ' . BASE_URL . 'views/admin/dashboard.php');
     } else {
-        header('Location: ' . BASE_URL . 'dashboard.php');
+        header('Location: ' . BASE_URL . 'dashboardUser.php');
     }
     exit;
 }
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($user['role'] === 'admin') {
                         header('Location: ' . BASE_URL . 'views/admin/dashboard.php');
                     } else {
-                        header('Location: ' . BASE_URL . 'dashboard.php');
+                        header('Location: ' . BASE_URL . 'dashboardUser.php');
                     }
                     exit;
                     
@@ -86,19 +86,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <title>Login</title>
-    <style>
-        body { font-family: Arial; padding: 50px; background: #f0f0f0; }
-        .login-box { background: white; padding: 30px; max-width: 400px; margin: 0 auto; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #333; }
-        .error { color: red; background: #ffebee; padding: 10px; border-radius: 5px; margin: 10px 0; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; }
-        button { width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
-        .debug { background: #e3f2fd; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px; }
-    </style>
+    
 </head>
 <body>
     <div class="login-box">
-        <h2>🔐 Login</h2>
+        <h2> Login</h2>
         
         <?php if ($error): ?>
             <div class="error"><?php echo $error; ?></div>

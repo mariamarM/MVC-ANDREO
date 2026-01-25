@@ -12,8 +12,7 @@ if (!isset($_SESSION['user_id'])) {
     <title>Access denied</title>
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/app.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
-    <link rel="stylesheet" href="/views/css/views.css">
-    <script src="<?php echo BASE_URL; ?>js/cursor-effect.js" defer></script>
+    <script src="<?php echo BASE_URL; ?>/js/cursor-effect.js" defer></script>
 
     <style>
         body {
@@ -45,7 +44,7 @@ if (!isset($_SESSION['user_id'])) {
     </style>
 </head>
 <body >
-    <?php require_once __DIR__ . '/../views/layout/nav.php'; ?>
+    <?php require_once __DIR__ . './views/layout/nav.php'; ?>
     <div class="box">
         <h2>Get logged in</h2>
         <p>You need an account to access your dashboard.</p>
@@ -100,16 +99,141 @@ try {
     <title>User Dashboard</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
     <link rel="stylesheet" href="/css/app.css">
-    <link rel="stylesheet" href="/views/css/views.css">
-        <script src="<?php echo BASE_URL; ?>js/cursor-effect.js" defer></script>
+    <script src="/js/cursor-effect.js" defer></script>
 
 </head>
+<style>
+/* ===== RESET ===== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f2f2f2;
+    font-family: 'Inter', Arial, sans-serif;
+}
+
+/* ===== MAIN GRID ===== */
+main {
+    max-width: 1300px;
+    margin: 40px auto;
+    padding: 40px;
+    background: white;
+    border-radius: 40px 60px 45px 35px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.08);
+
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    grid-template-areas:
+        "user stats"
+        "user reviews";
+    gap: 40px;
+}
+
+/* ===== USUARIO (usa el H1 REAL) ===== */
+main > h1 {
+    grid-area: user;
+    background: #e11d2e;
+    color: white;
+    padding: 30px 25px;
+    border-radius: 45px 35px 55px 30px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    font-size: 22px;
+}
+
+main > h1 i {
+    font-size: 90px;
+    margin-bottom: 20px;
+    opacity: 0.9;
+}
+
+/* ===== BOTÓN CREAR ===== */
+.action-buttons {
+    grid-column: 2;
+    margin-bottom: 10px;
+}
+
+.action-buttons .btn {
+    background: #e11d2e;
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(225,29,46,0.35);
+}
+
+/* ===== ESTADÍSTICAS (última section) ===== */
+main section:last-of-type {
+    grid-area: stats;
+}
+
+main section:last-of-type > div {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+main section:last-of-type > div > div {
+    border-radius: 30px;
+    border: 2px solid #eee;
+    padding: 25px;
+    background: white;
+    text-align: center;
+}
+
+/* ===== REVIEWS (primera section) ===== */
+main section:nth-of-type(1) {
+    grid-area: reviews;
+    background: #2f2f2f;
+    padding: 30px;
+    border-radius: 35px 25px 40px 30px;
+    color: white;
+}
+
+main section:nth-of-type(1) h2 {
+    color: white;
+    margin-bottom: 20px;
+}
+
+/* ===== REVIEW ITEM ===== */
+.review-item {
+    background: #555;
+    padding: 18px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+    main {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "user"
+            "stats"
+            "reviews";
+    }
+
+    main section:last-of-type > div {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+
 <body>
 
 <?php require_once __DIR__ . '/../views/layout/nav.php'; ?>
 
 <main>
-    <h1><i class="fas fa-user-circle"></i> Bienvenido, <?= htmlspecialchars($_SESSION['user_name'] ?? 'Usuario') ?>!</h1>
+   <h1><i class="fas fa-user-circle"></i> Bienvenido, <?= htmlspecialchars($_SESSION['user_name'] ?? 'Usuario') ?>!</h1> 
     
     <div class="action-buttons">
         <button id="openReviewModal" class="btn">
@@ -228,7 +352,7 @@ try {
             <h3><i class="fas fa-star"></i> Crear Nueva Review</h3>
             <button class="modal-close" id="closeReviewModal">&times;</button>
         </div>
-        <form id="createReviewForm" action="/views/reviews/create.php" method="POST">
+        <form id="createReviewForm" action="<?php echo BASE_URL; ?>views/reviews/create.php"method="POST">
             <div class="modal-body">
                 <div class="form-group">
                     <label for="song_id"><i class="fas fa-music"></i> Canción *</label>
@@ -286,8 +410,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const openBtn = document.getElementById('openReviewModal');
     const closeBtn = document.getElementById('closeReviewModal');
     const cancelBtn = document.getElementById('cancelReviewModal');
-    
-  
     
     const stars = document.querySelectorAll('.rating-star');
     const ratingInput = document.getElementById('rating');
@@ -384,40 +506,108 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const formData = new FormData(this);
             
+            // Mostrar datos que se enviarán
+            console.log('=== DATOS A ENVIAR ===');
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+            
             const submitBtn = reviewForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
             submitBtn.disabled = true;
             
             try {
-                console.log('Enviando datos a:', this.action);
+               console.log('Enviando datos a:', this.action);
+
+// Y cambia el action ANTES de enviar:
+const formAction = '/views/reviews/create.php'; // Ruta ABSOLUTA
+
+const response = await fetch(formAction, {  // Usa formAction en lugar de this.action
+    method: 'POST',
+    body: formData,
+    headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+    }
+});
                 
-                const response = await fetch(this.action, {
-                    method: 'POST',
-                    body: formData
-                });
+                // 1. PRIMERO obtener la respuesta como TEXTO
+                const responseText = await response.text();
+                console.log('=== RESPUESTA CRUDA DEL SERVIDOR ===');
+                console.log('Status:', response.status, response.statusText);
+                console.log('Content-Type:', response.headers.get('Content-Type'));
+                console.log('Primeros 500 caracteres de la respuesta:');
+                console.log(responseText.substring(0, 500) + (responseText.length > 500 ? '...' : ''));
                 
-                // SI O SI PARSEAR A JSON SINO NO LO LE
-                const data = await response.json();
-                console.log('Respuesta:', data);
+                // 2. Verificar si la respuesta parece HTML (error)
+                if (responseText.trim().startsWith('<!DOCTYPE') || 
+                    responseText.includes('<html') || 
+                    responseText.includes('Parse error') ||
+                    responseText.includes('Fatal error') ||
+                    responseText.includes('Warning:') ||
+                    responseText.includes('Notice:')) {
+                    
+                    console.error('❌ ERROR: El servidor devolvió HTML/error en lugar de JSON');
+                    
+                    // Extraer mensaje de error si es posible
+                    let errorMessage = 'Error del servidor';
+                    if (responseText.includes('Fatal error')) {
+                        const match = responseText.match(/Fatal error:([^<]+)/);
+                        if (match) errorMessage = 'Error fatal: ' + match[1].trim();
+                    } else if (responseText.includes('Parse error')) {
+                        const match = responseText.match(/Parse error:([^<]+)/);
+                        if (match) errorMessage = 'Error de sintaxis: ' + match[1].trim();
+                    }
+                    
+                    alert('❌ ' + errorMessage + '\n\nRevisa la consola para más detalles.');
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    return;
+                }
                 
+                // 3. Intentar parsear como JSON
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                    console.log('✅ JSON parseado correctamente:', data);
+                } catch (jsonError) {
+                    console.error('❌ ERROR parsing JSON:', jsonError);
+                    console.error('Respuesta completa que no pudo parsearse:');
+                    console.error(responseText);
+                    
+                    alert('❌ Error: El servidor no devolvió un JSON válido.\n\nRevisa la consola para ver la respuesta completa.');
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+                
+                // 4. Procesar respuesta
                 if (data.success) {
                     closeModal();
-                    
-                    alert('✅ Review creada exitosamente!');
+                    alert('✅ ' + (data.message || 'Review creada exitosamente!'));
                     
                     setTimeout(() => {
                         window.location.reload();
                     }, 1000);
                     
                 } else {
-                    alert('❌ Error: ' + data.message);
+                    alert('❌ Error: ' + (data.message || 'Error desconocido'));
                     submitBtn.innerHTML = originalText;
                     submitBtn.disabled = false;
                 }
+                
             } catch (error) {
-                console.error('Error:', error);
-                alert('❌ Error de conexión. Por favor, intenta de nuevo.');
+                console.error('❌ Error de conexión o fetch:', error);
+                
+                // Determinar tipo de error
+                let errorMessage = 'Error de conexión';
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorMessage = 'Error de red o la URL no es accesible';
+                } else if (error.name === 'SyntaxError') {
+                    errorMessage = 'Error en la respuesta del servidor';
+                }
+                
+                alert('❌ ' + errorMessage + '.\n\nPor favor, intenta de nuevo.\n\nDetalles: ' + error.message);
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             }
@@ -445,6 +635,49 @@ document.addEventListener('DOMContentLoaded', function() {
             closeModal();
         }
     });
+    
+    // Función para probar la conexión manualmente
+    window.testReviewConnection = function() {
+        console.log('=== PRUEBA MANUAL DE CONEXIÓN ===');
+        
+        const testData = new FormData();
+        testData.append('song_id', '1');
+        testData.append('rating', '5');
+        testData.append('comment', 'Esta es una prueba de conexión');
+        testData.append('create_review', '1');
+        testData.append('modal_submit', '1');
+        
+        console.log('Probando con datos:', {
+            song_id: 1,
+            rating: 5,
+            comment: 'Esta es una prueba de conexión'
+        });
+        
+        fetch('/views/reviews/create.php', {
+            method: 'POST',
+            body: testData
+        })
+        .then(response => response.text())
+        .then(text => {
+            console.log('Respuesta del servidor:');
+            console.log(text.substring(0, 1000));
+            
+            try {
+                const json = JSON.parse(text);
+                console.log('JSON parseado:', json);
+                alert('✅ Conexión OK: ' + (json.success ? 'Éxito' : 'Error: ' + json.message));
+            } catch(e) {
+                console.error('No es JSON:', e);
+                alert('❌ Error: El servidor no devolvió JSON válido');
+            }
+        })
+        .catch(error => {
+            console.error('Error de fetch:', error);
+            alert('❌ Error de conexión: ' + error.message);
+        });
+    };
+    
+    
 });
 </script>
 </body>

@@ -1,6 +1,10 @@
 <?php
-// views/posts/index.php
-require_once __DIR__ . '/../../config/config.php'; // <- CORREGIDO LA RUTA
+
+if (!defined('BASE_URL')) {
+    define('BASE_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/');
+}
+$baseDir = dirname(__DIR__, 3); 
+$configFile = $baseDir . '/config/config.php';
 
 // Verificar sesión
 if (!isset($_SESSION['user_id'])) {

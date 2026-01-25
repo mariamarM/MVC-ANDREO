@@ -1,34 +1,20 @@
-
-
 # /var/www/html/public/.htaccess
 
-# Permitir acceso
 Require all granted
 Options -Indexes
-
-# Habilitar rewrite engine
 RewriteEngine On
 
-# EXCEPCIONES: No redirigir estos archivos/directorios
+# 1. Permitir acceso directo a archivos existentes
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# No redirigir archivos específicos (js, css, imágenes)
-RewriteCond %{REQUEST_URI} \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ [NC]
+# 2. Permitir archivos PHP directamente
+RewriteCond %{REQUEST_URI} \.php$ [NC]
 RewriteRule ^ - [L]
 
+# 3. Permitir rutas específicas
+RewriteRule ^(views/|admin/|css/|js/|images/) - [L]
 
-
-
-
-# NO redirigir rutas que empiecen con /views/ o /admin/
-RewriteCond %{REQUEST_URI} ^/views/ [OR]
-RewriteCond %{REQUEST_URI} ^/admin/ [OR]
-RewriteCond %{REQUEST_URI} ^/css/ [OR]
-RewriteCond %{REQUEST_URI} ^/js/ [OR]
-RewriteCond %{REQUEST_URI} ^/images/
-
-
-# Redirigir todo lo demás a index.php
+# 4. Redirigir todo lo demás a index.php
 RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
