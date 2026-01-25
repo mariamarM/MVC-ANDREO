@@ -43,8 +43,8 @@ if (!isset($_SESSION['user_id'])) {
         }
     </style>
 </head>
-<body >
-    <?php require_once __DIR__ . './views/layout/nav.php'; ?>
+<body class="userdashboard">
+<?php require_once __DIR__ . '/../views/layout/nav.php'; ?>
     <div class="box">
         <h2>Get logged in</h2>
         <p>You need an account to access your dashboard.</p>

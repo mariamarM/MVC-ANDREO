@@ -9,6 +9,11 @@
   --cursor-thickness: 1px;
   --cursor-gap: 20px;
 }
+body{
+    
+  font-family: var(--font-primary);
+  background-color: #F5F5F5;
+}
 /* ===== NAV GENERAL ===== */
 nav {
   position: absolute;
@@ -579,3 +584,4 @@ h2 {
   gap: 10px;
   flex-shrink: 0;
 }
+/*login*/
