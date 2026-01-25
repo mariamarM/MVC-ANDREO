@@ -113,15 +113,13 @@ try {
   flex-wrap: wrap;
   margin-bottom: 20px;
      position:absolute; 
-    top:20% ;
-    right:40%;
+ 
       background: #e11d2e;
     color: white;
     border: none;
     padding: 14px 24px;
     border-radius: 30px;
     cursor: pointer;
-    box-shadow: 0 10px 25px rgba(225,29,46,0.35);
 }
 body {
     margin: 0;
@@ -131,11 +129,10 @@ body {
 
 /* ===== MAIN GRID ===== */
 main {
-    max-width: 1300px;
+    max-width: 67%;
     margin: 40px auto;
     padding: 40px;
  
-
     display: grid;
     grid-template-columns: 300px 1fr;
     grid-template-areas:
@@ -150,8 +147,7 @@ main > h1 {
     background: #e11d2e;
     color: white;
     padding: 30px 25px;
-    border-radius: 45px 35px 55px 30px;
-
+    border-radius: 45px 95px 55px 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -227,7 +223,7 @@ main section:nth-of-type(1) h2 {
 </style>
 
 
-<body>
+<body class="userdashboard">
 
 <?php require_once __DIR__ . '/../views/layout/nav.php'; ?>
 
