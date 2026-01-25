@@ -4,7 +4,6 @@ define('DB_NAME', 'blog_db');
 define('DB_USER', 'blog_user');
 define('DB_PASS', 'blog_pass');
 
-session_start();
 $pdo = new PDO(
     "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
     DB_USER,
