@@ -1,17 +1,19 @@
 
 
-
-
-
+<?php
+if (!defined('BASE_URL')) {
+    define('BASE_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/');
+}
+?>
 <nav>
     <div class="containerNav">
 
         <ul class="nav-list">
    <li><a href="<?php echo BASE_URL; ?>dashboardUser.php">MyMusic</a></li>
-<li><a href="<?php echo BASE_URL; ?>login.php">songs</a></li>
+<li><a href="<?php echo BASE_URL; ?>buscadorCanciones.php">songs</a></li>
 <li><a href="<?php echo BASE_URL; ?>register.php">playlists</a></li>
-<li><a href="<?php echo BASE_URL; ?>about.php">lastweek</a></li>
-<li><a href="<?php echo BASE_URL; ?>contact.php">about us</a></li>
+<li><a href="<?php echo BASE_URL; ?>lastfm.php">lastweek</a></li>
+<li><a href="<?php echo BASE_URL; ?>aboutus.php">about us</a></li>
   </ul>
 
     </div>

@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
-
+if (!defined('BASE_URL')) {
+    define('BASE_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/');
+}
 if (!isset($_SESSION['user_id'])) {
 ?>
 <!DOCTYPE html>
@@ -11,7 +13,7 @@ if (!isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="<?= BASE_URL ?>/css/app.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
     <link rel="stylesheet" href="/views/css/views.css">
-    <script src="/js/cursor-effect.js" defer></script>
+    <script src="<?php echo BASE_URL; ?>js/cursor-effect.js" defer></script>
 
     <style>
         body {
@@ -99,7 +101,8 @@ try {
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
     <link rel="stylesheet" href="/css/app.css">
     <link rel="stylesheet" href="/views/css/views.css">
-    
+        <script src="<?php echo BASE_URL; ?>js/cursor-effect.js" defer></script>
+
 </head>
 <body>
 
