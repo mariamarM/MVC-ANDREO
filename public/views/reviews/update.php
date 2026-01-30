@@ -1,5 +1,4 @@
 <?php
-// views/posts/update.php
 require_once __DIR__ . '/../../../config/config.php';
 
 // Verificar sesión
@@ -8,7 +7,6 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Obtener ID de la review a editar
 $review_id = $_GET['id'] ?? 0;
 
 if (!$review_id) {

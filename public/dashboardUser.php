@@ -251,7 +251,7 @@ main section:nth-of-type(1) h2 {
         </div>
     <?php endif; ?>
     
-    <section>
+    <section style="margin-top:-20px;">
         <h2><i class="fas fa-star"></i> Tus reviews recientes</h2>
         
         <?php if (empty($reviews)): ?>
@@ -261,7 +261,7 @@ main section:nth-of-type(1) h2 {
                 <p>Crea tu primera review haciendo clic en el botón de arriba</p>
             </div>
         <?php else: ?>
-<div id="reviews-container">
+<div id="reviews-container" >
     <?php if (empty($reviews)): ?>
         <div class="empty-state">
             <i class="fas fa-star" style="font-size: 36px; margin-bottom: 10px;"></i>
@@ -269,19 +269,62 @@ main section:nth-of-type(1) h2 {
             <p>Crea tu primera review haciendo clic en el botón de arriba</p>
         </div>
     <?php else: ?>
-        <?php foreach ($reviews as $review): ?>
+        <?php 
+        $reviews_to_show = array_slice($reviews, 0, 2);
+        ?>
+        
+        <?php foreach ($reviews_to_show as $review): ?>
             <div class="review-item" id="review-<?= $review['id'] ?>">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0 0 8px 0; color: #fff;">
+                            <?= htmlspecialchars($review['song_title']) ?> - <?= htmlspecialchars($review['artist']) ?>
+                        </h4>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <div style="color: #ffc107; font-size: 18px;">
+                                <?= str_repeat('★', $review['rating']) ?><?= str_repeat('☆', 5 - $review['rating']) ?>
+                                <span style="color: #ccc; margin-left: 5px;">(<?= $review['rating'] ?>/5)</span>
+                            </div>
+                            <small style="color: #aaa;">
+                                <?= date('d/m/Y H:i', strtotime($review['created_at'])) ?>
+                            </small>
+                        </div>
+                        <p style="color: #ddd; margin: 0; line-height: 1.5;">
+                            <?= nl2br(htmlspecialchars($review['comment'])) ?>
+                        </p>
+                    </div>
+                    <div style="margin-left: 15px;">
+                        <a href="<?= BASE_URL ?>views/reviews/update.php?id=<?= $review['id'] ?>" 
+                           style="color: #4da6ff; margin-right: 10px;"
+                           title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="<?= BASE_URL ?>views/reviews/delete.php?id=<?= $review['id'] ?>" 
+                           style="color: #ff6b6b;"
+                           onclick="return confirm('¿Eliminar esta review?');"
+                           title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
         <?php endforeach; ?>
+
+        <?php if (count($reviews) > 2): ?>
+            <div style="text-align: center; margin-top: 15px; padding: 10px; background: #444; border-radius: 10px;">
+                <p style="color: #aaa; margin: 0;">
+                    <i class="fas fa-info-circle"></i>
+                    Tienes <?= count($reviews) - 2 ?> reviews más. 
+                    <a href="<?= BASE_URL ?>views/reviews/index.php" style="color: #4da6ff;">
+                        Ver todas
+                    </a>
+                </p>
+            </div>
+        <?php endif; ?>
     <?php endif; ?>
 </div>
             
-            <div style="text-align: center; margin-top: 15px;">
-                <a href="/views/reviews/index.php" 
-                   style="color: #007bff; text-decoration: none;">
-                    <i class="fas fa-arrow-right"></i> Ver todas mis reviews
-                </a>
-            </div>
+       
         <?php endif; ?>
     </section>
     
@@ -516,8 +559,8 @@ document.addEventListener('DOMContentLoaded', function() {
                console.log('Enviando datos a:', this.action);
 
 // Y cambia el action ANTES de enviar:
-const formAction = '/views/reviews/create.php'; // Ruta ABSOLUTA
-
+// CORREGIR EN EL SCRIPT
+const formAction = BASE_URL + 'views/reviews/create.php';
 const response = await fetch(formAction, {  // Usa formAction en lugar de this.action
     method: 'POST',
     body: formData,
