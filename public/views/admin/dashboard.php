@@ -87,7 +87,7 @@ if ($_SESSION['user_role'] !== 'admin') {
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-
+text-decoration: none;
             gap: 8px;
         }
 
@@ -170,15 +170,7 @@ font-size: 18px;
             box-shadow: 0 10px 30px rgba(225, 29, 46, 0.2);
         }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #e11d2e, #ff6b6b);
-        }
+     
 
         .stat-header {
             display: flex;
@@ -229,26 +221,27 @@ font-size: 18px;
 
         /* ===== GRÁFICO DE INGRESOS ===== */
         .chart-section {
-            margin-bottom: 40px;
-        }
+               width: 100%;
+    margin-top: -30px;
+}
+        
 
         .chart-container {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
             padding: 30px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
         }
 
         .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
+         display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -25px;
         }
 
         .chart-title {
-            font-size: 1.5rem;
+            font-size: 16px;
             color: white;
         }
 
@@ -262,7 +255,7 @@ font-size: 18px;
         }
 
         .chart-placeholder {
-            height: 300px;
+            height: 200px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -277,8 +270,7 @@ font-size: 18px;
             display: flex;
             justify-content: center;
             gap: 30px;
-            margin-top: 25px;
-            padding-top: 25px;
+         padding-top:11px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 

@@ -1,36 +1,64 @@
 <?php
-// navAdmin.php
+
 if (!defined('BASE_URL')) {
     define('BASE_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/');
 }
+
+
+
+// Asegurar que la sesión esté iniciada
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Definir variables con valores por defecto para evitar warnings
+$username = '';
+$email = '';
+
+// Intentar obtener el username de diferentes formas
+if (isset($_SESSION['username'])) {
+    $username = $_SESSION['username'];
+} elseif (isset($_SESSION['user_name'])) {
+    $username = $_SESSION['user_name'];
+} elseif (isset($_SESSION['name'])) {
+    $username = $_SESSION['name'];
+}
+
+// Intentar obtener el email de diferentes formas
+if (isset($_SESSION['email'])) {
+    $email = $_SESSION['email'];
+} elseif (isset($_SESSION['user_email'])) {
+    $email = $_SESSION['user_email'];
+}
+
 ?>
 <nav class="admin-nav">
     <div class="nav-container">
 
-        <div class="user-info">
-            <i class="fas fa-user fa-4x"></i>
-            <div class="user-details">
-                <div class="user-name">
-                    <?php echo ($_SESSION['username']); ?>
+       <div class="user-info">
+                <i class="fas fa-user fa-4x"></i>
+                <div class="user-details">
+                    <div class="user-name">
+                        <?php echo htmlspecialchars($username ?: 'Administrador'); ?>
+                    </div>
+                    <div class="user-email">
+                        <?php echo htmlspecialchars($email ?: 'admin@example.com'); ?>
+                    </div>
+                    <a href="<?php echo BASE_URL; ?>logout.php" class="logout-btn">
+                        Cerrar sesión
+                    </a>
                 </div>
-                <div class="user-email">
-                    <?php echo ($_SESSION['email']); ?>
-                </div>
-            </div>
 
-            <div class="user-actions">
-                <div class="icon-btn" title="Notificaciones">
-                    <i class="fas fa-bell"></i>
+                <div class="user-actions">
+                    <div class="icon-btn" title="Notificaciones">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="icon-btn" title="Configuración">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    
                 </div>
-                <div class="icon-btn" title="Configuración">
-                    <i class="fas fa-cog"></i>
-                </div>
-                <a href="<?php echo BASE_URL; ?>logout.php" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                   
-                </a>
             </div>
-        </div>
 
         <ul class="nav-list">
             <li>
@@ -67,12 +95,12 @@ if (!defined('BASE_URL')) {
     }
 
     .nav-container {
-      display: flex;
-    justify-content: flex-start;
-    gap: 39%;
-    max-width: 31%;
-    margin: 0 4%;
-    align-items: flex-start;
+        display: flex;
+        justify-content: flex-start;
+        gap: 104%;
+        max-width: 31%;
+        margin: 0 -5%;
+        align-items: flex-end;
     }
 
     .nav-brand {
@@ -100,12 +128,12 @@ if (!defined('BASE_URL')) {
 
     .nav-list {
         display: flex;
-        width: 100%;
+        width: 115%;
         height: 98px;
-        padding: 10px 83px;
+        padding: 10px 119px;
         justify-content: center;
         align-items: center;
-        gap: 67px;
+        gap: 82px;
         border-radius: 15px;
         border: 1px solid #989898;
         background: rgba(118, 118, 118, 0.40);
@@ -148,17 +176,22 @@ if (!defined('BASE_URL')) {
     .user-actions {
         display: flex;
         align-items: center;
-        gap: 20px;
+        gap: 9px;
         flex-direction: column;
     }
 
     .user-info {
-         display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 12px 20px;
-    border-radius: 12px;
-    justify-content: flex-start;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px 20px;
+        border-radius: 12px;
+        justify-content: flex-start;
 
+    }
+
+    .user-info i {
+        padding-right: 20px;
+        margin-left: 30px;
     }
 </style>
