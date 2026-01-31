@@ -62,19 +62,18 @@ if (isset($_SESSION['email'])) {
 
         <ul class="nav-list">
             <li>
-                <a href="<?php echo BASE_URL; ?>admin/users.php">
+                <a href="<?php echo BASE_URL; ?>views/admin/users.php">
                     <i class="fas fa-users"></i>
 
                 </a>
             </li>
             <li>
-                <a href="<?php echo BASE_URL; ?>admin/dashboard.php">
+                <a href="<?php echo BASE_URL; ?>views/admin/dashboard.php">
                     <i class="fas fa-home"></i>
-
                 </a>
             </li>
             <li>
-                <a href="<?php echo BASE_URL; ?>admin/settings.php">
+                <a href="<?php echo BASE_URL; ?>views/admin/actions.php">
                     <i class="fas fa-cog"></i>
 
                 </a>
@@ -194,4 +193,17 @@ if (isset($_SESSION['email'])) {
         padding-right: 20px;
         margin-left: 30px;
     }
+           .logout-btn  {
+            color: #1C1C1C;
+           
+       
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+text-decoration: none;
+         
+        }
 </style>

@@ -35,7 +35,7 @@ if ($_SESSION['user_role'] !== 'admin') {
         .user-details {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 10px;
         }
 
         .user-name {
@@ -77,19 +77,7 @@ if ($_SESSION['user_role'] !== 'admin') {
 
 
 
-        .logout-btn a {
-            color: #1C1C1C;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-text-decoration: none;
-            gap: 8px;
-        }
+ 
 
         .logout-btn:hover {
             transform: translateY(-2px);
