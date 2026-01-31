@@ -1,0 +1,536 @@
+<?php
+require_once __DIR__ . '/../../../config/config.php';
+
+// Verificar sesión
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ' . BASE_URL . 'login.php');
+    exit;
+}
+
+// Verificar rol
+if ($_SESSION['user_role'] !== 'admin') {
+    header('Location: ' . BASE_URL . 'dashboardUser.php');
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Panel de Administración</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="<?php echo BASE_URL; ?>js/cursor-effect.js" defer></script>
+    <style>
+        body {
+            background: linear-gradient(236deg, #220808 63.05%, #940B0B 90.6%, #FF1717 102.38%);
+            min-height: 100vh;
+            color: #FFF;
+            font-family: "Manrope", sans-serif;
+            font-size: 18px;
+            overflow: hidden;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .user-email {
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, #e11d2e, #ff6b6b);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+
+
+        .icon-btn {
+
+            width: 44px;
+            height: 44px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+
+
+        .logout-btn a {
+            color: #1C1C1C;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(225, 29, 46, 0.4);
+        }
+
+        /* ===== CONTENIDO PRINCIPAL ===== */
+        .admin-container {
+            margin: 43px 30px;
+            display: flex;
+            width: 95%;
+            height: 664px;
+            padding: 27px 21px;
+            align-items: flex-start;
+            align-content: flex-start;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            border-radius: 10px;
+            background: rgba(15, 15, 19, 0.70);
+         
+        }
+
+        
+
+        /* ===== ESTADÍSTICAS ===== */
+        .stats-section {
+            display: flex;
+            width: 75%;
+            height: 310px;
+padding:0px 20px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 25px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            border: 1px solid #DA1E28;
+        }
+
+        .section-title {
+          display: flex;
+width: 120px;
+align-items: center;
+gap: -1px;
+font-size: 18px;
+        }
+
+        .section-title i {
+            color: #e11d2e;
+        }
+
+        .stats-grid {
+            display: flex;
+       
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            flex-direction:row ;
+            
+        }
+
+        .stat-card {
+            display: flex;
+            width: 283px;
+            height: 182px;
+            padding: 10px 10px 10px 16px;
+            flex-direction: column;
+            align-items: flex-start;
+           
+            flex-shrink: 0;
+            border-radius: 14px;
+            background: #141418;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(225, 29, 46, 0.5);
+            box-shadow: 0 10px 30px rgba(225, 29, 46, 0.2);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #e11d2e, #ff6b6b);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(225, 29, 46, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #e11d2e;
+        }
+
+        .stat-change {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+
+        .stat-change.negative {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+            color: white;
+        }
+
+        .stat-label {
+            color: #aaa;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ===== GRÁFICO DE INGRESOS ===== */
+        .chart-section {
+            margin-bottom: 40px;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .chart-selector {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            color: #aaa;
+            font-size: 1.1rem;
+        }
+
+        .chart-footer {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .year-selector {
+            display: flex;
+            gap: 15px;
+        }
+
+        .year-btn {
+            padding: 8px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            color: #aaa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .year-btn:hover {
+            background: rgba(225, 29, 46, 0.1);
+            color: #e11d2e;
+        }
+
+        .year-btn.active {
+            background: rgba(225, 29, 46, 0.2);
+            color: #e11d2e;
+            border-color: #e11d2e;
+        }
+
+        /* ===== USUARIOS RECIENTES ===== */
+        .audio-section {
+          margin-bottom: 40px;
+    border-radius: 10px;
+    border: 1px solid #DA1E28;
+    display: flex;
+    width: 20%;
+    height: 284px;
+    padding: 13px 21px 11px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 25px;
+        }
+
+        .users-table {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            padding: 20px;
+            background: rgba(225, 29, 46, 0.1);
+            font-weight: 600;
+            color: #e11d2e;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .table-row:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .user-role {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .role-admin {
+            background: rgba(225, 29, 46, 0.1);
+            color: #e11d2e;
+        }
+
+        .role-user {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .user-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-list {
+                gap: 20px;
+            }
+
+            .table-header,
+            .table-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .chart-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body class="admin-page admin-dashboard">
+    <?php include __DIR__ . '/../../../views/layout/navAdmin.php'; ?>
+
+    <div class="admin-container">
+
+
+
+        <section class="stats-section">
+
+            <p>Engagement Overview</p>
+            <div class="stats-grid">
+                <!-- Tarjeta 1 -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <div class="stat-change">+6.1%</div>
+                    </div>
+                    <div class="stat-value">3,201</div>
+                    <div class="stat-label">Canciones Escuchadas</div>
+                    <p style="margin-top: 10px; color: #aaa; font-size: 14px;">Nuevos artistas descubiertos</p>
+                </div>
+
+                <!-- Tarjeta 2 -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="stat-change">+11%</div>
+                    </div>
+                    <div class="stat-value">128</div>
+                    <div class="stat-label">Descubrimientos de Artistas</div>
+                    <p style="margin-top: 10px; color: #aaa; font-size: 14px;">Artistas nuevos este mes</p>
+                </div>
+
+                <!-- Tarjeta 3 -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-change negative">-0.2%</div>
+                    </div>
+                    <div class="stat-value">43,781</div>
+                    <div class="stat-label">Minutos de Escucha</div>
+                    <p style="margin-top: 10px; color: #aaa; font-size: 14px">Tiempo total de reproducción</p>
+                </div>
+
+                <!-- Tarjeta 4 -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-change">+8.5%</div>
+                    </div>
+                    <div class="stat-value">$12,450</div>
+                    <div class="stat-label">Ingresos Totales</div>
+                    <p style="margin-top: 10px; color: #aaa; font-size: 14px">Ingresos mensuales</p>
+                </div>
+            </div>
+        </section>
+
+<section class="audio-section">
+            <h2 class="section-title">
+                <i class="fas fa-music"></i>
+                <p>Audio</p>
+               
+            </h2>
+ <p> .WAV TO MP3</p>
+                <i class="fas fa-download"></i>
+            
+        </section> 
+        <!-- Gráfico de ingresos -->
+         <section class="chart-section">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Datos de Ingresos</h3>
+                    <select class="chart-selector">
+                        <option>Usuario A</option>
+                        <option>Usuario B</option>
+                        <option>Usuario C</option>
+                    </select>
+                </div>
+
+                <div class="chart-placeholder">
+                    <div style="text-align: center;">
+                        <i class="fas fa-chart-bar" style="font-size: 48px; margin-bottom: 15px; color: #e11d2e;"></i>
+                        <p>Gráfico de ingresos mensuales</p>
+                        <p style="font-size: 14px; margin-top: 5px;">Los datos se muestran aquí</p>
+                    </div>
+                </div>
+
+                <div class="chart-footer">
+                    <div class="year-selector">
+                        <button class="year-btn">2020</button>
+                        <button class="year-btn active">2021</button>
+                        <button class="year-btn">2022</button>
+                    </div>
+                </div>
+            </div>
+        </section> 
+
+        <!-- Usuarios recientes -->
+        
+    </div>
+
+    <script>
+        document.querySelectorAll('.year-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+
+</html>

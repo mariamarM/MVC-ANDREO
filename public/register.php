@@ -22,118 +22,118 @@ $error = $_GET['error'] ?? '';
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
     <script src="<?= BASE_URL ?>/js/cursor-effect.js" defer></script>
     <style>
-    /* ===== Caja de registro similar a login ===== */
-    .register-box {
-        display: flex;
-        width: 50%;
-        padding: 4% 25%;
-        border-radius: 28px;
-        flex-direction: column;
-    }
+        /* ===== Caja de registro similar a login ===== */
+        .register-box {
+            display: flex;
+            width: 50%;
+            padding: 4% 25%;
+            border-radius: 28px;
+            flex-direction: column;
+        }
 
-    .register-box label {
-        margin-top: 20px;
-        color: #e11d2e;
-        font-size: 16px;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
+        .register-box label {
+            margin-top: 20px;
+            color: #e11d2e;
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
 
-    /* ===== TITULO ===== */
-    .register-box h2 {
-        color: #e11d2e;
-        font-size: 28px;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
+        /* ===== TITULO ===== */
+        .register-box h2 {
+            color: #e11d2e;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
 
-    .register-box h2::after {
-        content: "/";
-        margin-left: 8px;
-    }
+        .register-box h2::after {
+            content: "/";
+            margin-left: 8px;
+        }
 
-    /* ===== SEPARADOR ===== */
-    .register-box h2 + hr {
-        border: none;
-        height: 2px;
-        background: #e11d2e;
-        margin: 20px 0 40px;
-    }
+        /* ===== SEPARADOR ===== */
+        .register-box h2+hr {
+            border: none;
+            height: 2px;
+            background: #e11d2e;
+            margin: 20px 0 40px;
+        }
 
-    /* ===== ERRORES ===== */
-    .register-box .error {
-        background: #f8d7da;
-        color: #721c24;
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-    }
+        /* ===== ERRORES ===== */
+        .register-box .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
 
-    /* ===== FORM ===== */
-    .register-box form {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
+        /* ===== FORM ===== */
+        .register-box form {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
 
-    .register-box input {
-        width: 100%;
-        padding: 14px 16px;
-        border: 1.8px solid #e11d2e;
-        border-radius: 6px;
-        font-size: 16px;
-    }
+        .register-box input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1.8px solid #e11d2e;
+            border-radius: 6px;
+            font-size: 16px;
+        }
 
-    .register-box input:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(225, 29, 46, 0.2);
-    }
+        .register-box input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(225, 29, 46, 0.2);
+        }
 
-    /* ===== BOTÓN REGISTER ===== */
-    .register-box button {
-        margin-top: 10px;
-        background: #e11d2e;
-        color: white;
-        border: none;
-        padding: 18px;
-        font-size: 18px;
-        font-weight: bold;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
+        /* ===== BOTÓN REGISTER ===== */
+        .register-box button {
+            margin-top: 10px;
+            background: #e11d2e;
+            color: white;
+            border: none;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
 
-    .register-box button::after {
-        content: " /";
-    }
+        .register-box button::after {
+            content: " /";
+        }
 
-    .register-box button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 20px rgba(225, 29, 46, 0.35);
-    }
+        .register-box button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(225, 29, 46, 0.35);
+        }
 
-    /* ===== LINKS ===== */
-    .register-box p {
-        margin-top: 30px;
-    }
+        /* ===== LINKS ===== */
+        .register-box p {
+            margin-top: 30px;
+        }
 
-    .register-box a {
-        color: #e11d2e;
-        text-decoration: underline;
-        font-weight: bold;
-    }
+        .register-box a {
+            color: #e11d2e;
+            text-decoration: underline;
+            font-weight: bold;
+        }
 
-    /* ===== Responsive account link ===== */
-    .account {
-        color: #e11d2e;
-        font-weight: bold;
-        text-decoration: none;
-        white-space: nowrap;
-        position: absolute;
-        bottom: 25%;
-        font-size: 20px;
-        right: 62%;
-    }
+        /* ===== Responsive account link ===== */
+        .account {
+            color: #e11d2e;
+            font-weight: bold;
+            text-decoration: none;
+            white-space: nowrap;
+            position: absolute;
+            bottom: 25%;
+            font-size: 20px;
+            right: 62%;
+        }
     </style>
 </head>
 
@@ -159,7 +159,15 @@ $error = $_GET['error'] ?? '';
 
             <label for="music_genre">Favorite Music Genre /</label>
             <input type="text" name="music_genre" id="music_genre" placeholder="Género musical favorito">
-
+            <div style="position:absolute; top:40%; left:10%;">
+            <label for="role">Role /</label>
+            <div >
+                <input type="checkbox" name="is_admin" id="is_admin" value="1">
+                <label for="is_admin" style="display: inline; margin-left: 8px; color: #333; font-weight: normal;">
+                    Register as Administrator
+                </label>
+            </div>
+</div>
             <button type="submit">Register</button>
         </form>
 
