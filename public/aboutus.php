@@ -17,46 +17,33 @@ if (!defined('BASE_URL')) {
     <script src="<?php echo BASE_URL; ?>js/cursor-effect.js" defer></script>
     
     <style>
-        /* Estilos específicos para About Us */
-      
-        
-        main {
-            padding-top: 80px;
-            min-height: 100vh;
-        }
-        
-        .titlesong {
-            padding: 40px 60px 20px;
-        }
-        
+     
         .titlesong h1 {
-            font-size: 72px;
+            font-size: 82px;
             font-weight: 900;
             color: #ff0000;
-            margin: 0;
+          text-align: center;
             text-transform: uppercase;
             letter-spacing: -2px;
             line-height: 1;
         }
         
-        /* Contenedores principales */
         .about-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            padding: 0 60px 60px;
-            position: relative;
+           max-width: 40%;
+           gap:100px;
+            display: flex;
+            flex-direction: column;
         }
         
        
-        
-        /* Secciones */
+     
         .about-section {
             border: 2px solid #ff0000;
             border-radius: 8px;
+            background-color: #ff0000;
             padding: 30px;
             position: relative;
-            min-height: 300px;
+            min-height: 200px;
             display: flex;
             flex-direction: column;
         }
@@ -78,7 +65,7 @@ if (!defined('BASE_URL')) {
         .section-number {
             font-size: 48px;
             font-weight: 900;
-            color: #ff0000;
+            color: #cccccc;
             margin: 0 0 20px 0;
             line-height: 1;
         }
@@ -100,9 +87,7 @@ if (!defined('BASE_URL')) {
         
         /* Sección 02 - Estilo específico */
         .section-02 {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+           
             border-radius: 20px 90px 32px 40px;
         }
         
@@ -200,7 +185,6 @@ El proyecto completo seria, posicionar eventos con relacion a los gustos del usu
             <img src="/img/lastfm.png" alt="Last.fm Icon" class="iconImage">
             <img src="/img/github.png" alt="GitHub Icon" class="iconImage">
         </div>
-                    <div class="vertical-divider"></div>
 
     </main>
 </body>

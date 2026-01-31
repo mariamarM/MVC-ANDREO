@@ -159,15 +159,16 @@ $error = $_GET['error'] ?? '';
 
             <label for="music_genre">Favorite Music Genre /</label>
             <input type="text" name="music_genre" id="music_genre" placeholder="Género musical favorito">
-            <div style="position:absolute; top:40%; left:10%;">
+            
+            <!-- <div style="position:absolute; top:40%; left:10%;">
             <label for="role">Role /</label>
             <div >
-                <input type="checkbox" name="is_admin" id="is_admin" value="1">
+              <input type="checkbox" name="is_admin" id="is_admin" value="1">
                 <label for="is_admin" style="display: inline; margin-left: 8px; color: #333; font-weight: normal;">
                     Register as Administrator
-                </label>
+                </label> 
             </div>
-</div>
+</div> -->
             <button type="submit">Register</button>
         </form>
 

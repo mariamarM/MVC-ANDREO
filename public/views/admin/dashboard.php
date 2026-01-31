@@ -288,7 +288,6 @@ font-size: 18px;
             border-color: #e11d2e;
         }
 
-        /* ===== USUARIOS RECIENTES ===== */
         .audio-section {
           margin-bottom: 40px;
     border-radius: 10px;
@@ -405,7 +404,6 @@ font-size: 18px;
 
             <p>Engagement Overview</p>
             <div class="stats-grid">
-                <!-- Tarjeta 1 -->
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">
@@ -418,7 +416,6 @@ font-size: 18px;
                     <p style="margin-top: 10px; color: #aaa; font-size: 14px;">Nuevos artistas descubiertos</p>
                 </div>
 
-                <!-- Tarjeta 2 -->
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">
@@ -431,7 +428,6 @@ font-size: 18px;
                     <p style="margin-top: 10px; color: #aaa; font-size: 14px;">Artistas nuevos este mes</p>
                 </div>
 
-                <!-- Tarjeta 3 -->
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">
@@ -444,7 +440,6 @@ font-size: 18px;
                     <p style="margin-top: 10px; color: #aaa; font-size: 14px">Tiempo total de reproducción</p>
                 </div>
 
-                <!-- Tarjeta 4 -->
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">
@@ -469,7 +464,6 @@ font-size: 18px;
                 <i class="fas fa-download"></i>
             
         </section> 
-        <!-- Gráfico de ingresos -->
          <section class="chart-section">
             <div class="chart-container">
                 <div class="chart-header">
@@ -483,9 +477,7 @@ font-size: 18px;
 
                 <div class="chart-placeholder">
                     <div style="text-align: center;">
-                        <i class="fas fa-chart-bar" style="font-size: 48px; margin-bottom: 15px; color: #e11d2e;"></i>
                         <p>Gráfico de ingresos mensuales</p>
-                        <p style="font-size: 14px; margin-top: 5px;">Los datos se muestran aquí</p>
                     </div>
                 </div>
 
@@ -499,7 +491,6 @@ font-size: 18px;
             </div>
         </section> 
 
-        <!-- Usuarios recientes -->
         
     </div>
 
