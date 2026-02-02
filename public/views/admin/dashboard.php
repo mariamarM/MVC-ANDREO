@@ -119,7 +119,8 @@ if ($_SESSION['user_role'] !== 'admin') {
 
         .section-title {
             display: flex;
-            width: 120px;
+            width: 91px;
+            margin-left: -65%;
             align-items: center;
             gap: -1px;
             font-size: 18px;
@@ -243,17 +244,17 @@ if ($_SESSION['user_role'] !== 'admin') {
         }
 
         .chart-placeholder {
-            height: 200px;
+            height: 210px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.02);
-            color: #aaa;
+           
             font-size: 1.1rem;
         }
-
+ .chart-placeholder img{
+    width: 120%;
+    margin-left:-20%;
+ }
         .chart-footer {
             display: flex;
             justify-content: center;
@@ -294,11 +295,25 @@ if ($_SESSION['user_role'] !== 'admin') {
             border: 1px solid #DA1E28;
             display: flex;
             width: 20%;
-            height: 284px;
+            height: 43%;
+            font-size: 24px;
+            color: #FFF;
+            font-family: "Manrope", sans-serif;
             padding: 13px 21px 11px 12px;
             flex-direction: column;
             align-items: center;
-            gap: 25px;
+            gap: 65px;
+        }
+
+        .audio-section p {
+            color: rgba(255, 255, 255, 0.40);
+            font-family: "Manrope", sans-serif;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 0;
+            /* 0% */
+            letter-spacing: 0.15px;
         }
 
         .users-table {
@@ -471,7 +486,7 @@ if ($_SESSION['user_role'] !== 'admin') {
         <section class="audio-section">
             <h2 class="section-title">
                 <i class="fas fa-music"></i>
-                <p>Audio</p>
+                Audio
 
             </h2>
             <p> .WAV TO MP3</p>
@@ -491,7 +506,8 @@ if ($_SESSION['user_role'] !== 'admin') {
 
                 <div class="chart-placeholder">
                     <div style="text-align: center;">
-                        <p>Gráfico de ingresos mensuales</p>
+                        <img src="./img/BarLineChart.png" >
+                        <!-- <p>Gráfico de ingresos mensuales</p> -->
                     </div>
                 </div>
 
