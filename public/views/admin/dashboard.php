@@ -77,7 +77,7 @@ if ($_SESSION['user_role'] !== 'admin') {
 
 
 
- 
+
 
         .logout-btn:hover {
             transform: translateY(-2px);
@@ -98,17 +98,17 @@ if ($_SESSION['user_role'] !== 'admin') {
             justify-content: flex-start;
             border-radius: 10px;
             background: rgba(15, 15, 19, 0.70);
-         
+
         }
 
-        
+
 
         /* ===== ESTADÍSTICAS ===== */
         .stats-section {
             display: flex;
             width: 75%;
             height: 310px;
-padding:0px 20px;
+            padding: 0px 20px;
             flex-direction: column;
             align-items: flex-start;
             gap: 25px;
@@ -118,11 +118,12 @@ padding:0px 20px;
         }
 
         .section-title {
-          display: flex;
-width: 120px;
-align-items: center;
-gap: -1px;
-font-size: 18px;
+            display: flex;
+            width: 120px;
+            align-items: center;
+            gap: -1px;
+            font-size: 18px;
+            justify-content: space-between;
         }
 
         .section-title i {
@@ -131,12 +132,12 @@ font-size: 18px;
 
         .stats-grid {
             display: flex;
-       
+
             justify-content: space-between;
             width: 100%;
             height: 100%;
-            flex-direction:row ;
-            
+            flex-direction: row;
+
         }
 
         .stat-card {
@@ -146,8 +147,8 @@ font-size: 18px;
             padding: 10px 10px 10px 16px;
             flex-direction: column;
             align-items: flex-start;
-           
-            flex-shrink: 0;
+            font-family: "Manrope", sans-serif;
+
             border-radius: 14px;
             background: #141418;
         }
@@ -158,13 +159,14 @@ font-size: 18px;
             box-shadow: 0 10px 30px rgba(225, 29, 46, 0.2);
         }
 
-     
+
 
         .stat-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
+            gap: 20px;
         }
 
         .stat-icon {
@@ -180,16 +182,14 @@ font-size: 18px;
         }
 
         .stat-change {
+            color: #2ecc71;
             font-size: 14px;
             font-weight: 600;
             padding: 4px 12px;
-            border-radius: 20px;
-            background: rgba(46, 204, 113, 0.1);
-            color: #2ecc71;
+
         }
 
         .stat-change.negative {
-            background: rgba(231, 76, 60, 0.1);
             color: #e74c3c;
         }
 
@@ -209,10 +209,10 @@ font-size: 18px;
 
         /* ===== GRÁFICO DE INGRESOS ===== */
         .chart-section {
-               width: 100%;
-    margin-top: -30px;
-}
-        
+            width: 100%;
+            margin-top: -30px;
+        }
+
 
         .chart-container {
             background: rgba(255, 255, 255, 0.05);
@@ -222,10 +222,10 @@ font-size: 18px;
         }
 
         .chart-header {
-         display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: -25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: -25px;
         }
 
         .chart-title {
@@ -258,7 +258,7 @@ font-size: 18px;
             display: flex;
             justify-content: center;
             gap: 30px;
-         padding-top:11px;
+            padding-top: 11px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -289,16 +289,16 @@ font-size: 18px;
         }
 
         .audio-section {
-          margin-bottom: 40px;
-    border-radius: 10px;
-    border: 1px solid #DA1E28;
-    display: flex;
-    width: 20%;
-    height: 284px;
-    padding: 13px 21px 11px 12px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 25px;
+            margin-bottom: 40px;
+            border-radius: 10px;
+            border: 1px solid #DA1E28;
+            display: flex;
+            width: 20%;
+            height: 284px;
+            padding: 13px 21px 11px 12px;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
         }
 
         .users-table {
@@ -408,63 +408,77 @@ font-size: 18px;
                     <div class="stat-header">
                         <div class="stat-icon">
                             <i class="fas fa-music"></i>
+
                         </div>
+                        <div class="stat-label">Tracks Listened</div>
                         <div class="stat-change">+6.1%</div>
                     </div>
                     <div class="stat-value">3,201</div>
-                    <div class="stat-label">Canciones Escuchadas</div>
-                    <p style="margin-top: 10px; color: #aaa; font-size: 14px;">Nuevos artistas descubiertos</p>
+
+                    <p style="margin-top: 10px; color: #aaa; font-size: 14px;">Canciones conocidas por playlists
+                        externas</p>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">
-                            <i class="fas fa-user-plus"></i>
+                            <i class="fas fa-satellite"></i>
                         </div>
-                        <div class="stat-change">+11%</div>
+                        <div class="stat-label">Descubrimientos de Artistas</div>
+                        <div class="stat-change">
+                            <img src="../img/flechaverde.png">
+                            +11%
+                        </div>
                     </div>
                     <div class="stat-value">128</div>
-                    <div class="stat-label">Descubrimientos de Artistas</div>
-                    <p style="margin-top: 10px; color: #aaa; font-size: 14px;">Artistas nuevos este mes</p>
+
+                    <p style="margin-top: 10px; color: #aaa; font-size: 14px;">Artistas nuevos este mes en la aplicación
+                    </p>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">
-                            <i class="fas fa-clock"></i>
+                            <i class="fas fa-headset"></i>
+
                         </div>
+                        <div class="stat-label">Minutos de Escucha</div>
                         <div class="stat-change negative">-0.2%</div>
                     </div>
                     <div class="stat-value">43,781</div>
-                    <div class="stat-label">Minutos de Escucha</div>
+
                     <p style="margin-top: 10px; color: #aaa; font-size: 14px">Tiempo total de reproducción</p>
                 </div>
-
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">
-                            <i class="fas fa-dollar-sign"></i>
+
+                            <i class="fas fa-user-plus"></i>
                         </div>
-                        <div class="stat-change">+8.5%</div>
+                        <div class="stat-label">Usuarios Logeados</div>
+                        <div class="stat-change">
+                            <img src="./img/flechaverde.png">
+                            +8.5%
+                        </div>
                     </div>
-                    <div class="stat-value">$12,450</div>
-                    <div class="stat-label">Ingresos Totales</div>
-                    <p style="margin-top: 10px; color: #aaa; font-size: 14px">Ingresos mensuales</p>
+                    <div class="stat-value">345</div>
+
+                    <p style="margin-top: 10px; color: #aaa; font-size: 14px">Usuarios activos este mes</p>
                 </div>
             </div>
         </section>
 
-<section class="audio-section">
+        <section class="audio-section">
             <h2 class="section-title">
                 <i class="fas fa-music"></i>
                 <p>Audio</p>
-               
+
             </h2>
- <p> .WAV TO MP3</p>
-                <i class="fas fa-download"></i>
-            
-        </section> 
-         <section class="chart-section">
+            <p> .WAV TO MP3</p>
+            <i class="fas fa-download"></i>
+
+        </section>
+        <section class="chart-section">
             <div class="chart-container">
                 <div class="chart-header">
                     <h3 class="chart-title">Datos de Ingresos</h3>
@@ -489,9 +503,9 @@ font-size: 18px;
                     </div>
                 </div>
             </div>
-        </section> 
+        </section>
 
-        
+
     </div>
 
     <script>

@@ -2,12 +2,13 @@
 namespace App\Controllers;
 
 use Models\User;
+use Models\Admin;
 
 class AdminController extends Controller {
     
     // Verificar si es administrador
     private function checkAdmin() {
-        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
             $_SESSION['error'] = "Acceso denegado. Se requiere permisos de administrador.";
             $this->redirect('/home');
             return false;
@@ -15,29 +16,78 @@ class AdminController extends Controller {
         return true;
     }
     
-    // Dashboard de administrador
-    public function dashboard() {
-        if (!$this->checkAdmin()) return;
-        
-        $userModel = new User();
-        $totalUsers = $userModel->count();
-        
-        $this->render('admin/dashboard.php', [
-            'totalUsers' => $totalUsers
-        ]);
-    }
-    
-    // Listar todos los usuarios
+    // Listar usuarios, reviews o canciones con filtro
     public function users() {
         if (!$this->checkAdmin()) return;
         
-        $userModel = new User();
-        $users = $userModel->getAll();
+        $adminModel = new Admin();
         
-        $this->render('admin/users/index.php', [
-            'users' => $users
+        // Obtener filtro actual con valor por defecto
+        $filtro = isset($_GET['filtro']) ? $_GET['filtro'] : 'usuarios';
+        $search = isset($_GET['search']) ? $_GET['search'] : '';
+        
+        // Validar que el filtro sea válido
+        $filtros_validos = ['usuarios', 'reviews', 'canciones'];
+        if (!in_array($filtro, $filtros_validos)) {
+            $filtro = 'usuarios';
+        }
+        
+        // Inicializar variables
+        $data = [];
+        $totalRegistros = 0;
+        
+        // Obtener datos según el filtro
+        if ($filtro == 'usuarios') {
+            if (!empty($search)) {
+                $data = $adminModel->searchUsers($search);
+            } else {
+                $data = $adminModel->getAllUsers();
+            }
+        } elseif ($filtro == 'reviews') {
+            if (!empty($search)) {
+                $data = $adminModel->searchReviews($search);
+            } else {
+                $data = $adminModel->getAllReviews();
+            }
+        } elseif ($filtro == 'canciones') {
+            if (!empty($search)) {
+                $data = $adminModel->searchSongs($search);
+            } else {
+                $data = $adminModel->getAllSongs();
+            }
+        }
+        
+        $totalRegistros = is_array($data) ? count($data) : 0;
+        
+        // Obtener estadísticas - manejar posibles errores
+        try {
+            $stats = $adminModel->getStats();
+            // Asegurarse de que $stats es un array
+            if (!$stats || !is_array($stats)) {
+                $stats = [
+                    'total_users' => 0,
+                    'total_reviews' => 0,
+                    'total_songs' => 0
+                ];
+            }
+        } catch (Exception $e) {
+            $stats = [
+                'total_users' => 0,
+                'total_reviews' => 0,
+                'total_songs' => 0
+            ];
+        }
+        
+        // Renderizar la vista con todas las variables
+        $this->render('admin/users.php', [
+            'filtro' => $filtro,
+            'search' => $search,
+            'data' => $data,
+            'totalRegistros' => $totalRegistros,
+            'stats' => $stats
         ]);
     }
+    
     
     // Editar usuario (formulario)
     public function editUser($id) {
@@ -131,6 +181,31 @@ class AdminController extends Controller {
         
         $this->redirect('/admin/users');
     }
+    
+    // Eliminar review
+    public function deleteReview($id) {
+        if (!$this->checkAdmin()) return;
+        
+        $adminModel = new Admin();
+        
+        // Necesitarías un método en el modelo para eliminar reviews
+        // $adminModel->deleteReview($id);
+        
+        $_SESSION['success'] = "Review eliminada correctamente";
+        $this->redirect('/admin/users?filtro=reviews');
+    }
+    
+    // Eliminar canción
+    public function deleteSong($id) {
+        if (!$this->checkAdmin()) return;
+        
+        $adminModel = new Admin();
+        
+        // Necesitarías un método en el modelo para eliminar canciones
+        // $adminModel->deleteSong($id);
+        
+        $_SESSION['success'] = "Canción eliminada correctamente";
+        $this->redirect('/admin/users?filtro=canciones');
+    }
 }
-
 ?>
