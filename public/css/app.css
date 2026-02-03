@@ -9,10 +9,9 @@
   --cursor-thickness: 1px;
   --cursor-gap: 20px;
 }
-body{
-    
+body {
   font-family: var(--font-primary);
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
 }
 /* ===== NAV GENERAL ===== */
 nav {
@@ -167,12 +166,11 @@ nav {
   margin-top: 5px;
 }
 
-h1 {
+/* h1 {
   color: #333;
-  border-bottom: 2px solid #eee;
   padding-bottom: 10px;
   margin-bottom: 30px;
-}
+} */
 section {
   margin-top: 30px;
   padding: 20px;
@@ -240,9 +238,9 @@ h2 {
 }
 .reviewbtn {
   position: absolute;
-    top: 13%;
-    right: -10%;
-    width: 40%;
+  top: 13%;
+  right: -10%;
+  width: 40%;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
@@ -384,9 +382,7 @@ h2 {
   font-size: 28px;
   color: #ddd;
   cursor: pointer;
-  transition:
-    color 0.2s,
-    transform 0.2s;
+  transition: color 0.2s, transform 0.2s;
 }
 
 .rating-star:hover,
@@ -556,12 +552,11 @@ h2 {
 /*HOME TODO SECCION*/
 .containermusic {
   position: absolute;
-  top: 16%;
-  left: 9%;
+  top: 30%;
+  left: 14%;
   display: flex;
   width: 842px;
   height: 462px;
-
   align-items: flex-start;
   align-content: flex-start;
   flex-direction: column;
@@ -578,11 +573,16 @@ h2 {
 }
 .musicTop {
   display: flex;
-  width: 401px;
+  width: 60%;
   height: 188px;
   padding: 10px;
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
 }
-/*admin panel*/
+.musicTop img {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  object-fit: cover;
+}

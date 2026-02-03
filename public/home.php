@@ -32,7 +32,7 @@ if (!defined('BASE_URL')) {
 
     h3 {
         color: #89f5d4;
-        margin: 3% 10%;
+        margin: -2% 10%;
         text-align: left;
         mix-blend-mode: difference;
 
@@ -52,6 +52,24 @@ if (!defined('BASE_URL')) {
         color: #FFF;
         font-family: "Manrope", sans-serif;
         font-size: 24px;
+        font-style: normal;
+        font-weight: 400;
+    }
+
+    .song {
+        display: flex;
+        width: 250px;
+        height: 100px;
+        padding: 10px 10px 10px 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .song p {
+        color: #DB2525;
+        font-family: "Manrope", sans-serif;
+        font-size: 30px;
         font-style: normal;
         font-weight: 400;
     }
@@ -76,7 +94,7 @@ if (!defined('BASE_URL')) {
                 </div>
             </div>
             <div class="musicTop">
-                <img src="<?php echo BASE_URL; ?>images/placeholder.jpg" alt="Song cover">
+                <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover">
                 <div class="song">
                     <p class="song-title">Song Title 2</p>
                     <p class="song-artist">Artist 2</p>
@@ -85,7 +103,7 @@ if (!defined('BASE_URL')) {
                 </div>
             </div>
             <div class="musicTop">
-                <img src="<?php echo BASE_URL; ?>images/placeholder.jpg" alt="Song cover">
+                <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover">
                 <div class="song">
                     <p class="song-title">Song Title 3</p>
                     <p class="song-artist">Artist 3</p>
@@ -94,7 +112,7 @@ if (!defined('BASE_URL')) {
                 </div>
             </div>
             <div class="musicTop">
-                <img src="<?php echo BASE_URL; ?>images/placeholder.jpg" alt="Song cover">
+                <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover">
                 <div class="song">
                     <p class="song-title">Song Title 4</p>
                     <p class="song-artist">Artist 4</p>
