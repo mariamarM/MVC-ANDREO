@@ -12,11 +12,50 @@ if (!defined('BASE_URL')) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Virtual Closet</title>
-    
+
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>css/app.css">
     <script src="<?php echo BASE_URL; ?>js/cursor-effect.js" defer></script>
 
 </head>
+<style>
+    h1,
+    h3 {
+        color: #DB2525;
+        font-family: "Manrope", sans-serif;
+        font-size: 140px;
+        font-style: normal;
+        font-weight: 800;
+        line-height: 0;
+        letter-spacing: 0.15px;
+        text-align: center;
+    }
+
+    h3 {
+        color: #89f5d4;
+        margin: 3% 10%;
+        text-align: left;
+        mix-blend-mode: difference;
+
+    }
+
+    .articlehome {
+        position: absolute;
+        right: 10%;
+        top: 15%;
+    }
+
+    section,
+    h2 {
+        border-radius: 4px 40px 4px 10px;
+        width: 100%;
+        background-color: #DB2525;
+        color: #FFF;
+        font-family: "Manrope", sans-serif;
+        font-size: 24px;
+        font-style: normal;
+        font-weight: 400;
+    }
+</style>
 
 <body>
     <?php
