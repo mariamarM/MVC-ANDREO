@@ -152,20 +152,32 @@ if (!defined('BASE_URL')) {
                 font-size: 16px;
             }
         }
+
         .containerIcons {
             position: absolute;
             bottom: 23%;
             right: 15%;
             display: flex;
             gap: 40px;
+display: flex;
+            align-items: center;
         }
-        .lineavertical{
+
+        .lineavertical {
             text-align: center;
-width:99%;
-            height:1px;
-            border-top:2px solid #c2c2c2;
-            position:absolute;
-            bottom:23%;
+            width: 99%;
+            height: 1px;
+            border-top: 2px solid #c2c2c2;
+            position: absolute;
+            bottom: 23%;
+        }
+        .iconImageL {
+            width: 60px;
+            height: 60px;
+        }
+        .iconImage{
+            width: 70px;
+            height: 70px;
         }
     </style>
 </head>
@@ -200,10 +212,10 @@ width:99%;
         </div>
         <div class="containerIcons">
             <img src="/img/dice.png" alt="Dice Icon" class="iconImage">
-            <img src="/img/lastfm.png" alt="Last.fm Icon" class="iconImage">
+            <img src="/img/lastfm.png" alt="Last.fm Icon" class="iconImageL">
             <img src="/img/github.png" alt="GitHub Icon" class="iconImage">
         </div>
-<div class="lineavertical"></div>
+        <div class="lineavertical"></div>
     </main>
 </body>
 
