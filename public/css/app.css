@@ -250,7 +250,7 @@ h2 {
   cursor: pointer;
 }
 .action-buttons {
-  background: #e11d2e;
+  background: var(--color-primary);
   color: white;
   border: none;
 }
