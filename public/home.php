@@ -1,153 +1,22 @@
-<!-- <?php
-require_once __DIR__ . '/../config/config.php';
-
-if (!defined('BASE_URL')) {
-    define('BASE_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/');
-}
-?>
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Virtual Closet</title>
-
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>css/app.css">
-    <script src="<?php echo BASE_URL; ?>js/cursor-effect.js" defer></script>
-
-</head>
-<style>
-    h1,
-    h3 {
-        color: #DB2525;
-        font-family: "Manrope", sans-serif;
-        font-size: 140px;
-        font-style: normal;
-        font-weight: 800;
-        line-height: 0;
-        letter-spacing: 0.15px;
-        text-align: center;
-    }
-
-
-    h3 {
-        color: #89f5d4;
-        margin: -2% 10%;
-        text-align: left;
-        mix-blend-mode: difference;
-
-    }
-
-    .articlehome {
-        position: absolute;
-        right: 10%;
-        top: 15%;
-    }
-
-    section,
-    h2 {
-        border-radius: 4px 40px 4px 10px;
-        width: 100%;
-        background-color: #DB2525;
-        color: #FFF;
-        font-family: "Manrope", sans-serif;
-        font-size: 24px;
-        font-style: normal;
-        font-weight: 400;
-    }
-
-    .song {
-        display: flex;
-        width: 250px;
-        height: 100px;
-        padding: 10px 10px 10px 0;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-
-    .song p {
-        color: #DB2525;
-        font-family: "Manrope", sans-serif;
-        font-size: 30px;
-        font-style: normal;
-        font-weight: 400;
-    }
-</style>
-
-<body>
-    <?php
-    $base_url = BASE_URL;
-    require __DIR__ . '/../views/layout/nav.php';
-    ?>
-    <main>
-        <h1>GREATEST HITS</h1>
-        <h3>MVC</h3>
-        <div class="containermusic">
-            <div class="musicTop">
-                <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover">
-                <div class="song">
-                    <p class="song-title">Song Title 1</p>
-                    <p class="song-artist">Artist 1</p>
-                    <p class="song-ranking">#1</p>
-                    <p class="song-timer">3:45</p>
-                </div>
-            </div>
-            <div class="musicTop">
-                <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover">
-                <div class="song">
-                    <p class="song-title">Song Title 2</p>
-                    <p class="song-artist">Artist 2</p>
-                    <p class="song-ranking">#2</p>
-                    <p class="song-timer">4:20</p>
-                </div>
-            </div>
-            <div class="musicTop">
-                <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover">
-                <div class="song">
-                    <p class="song-title">Song Title 3</p>
-                    <p class="song-artist">Artist 3</p>
-                    <p class="song-ranking">#3</p>
-                    <p class="song-timer">3:15</p>
-                </div>
-            </div>
-            <div class="musicTop">
-                <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover">
-                <div class="song">
-                    <p class="song-title">Song Title 4</p>
-                    <p class="song-artist">Artist 4</p>
-                    <p class="song-ranking">#4</p>
-                    <p class="song-timer">5:10</p>
-                </div>
-            </div>
-        </div>
-        <article class="articlehome">
-            <section class="music-section">
-                <h2>ARTISTS</h2>
-            </section>
-            <section class="music-section">
-                <h2>ALBUMS</h2>
-            </section>
-            <section class="music-section">
-                <h2>GENRE</h2>
-            </section>
-            <section class="music-section">
-                <h2>POPULAR REVIEWS</h2>
-            </section>
-        </article>
-    </main>
-
-</body>
-
-</html> -->
 
 <?php
 require_once __DIR__ . '/../config/config.php';
 
-if (!defined('BASE_URL')) {
-    define('BASE_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/');
+$songs = $songs ?? null;
+if (!isset($songs)) {
+    error_log("ERROR: home.php - $songs NO está definida");
+    $songs = []; // Inicializar como array vacío
+} else {
+    error_log("DEBUG: home.php - Recibidas " . count($songs) . " canciones");
 }
+
+
+
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+$host = $_SERVER['HTTP_HOST'];
+$base_url = $protocol . "://" . $host . "/";
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -164,7 +33,6 @@ if (!defined('BASE_URL')) {
         :root{
             --color-rojo: #ff0000;
         }
-        /* ESTILOS EXISTENTES */
         h1,
         h3 {
             color: var(--color-rojo);
@@ -175,13 +43,14 @@ if (!defined('BASE_URL')) {
             line-height: 0;
             letter-spacing: 0.15px;
             text-align: center;
+               mix-blend-mode: difference;
         }
 
         h3 {
-            color: #89f5d4;
+            color: var(--color-rojo);
             margin: -2% 10%;
             text-align: left;
-            mix-blend-mode: difference;
+         
         }
 
         .articlehome {
@@ -202,24 +71,42 @@ if (!defined('BASE_URL')) {
             font-weight: 400;
         }
 
-        .song {
-            display: flex;
-            width: 250px;
-            height: 100px;
-            padding: 10px 10px 10px 0;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 8px;
-        }
+  .song {
+    display: block;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
 
-        .song p {
-            color: var(--color-rojo);
-            font-family: "Manrope", sans-serif;
-            font-size: 30px;
-            font-style: normal;
-            font-weight: 400;
-        }
+.song p {
+    margin: 0;
+    padding: 0;
+    line-height: 1; /* Altura de línea mínima */
+}
 
+.song-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: -2px; /* Ajuste negativo para eliminar espacio */
+}
+
+.song-artist {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: -2px;
+}
+
+.song-ranking {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: -2px;
+}
+
+.song-timer {
+    font-size: 18px;
+    color: #555;
+}
         /* ESTILOS DE LA ANIMACIÓN */
         .anim-container {
             position: fixed;
@@ -261,7 +148,7 @@ if (!defined('BASE_URL')) {
             padding: 0 1.5rem;
         }
 
-        /* Animaciones */
+       
         @keyframes slideText {
             0% {
                 transform: translateX(0);
@@ -317,13 +204,12 @@ if (!defined('BASE_URL')) {
             }
         }
 
-        /* Ocultar contenido inicialmente */
+      
         main {
             opacity: 0;
             animation: fadeInContent 0.8s 3s forwards;
         }
 
-        /* Asegurar que el body no tenga scroll durante la animación */
         body.animating {
             overflow: hidden;
         }
@@ -331,55 +217,57 @@ if (!defined('BASE_URL')) {
 </head>
 
 <body class="animating">
-    <!-- Contenedor de animación -->
     <div class="anim-container" id="animContainer"></div>
 
-    <!-- Tu contenido existente (oculto inicialmente) -->
     <div id="mainContent">
         <?php
         $base_url = BASE_URL;
         require __DIR__ . '/../views/layout/nav.php';
         ?>
         <main>
-            <h1>GREATEST HITS</h1>
+             <h1>GREATEST HITS</h1>
             <h3>MVC</h3>
-            <div class="containermusic">
+             <div class="containermusic">
+            <?php if (!empty($songs)): ?>
+                <?php foreach ($songs as $index => $song): ?>
+                    <div class="musicTop">
+                        <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover">
+                        <div class="song">
+                            <p class="song-title"><?php echo htmlspecialchars($song['title'] ?? 'Sin título'); ?></p>
+                            <p class="song-artist"><?php echo htmlspecialchars($song['artist'] ?? 'Artista desconocido'); ?></p>
+                            <p class="song-ranking">#<?php echo $index + 1; ?></p>
+                            <p class="song-timer">
+                                <?php 
+                                // Usar duración formateada si existe, si no formatear
+                                if (isset($song['formatted_duration'])) {
+                                    echo htmlspecialchars($song['formatted_duration']);
+                                } else if (isset($song['duration'])) {
+                                    // Formatear en el momento si no está preformateado
+                                    if (preg_match('/^(\d+):(\d{2}):(\d{2})$/', $song['duration'], $matches)) {
+                                        $hours = (int)$matches[1];
+                                        $minutes = (int)$matches[2];
+                                        $seconds = $matches[3];
+                                        $totalMinutes = ($hours * 60) + $minutes;
+                                        echo $totalMinutes . ':' . $seconds;
+                                    } else {
+                                        echo htmlspecialchars($song['duration']);
+                                    }
+                                } else {
+                                    echo '0:00';
+                                }
+                                ?>
+                            </p>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
                 <div class="musicTop">
-                    <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover">
                     <div class="song">
-                        <p class="song-title">Song Title 1</p>
-                        <p class="song-artist">Artist 1</p>
-                        <p class="song-ranking">#1</p>
-                        <p class="song-timer">3:45</p>
+                        <p class="song-title">No hay canciones disponibles</p>
+                        <p class="song-artist">DEBUG: Revisa logs de error</p>
                     </div>
                 </div>
-                <div class="musicTop">
-                    <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover">
-                    <div class="song">
-                        <p class="song-title">Song Title 2</p>
-                        <p class="song-artist">Artist 2</p>
-                        <p class="song-ranking">#2</p>
-                        <p class="song-timer">4:20</p>
-                    </div>
-                </div>
-                <div class="musicTop">
-                    <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover">
-                    <div class="song">
-                        <p class="song-title">Song Title 3</p>
-                        <p class="song-artist">Artist 3</p>
-                        <p class="song-ranking">#3</p>
-                        <p class="song-timer">3:15</p>
-                    </div>
-                </div>
-                <div class="musicTop">
-                    <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover">
-                    <div class="song">
-                        <p class="song-title">Song Title 4</p>
-                        <p class="song-artist">Artist 4</p>
-                        <p class="song-ranking">#4</p>
-                        <p class="song-timer">5:10</p>
-                    </div>
-                </div>
+            <?php endif; ?>
             </div>
             <article class="articlehome">
                 <section class="music-section">

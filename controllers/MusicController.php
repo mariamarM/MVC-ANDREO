@@ -1,43 +1,46 @@
 <?php
+// controllers/MusicController.php - CON DEBUG
+
 require_once __DIR__ . '/Controller.php';
 
 class MusicController extends Controller {
     
-    // Listar todas las canciones
-    public function index() {
-        // Datos de ejemplo (luego vendrán de la base de datos)
-        $songs = [
-            ['id' => 1, 'title' => 'Bohemian Rhapsody', 'artist' => 'Queen', 'year' => 1975],
-            ['id' => 2, 'title' => 'Blinding Lights', 'artist' => 'The Weeknd', 'year' => 2020],
-            ['id' => 3, 'title' => 'Stairway to Heaven', 'artist' => 'Led Zeppelin', 'year' => 1971],
-            ['id' => 4, 'title' => 'Billie Jean', 'artist' => 'Michael Jackson', 'year' => 1982],
-            ['id' => 5, 'title' => 'Hotel California', 'artist' => 'Eagles', 'year' => 1977],
-        ];
+    public function home() {
+        error_log("=== MusicController::home() INICIADO ===");
         
-        $this->render('music/index.php', [
-            'songs' => $songs,
-            'title' => 'Todas las canciones'
-        ]);
-    }
-    
-    // Ver una canción específica
-    public function show($id) {
-        // Buscar la canción por ID (ejemplo)
-        $allSongs = [
-            1 => ['id' => 1, 'title' => 'Bohemian Rhapsody', 'artist' => 'Queen', 'album' => 'A Night at the Opera', 'year' => 1975, 'genre' => 'Rock'],
-            2 => ['id' => 2, 'title' => 'Blinding Lights', 'artist' => 'The Weeknd', 'album' => 'After Hours', 'year' => 2020, 'genre' => 'Pop'],
-        ];
-        
-        $song = isset($allSongs[$id]) ? $allSongs[$id] : null;
-        
-        if (!$song) {
-            // Canción no encontrada
-            echo "Canción no encontrada";
-            return;
+        // Cargar configuración
+        if (!defined('BASE_URL')) {
+            require_once __DIR__ . '/../config/config.php';
         }
         
-        $this->render('music/show.php', [
-            'song' => $song
+        // Cargar modelo
+        require_once __DIR__ . '/../models/Cancion.php';
+        $cancionModel = new Cancion();
+        
+        // PRIMERO: Probar consulta SIMPLE
+        error_log("Probando consulta SIMPLE...");
+        $songsSimple = $cancionModel->getAllSimple();
+        
+        // LUEGO: Probar consulta normal
+        error_log("Probando consulta NORMAL...");
+        $songs = $cancionModel->getAll();
+        
+        // Usar la que funcione
+        $songsToUse = !empty($songs) ? $songs : $songsSimple;
+        
+        error_log("Canciones disponibles para usar: " . count($songsToUse));
+        
+        // Limitar a 4
+        $featuredSongs = !empty($songsToUse) ? array_slice($songsToUse, 0, 4) : [];
+        
+        error_log("Canciones a mostrar: " . count($featuredSongs));
+        
+        // Pasar a vista
+        $this->renderPublic('home.php', [
+            'songs' => $featuredSongs
         ]);
+        
+        error_log("=== MusicController::home() FINALIZADO ===");
     }
 }
+?>

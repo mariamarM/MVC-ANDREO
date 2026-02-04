@@ -8,12 +8,20 @@ abstract class Controller {
         $viewPath = __DIR__ . '/../views/' . $view;
         
        
-        require_once __DIR__ . '/../views/layout/header.php';
-        require $viewPath;
-        require_once __DIR__ . '/../views/layout/footer.php';
+       
     }
     
-    
+        protected function renderPublic($view, $data = []) {
+        extract($data);
+        $viewPath = __DIR__ . '/../public/' . $view;
+        
+        // Cargar config si no está cargada
+        if (!defined('BASE_URL')) {
+            require_once __DIR__ . '/../config/config.php';
+        }
+        
+        require $viewPath;
+    }
     protected function redirect($url) {
         header("Location: " . $url);
         exit;
