@@ -1,11 +1,11 @@
 :root {
-  --color-primary: #be0303;
-  --color-secondary: #be0303;
-  --color-borders: #be0303;
+  --color-primary: #FF0000;
+  --color-secondary: #FF0000;
+  --color-borders: #FF0000;
   --color-accent: #f05454;
   --color-accent-2: #30475e;
   --font-primary: "Konkhmer Sleokchher", sans-serif;
-  --cursor-color: #e00909;
+  --cursor-color: #FF0000;
   --cursor-thickness: 1px;
   --cursor-gap: 20px;
 }

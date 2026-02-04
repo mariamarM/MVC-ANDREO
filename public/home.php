@@ -161,10 +161,13 @@ if (!defined('BASE_URL')) {
     <script src="<?php echo BASE_URL; ?>js/cursor-effect.js" defer></script>
 
     <style>
+        :root{
+            --color-rojo: #ff0000;
+        }
         /* ESTILOS EXISTENTES */
         h1,
         h3 {
-            color: #DB2525;
+            color: var(--color-rojo);
             font-family: "Manrope", sans-serif;
             font-size: 140px;
             font-style: normal;
@@ -191,7 +194,7 @@ if (!defined('BASE_URL')) {
         h2 {
             border-radius: 4px 40px 4px 10px;
             width: 100%;
-            background-color: #DB2525;
+            background-color: var(--color-rojo);
             color: #FFF;
             font-family: "Manrope", sans-serif;
             font-size: 24px;
@@ -210,7 +213,7 @@ if (!defined('BASE_URL')) {
         }
 
         .song p {
-            color: #DB2525;
+            color: var(--color-rojo);
             font-family: "Manrope", sans-serif;
             font-size: 30px;
             font-style: normal;
@@ -224,7 +227,7 @@ if (!defined('BASE_URL')) {
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: #DB2525; /* Rojo que coincide con tu tema */
+            background: var(--color-rojo); /* Rojo que coincide con tu tema */
             z-index: 9999;
             overflow: hidden;
             display: flex;
@@ -237,7 +240,7 @@ if (!defined('BASE_URL')) {
             display: flex;
             align-items: center;
             overflow: hidden;
-            background: #DB2525;
+            background: var(--color-rojo);
             position: relative;
         }
 
@@ -453,7 +456,7 @@ if (!defined('BASE_URL')) {
                     fillScreen.style.left = '0';
                     fillScreen.style.width = '100%';
                     fillScreen.style.height = '10vh';
-                    fillScreen.style.background = '#DB2525';
+                    fillScreen.style.background = 'var(--color-rojo)';
                     fillScreen.style.animation = `fillScreen 0.5s ease-out forwards`;
                     animContainer.appendChild(fillScreen);
                     

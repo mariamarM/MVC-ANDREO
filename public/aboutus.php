@@ -18,8 +18,9 @@ if (!defined('BASE_URL')) {
 
     <style>
         .titlesong h1 {
-            font-size: 82px;
+            font-size: 100px;
             font-weight: 900;
+            margin-top: 20px;
             color: #ff0000;
             text-align: center;
             text-transform: uppercase;
@@ -28,19 +29,20 @@ if (!defined('BASE_URL')) {
         }
 
         .about-content {
+            position: absolute;
+            left: 10%;
+            top: 20%;
             max-width: 40%;
-            gap: 100px;
+            gap: 20px;
             display: flex;
             flex-direction: column;
         }
-
-
 
         .about-section {
             border: 2px solid #ff0000;
             border-radius: 8px;
             background-color: #ff0000;
-            padding: 30px;
+            padding: 20px 30px;
             position: relative;
             min-height: 200px;
             display: flex;
@@ -78,7 +80,7 @@ if (!defined('BASE_URL')) {
         }
 
         .section-text strong {
-            color: #e60606;
+            color: #ff0000;
             font-weight: 600;
         }
 
@@ -92,7 +94,7 @@ if (!defined('BASE_URL')) {
 
         .empty-section {
             font-size: 18px;
-        line-height: 1.6;
+            line-height: 1.6;
             color: #FFFFFF;
             margin: 0;
         }
@@ -150,6 +152,21 @@ if (!defined('BASE_URL')) {
                 font-size: 16px;
             }
         }
+        .containerIcons {
+            position: absolute;
+            bottom: 23%;
+            right: 15%;
+            display: flex;
+            gap: 40px;
+        }
+        .lineavertical{
+            text-align: center;
+width:99%;
+            height:1px;
+            border-top:2px solid #c2c2c2;
+            position:absolute;
+            bottom:23%;
+        }
     </style>
 </head>
 
@@ -186,7 +203,7 @@ if (!defined('BASE_URL')) {
             <img src="/img/lastfm.png" alt="Last.fm Icon" class="iconImage">
             <img src="/img/github.png" alt="GitHub Icon" class="iconImage">
         </div>
-
+<div class="lineavertical"></div>
     </main>
 </body>
 
