@@ -5,40 +5,36 @@ require_once __DIR__ . '/Controller.php';
 
 class MusicController extends Controller {
     
-    public function home() {
+   public function home() {
         error_log("=== MusicController::home() INICIADO ===");
         
-        // Cargar configuración
+        // 1. Cargar configuración
         if (!defined('BASE_URL')) {
             require_once __DIR__ . '/../config/config.php';
         }
         
-        // Cargar modelo
+        // 2. Cargar modelo
         require_once __DIR__ . '/../models/Cancion.php';
         $cancionModel = new Cancion();
         
-        // PRIMERO: Probar consulta SIMPLE
-        error_log("Probando consulta SIMPLE...");
-        $songsSimple = $cancionModel->getAllSimple();
-        
-        // LUEGO: Probar consulta normal
-        error_log("Probando consulta NORMAL...");
+        // 3. Obtener canciones
         $songs = $cancionModel->getAll();
+        error_log("Canciones obtenidas del modelo: " . count($songs));
         
-        // Usar la que funcione
-        $songsToUse = !empty($songs) ? $songs : $songsSimple;
+        // 4. Limitar a 4
+        $featuredSongs = !empty($songs) ? array_slice($songs, 0, 4) : [];
+        error_log("Canciones limitadas a mostrar: " . count($featuredSongs));
         
-        error_log("Canciones disponibles para usar: " . count($songsToUse));
-        
-        // Limitar a 4
-        $featuredSongs = !empty($songsToUse) ? array_slice($songsToUse, 0, 4) : [];
-        
-        error_log("Canciones a mostrar: " . count($featuredSongs));
-        
-        // Pasar a vista
-        $this->renderPublic('home.php', [
+        // 5. Crear el array de datos CORRECTAMENTE
+        $data = [
             'songs' => $featuredSongs
-        ]);
+        ];
+        
+        // DEBUG: Verificar array
+        error_log("Datos a pasar a vista: " . print_r($data, true));
+        
+        // 6. Renderizar vista con los datos
+        $this->renderPublic('home.php', $data);
         
         error_log("=== MusicController::home() FINALIZADO ===");
     }

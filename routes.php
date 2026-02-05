@@ -16,21 +16,27 @@ $path = trim($path, '/');
 switch ($path) {
     case '':
     case 'home':
-         // 1. Cargar configuración
-        require_once __DIR__ . '/config/config.php';
-        
-        // 2. Cargar modelo y obtener canciones
-        require_once __DIR__ . '/models/Cancion.php';
-        $cancionModel = new Cancion();
-        $songs = $cancionModel->getAll();
-        $featuredSongs = !empty($songs) ? array_slice($songs, 0, 4) : [];
-        
-        // 3. Definir variables para la vista
-        $songs = $featuredSongs;
-        
-        // 4. Incluir home.php directamente
-        require_once __DIR__ . '/public/home.php';
-        break;
+   require_once __DIR__ . '/config/config.php';
+    require_once __DIR__ . '/models/Cancion.php';
+    
+    $cancionModel = new Cancion();
+    $allSongs = $cancionModel->getAll();  // Cambia el nombre
+    $featuredSongs = !empty($allSongs) ? array_slice($allSongs, 0, 4) : [];
+    
+   
+    
+    // Pasar a home.php usando extract o variable global
+    $songs = $featuredSongs;  // Esto no funciona bien
+    
+    // En su lugar, usa EXTRACT o GLOBALS
+    $data = ['songs' => $featuredSongs];
+    extract($data);  // Esto crea $songs en el scope actual
+    
+    // O también
+    $GLOBALS['songs'] = $featuredSongs;
+    
+    require_once __DIR__ . '/public/home.php';
+    break;
         
     case 'music':
     case 'songs':
