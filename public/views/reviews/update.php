@@ -66,11 +66,6 @@ try {
         header('Location: ' . BASE_URL . 'views/posts/index.php');
         exit;
     }
-    
-} catch (PDOException $e) {
-    $_SESSION['error'] = 'Error en la base de datos: ' . $e->getMessage();
-    header('Location: ' . BASE_URL . 'dashboardUser.php');
-    exit;
 }
 ?>
 <!DOCTYPE html>
