@@ -62,15 +62,16 @@ $base_url = $protocol . "://" . $host . "/";
             line-height: 0;
             letter-spacing: 0.15px;
             text-align: center;
-            mix-blend-mode: difference;
+         
         }
 
-        h3 {
-            color: var(--color-rojo);
+         h3 {
+            color: #29ECF3;
             margin: -2% 10%;
             text-align: left;
-
+ mix-blend-mode: difference;
         }
+
 
         .articlehome {
             position: absolute;

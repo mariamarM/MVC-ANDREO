@@ -1,42 +1,74 @@
 <?php
+// /var/www/html/views/reviews/create.php - VERSIÓN CORREGIDA
+
+// 1. CONFIGURACIÓN DE ERRORES
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-$baseDir = dirname(__DIR__, 3); 
-$configFile = $baseDir . '/config/config.php';
-require_once __DIR__ . '/../../../config/Database.php';
+// 2. INCLUIR CONFIGURACIÓN PRIMERO (IMPORTANTE)
+$configFile = dirname(__DIR__, 3) . '/config/config.php';
+if (file_exists($configFile)) {
+    require_once $configFile;
+    error_log("✅ config.php cargado desde: $configFile");
+} else {
+    error_log("❌ config.php NO encontrado en: $configFile");
+    die("Error de configuración");
+}
 
+// 3. INCLUIR DATABASE DESPUÉS de config
+require_once dirname(__DIR__, 3) . '/config/Database.php';
 
-session_start();
+// 4. VERIFICAR SESIÓN - NO necesitas session_start() porque ya está en config.php
+error_log("=== CREATE.PH INICIADO ===");
 error_log("Session ID: " . session_id());
 error_log("User ID en sesión: " . ($_SESSION['user_id'] ?? 'NO'));
+error_log("BASE_URL: " . (defined('BASE_URL') ? BASE_URL : 'NO DEFINIDO'));
 
-// Verificar si es una petición desde modal
+// 5. Verificar si es una petición desde modal
 $isModal = isset($_POST['modal_submit']);
 error_log("Es modal: " . ($isModal ? 'Sí' : 'No'));
+error_log("POST data: " . print_r($_POST, true));
 
-if (!isset($_SESSION['user_id'])) {
-    error_log("Usuario NO logueado");
+// 6. VERIFICAR SESIÓN DEL USUARIO
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    error_log("❌ Usuario NO logueado o sesión vacía");
+    
     if ($isModal) {
         header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'Debes iniciar sesión']);
+        echo json_encode([
+            'success' => false, 
+            'message' => 'Debes iniciar sesión para crear una review',
+            'redirect' => BASE_URL . 'login.php'
+        ]);
         exit;
     }
-    header('Location: ' . BASE_URL . 'login.php');
+    
+    // Redirección normal
+    $_SESSION['error'] = 'Debes iniciar sesión para crear una review';
+    if (defined('BASE_URL')) {
+        header('Location: ' . BASE_URL . 'login.php');
+    } else {
+        header('Location: /login.php');
+    }
     exit;
 }
 
-error_log("Usuario logueado: ID=" . $_SESSION['user_id'] . ", Nombre=" . ($_SESSION['user_name'] ?? 'NO'));
+error_log("✅ Usuario logueado: ID=" . $_SESSION['user_id'] . ", Nombre=" . ($_SESSION['user_name'] ?? 'NO'));
 
-// OBTENER CONEXIÓN PDO
+// 7. OBTENER CONEXIÓN PDO
 try {
     $pdo = Database::getInstance();
+    
+    if ($pdo === null) {
+        throw new Exception("No se pudo obtener la conexión PDO");
+    }
+    
     error_log("✅ Conexión PDO obtenida exitosamente");
     
-    // Probar consulta simple
+    // Probar conexión
     $test = $pdo->query("SELECT 1")->fetch();
-    error_log("✅ Test query ejecutada: " . print_r($test, true));
+    error_log("✅ Test query ejecutada");
     
 } catch (Exception $e) {
     error_log("❌ Error obteniendo conexión PDO: " . $e->getMessage());
@@ -53,10 +85,7 @@ try {
     }
 }
 
-// Verificar método POST
-error_log("Método de request: " . $_SERVER['REQUEST_METHOD']);
-error_log("POST data: " . print_r($_POST, true));
-
+// 8. PROCESAR FORMULARIO
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_review'])) {
     error_log("✅ Procesando creación de review");
     
@@ -66,31 +95,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_review'])) {
     }
     
     try {
-        // Obtener datos
-        $song_id = isset($_POST['song_id']) ? (int)$_POST['song_id'] : 0;
-        $rating = isset($_POST['rating']) ? (int)$_POST['rating'] : 0;
+        // Validar y obtener datos
+        $song_id = filter_input(INPUT_POST, 'song_id', FILTER_VALIDATE_INT);
+        $rating = filter_input(INPUT_POST, 'rating', FILTER_VALIDATE_INT);
         $comment = trim($_POST['comment'] ?? '');
         
         error_log("Datos recibidos: song_id=$song_id, rating=$rating, comment=" . substr($comment, 0, 50) . "...");
         
         // Validaciones
-        if ($song_id <= 0) {
-            throw new Exception("Debes seleccionar una canción");
+        if (!$song_id || $song_id <= 0) {
+            throw new Exception("Debes seleccionar una canción válida");
         }
         
-        if ($rating < 1 || $rating > 5) {
-            throw new Exception("El rating debe estar entre 1 y 5");
+        if (!$rating || $rating < 1 || $rating > 5) {
+            throw new Exception("El rating debe ser un número entre 1 y 5");
         }
         
         if (empty($comment)) {
             throw new Exception("El comentario es obligatorio");
         }
         
+        if (strlen($comment) < 3) {
+            throw new Exception("El comentario debe tener al menos 3 caracteres");
+        }
+        
         // Verificar que la canción existe
-        error_log("Verificando canción ID: $song_id");
         $stmt = $pdo->prepare("SELECT id, title, artist FROM canciones WHERE id = ?");
         $stmt->execute([$song_id]);
-        $cancion = $stmt->fetch(PDO::FETCH_ASSOC);
+        $cancion = $stmt->fetch();
         
         if (!$cancion) {
             error_log("❌ Canción no encontrada: ID $song_id");
@@ -99,31 +131,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_review'])) {
         
         error_log("✅ Canción encontrada: " . $cancion['title'] . " - " . $cancion['artist']);
         
-        // Verificar si ya existe review
+        // Verificar si ya existe review del usuario para esta canción
         $user_id = $_SESSION['user_id'];
-        error_log("Buscando review existente para user_id=$user_id, song_id=$song_id");
         $stmt = $pdo->prepare("SELECT id FROM reviews WHERE user_id = ? AND song_id = ?");
         $stmt->execute([$user_id, $song_id]);
         $existing_review = $stmt->fetch();
         
         if ($existing_review) {
-            // Actualizar
+            // Actualizar review existente
             error_log("Actualizando review existente ID: " . $existing_review['id']);
-            $stmt = $pdo->prepare("UPDATE reviews SET rating = ?, comment = ? WHERE id = ?");
+            $stmt = $pdo->prepare("UPDATE reviews SET rating = ?, comment = ?, updated_at = NOW() WHERE id = ?");
             $stmt->execute([$rating, $comment, $existing_review['id']]);
             $review_id = $existing_review['id'];
             $action = 'actualizada';
+            $message = "Review actualizada exitosamente";
         } else {
-            // Insertar nueva
+            // Insertar nueva review
             error_log("Insertando nueva review");
             $stmt = $pdo->prepare("INSERT INTO reviews (user_id, song_id, rating, comment) VALUES (?, ?, ?, ?)");
             $stmt->execute([$user_id, $song_id, $rating, $comment]);
             $review_id = $pdo->lastInsertId();
             $action = 'creada';
+            $message = "Review creada exitosamente";
             error_log("✅ Review insertada con ID: $review_id");
         }
         
-        // Obtener datos completos
+        // Obtener datos completos de la nueva/actualizada review
         $stmt = $pdo->prepare("
             SELECT r.*, c.title as song_title, c.artist 
             FROM reviews r 
@@ -131,47 +164,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_review'])) {
             WHERE r.id = ?
         ");
         $stmt->execute([$review_id]);
-        $new_review = $stmt->fetch(PDO::FETCH_ASSOC);
+        $new_review = $stmt->fetch();
+        
+        if (!$new_review) {
+            throw new Exception("Error al recuperar los datos de la review");
+        }
+        
+        // Preparar respuesta
+        $response = [
+            'success' => true,
+            'message' => $message,
+            'review' => [
+                'id' => $new_review['id'],
+                'song_title' => $new_review['song_title'],
+                'artist' => $new_review['artist'],
+                'rating' => $new_review['rating'],
+                'comment' => $new_review['comment'],
+                'created_at' => $new_review['created_at'],
+                'formatted_date' => date('d/m/Y H:i', strtotime($new_review['created_at']))
+            ]
+        ];
+        
+        error_log("✅ Review $action exitosamente - ID: $review_id");
         
         if ($isModal) {
-            // Respuesta JSON
-            $response = [
-                'success' => true,
-                'message' => "Review $action exitosamente",
-                'review' => [
-                    'id' => $new_review['id'],
-                    'song_title' => $new_review['song_title'],
-                    'artist' => $new_review['artist'],
-                    'rating' => $new_review['rating'],
-                    'comment' => $new_review['comment'],
-                    'created_at' => $new_review['created_at']
-                ]
-            ];
-            
-            error_log("Enviando respuesta JSON: " . json_encode($response));
+            // Respuesta JSON para modal
             echo json_encode($response);
             exit;
             
         } else {
             // Redirección normal
-            $_SESSION['success'] = "Review $action exitosamente";
-            header('Location: ' . BASE_URL . 'views/reviews/index.php');
+            $_SESSION['success'] = $message;
+            if (defined('BASE_URL')) {
+                header('Location: ' . BASE_URL . 'views/reviews/index.php');
+            } else {
+                header('Location: /views/reviews/index.php');
+            }
             exit;
         }
         
     } catch (PDOException $e) {
         error_log("❌ Error PDO: " . $e->getMessage());
-        error_log("❌ Error code: " . $e->getCode());
+        error_log("❌ Error SQL: " . $e->getCode());
+        
+        $error_message = 'Error de base de datos';
+        if (strpos($e->getMessage(), 'SQLSTATE') !== false) {
+            $error_message .= ': ' . $e->getMessage();
+        }
         
         if ($isModal) {
             echo json_encode([
                 'success' => false, 
-                'message' => 'Error de base de datos: ' . $e->getMessage()
+                'message' => $error_message
             ]);
             exit;
         } else {
-            $_SESSION['error'] = 'Error de base de datos: ' . $e->getMessage();
-            header('Location: ' . BASE_URL . 'views/reviews/create.php');
+            $_SESSION['error'] = $error_message;
+            if (defined('BASE_URL')) {
+                header('Location: ' . BASE_URL . 'views/reviews/create.php');
+            } else {
+                header('Location: /views/reviews/create.php');
+            }
             exit;
         }
         
@@ -186,45 +239,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_review'])) {
             exit;
         } else {
             $_SESSION['error'] = $e->getMessage();
-            header('Location: ' . BASE_URL . 'views/reviews/create.php');
+            if (defined('BASE_URL')) {
+                header('Location: ' . BASE_URL . 'views/reviews/create.php');
+            } else {
+                header('Location: /views/reviews/create.php');
+            }
             exit;
         }
     }
 }
 
-// Si llegamos aquí, es GET
-error_log("Método GET - Mostrando formulario");
+// 9. SI LLEGA AQUÍ, ES UNA PETICIÓN GET (no debería llegar si es modal)
+error_log("⚠️  Método GET o no es creación de review");
 
-// Obtener canciones
+if ($isModal) {
+    error_log("❌ ERROR: Petición modal pero no es POST con create_review");
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error: Método no permitido'
+    ]);
+    exit;
+}
+
+// 10. Obtener canciones para formulario GET (si se necesita)
 try {
     $stmt = $pdo->query("SELECT id, title, artist FROM canciones ORDER BY title");
-    $canciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $canciones = $stmt->fetchAll();
     error_log("Canciones obtenidas: " . count($canciones));
 } catch (Exception $e) {
     $canciones = [];
     error_log("Error obteniendo canciones: " . $e->getMessage());
 }
-
-// NO mostrar HTML si es AJAX
-if ($isModal) {
-    error_log("ERROR: Petición AJAX pero llegó a sección HTML");
-    header('Content-Type: application/json');
-    echo json_encode([
-        'success' => false,
-        'message' => 'Error interno del servidor'
-    ]);
-    exit;
-}
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
     <title>Crear Review</title>
-    <style>body{font-family:Arial; padding:20px;}</style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .error { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .success { background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin: 10px 0; }
+    </style>
 </head>
 <body>
-    <h1>Crear Review (Formulario normal)</h1>
-    <p>Este es el formulario para GET. Para AJAX usa el modal.</p>
+    <h1>Crear Nueva Review</h1>
+    <p>Este formulario es para acceso directo. Para usar el modal, ve al dashboard.</p>
 </body>
 </html>

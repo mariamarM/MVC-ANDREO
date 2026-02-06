@@ -1,9 +1,73 @@
 <?php
+// dashboardUser.php - VERSIÓN SIMPLIFICADA
+
+// 1. Incluir config (que ahora inicia sesión)
 require_once __DIR__ . '/../config/config.php';
-if (!defined('BASE_URL')) {
-    define('BASE_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/');
+
+// // 2. DEBUG inmediato
+// if (isset($_GET['debug']) || isset($_GET['login'])) {
+//     echo "<div style='background:#000;color:#0f0;padding:10px;font-family:monospace;'>";
+//     echo "DEBUG: User ID = " . ($_SESSION['user_id'] ?? 'NULL') . " | ";
+//     echo "Session = " . session_id() . " | ";
+//     echo "Cookie = " . ($_COOKIE[session_name()] ?? 'NO') . " | ";
+//     echo "<a href='?force=1' style='color:#0ff;'>Forzar login</a>";
+//     echo "</div>";
+// }
+
+// 3. Verificación SIMPLE con opción de forzar
+if (empty($_SESSION['user_id'])) {
+    // Opción para forzar en desarrollo
+    if (isset($_GET['force']) && $_SERVER['REMOTE_ADDR'] === '127.0.0.1') {
+        $_SESSION['user_id'] = 1;
+        $_SESSION['user_name'] = 'Usuario Forzado';
+        $_SESSION['user_role'] = 'user';
+    } else {
+        // Mostrar error simple
+        ?>
+        <!DOCTYPE html>
+        <html>
+        <head><title>Acceso Denegado</title></head>
+        <body style="padding:50px;text-align:center;">
+            <h2>🔐 No hay sesión activa</h2>
+            <p>Session ID: <?php echo session_id(); ?></p>
+            <p><a href="<?php echo BASE_URL; ?>login.php">Ir al Login</a></p>
+            <p><small><a href="?force=1">Forzar acceso (solo local)</a></small></p>
+        </body>
+        </html>
+        <?php
+        exit;
+    }
 }
-if (!isset($_SESSION['user_id'])) {
+
+// 4. SI LLEGA AQUÍ, EL USUARIO ESTÁ LOGUEADO
+// Continúa con tu código NORMAL para obtener reviews...
+
+$reviews = [];
+$recent_likes = [];
+
+try {
+    require_once __DIR__ . '/../config/Database.php';
+    $pdo = Database::getInstance();
+    
+    if ($pdo) {
+        $stmt = $pdo->prepare("
+            SELECT r.*, c.title as song_title, c.artist 
+            FROM reviews r 
+            JOIN canciones c ON r.song_id = c.id 
+            WHERE r.user_id = ? 
+            ORDER BY r.created_at DESC 
+            LIMIT 5
+        ");
+        $stmt->execute([$_SESSION['user_id']]);
+        $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        // ... resto de tu código
+    }
+} catch (Exception $e) {
+    error_log("Error dashboard: " . $e->getMessage());
+}
+
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -294,17 +358,18 @@ main section:nth-of-type(1) h2 {
                         </p>
                     </div>
                     <div style="margin-left: 15px;">
-                        <a href="<?= BASE_URL ?>views/reviews/update.php?id=<?= $review['id'] ?>" 
-                           style="color: #4da6ff; margin-right: 10px;"
-                           title="Editar">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <a href="<?= BASE_URL ?>views/reviews/delete.php?id=<?= $review['id'] ?>" 
-                           style="color: #ff6b6b;"
-                           onclick="return confirm('¿Eliminar esta review?');"
-                           title="Eliminar">
-                            <i class="fas fa-trash"></i>
-                        </a>
+      
+<a href="<?php echo BASE_URL; ?>views/reviews/update.php?id=<?php echo $review['id']; ?>" 
+   style="color: #ffc107; margin-right: 10px;"
+   title="Editar">
+    <i class="fas fa-edit"></i>
+</a>
+<a href="<?php echo BASE_URL; ?>views/reviews/delete.php?id=<?php echo $review['id']; ?>" 
+   style="color: #ff6b6b;"
+   onclick="return confirm('¿Eliminar esta review?');"
+   title="Eliminar">
+    <i class="fas fa-trash"></i>
+</a>
                     </div>
                 </div>
             </div>
@@ -315,9 +380,9 @@ main section:nth-of-type(1) h2 {
                 <p style="color: #aaa; margin: 0;">
                     <i class="fas fa-info-circle"></i>
                     Tienes <?= count($reviews) - 2 ?> reviews más. 
-                    <a href="<?= BASE_URL ?>views/reviews/index.php" style="color: #4da6ff;">
-                        Ver todas
-                    </a>
+<a href="<?php echo BASE_URL; ?>views/reviews/index.php" style="color: #4da6ff;">
+    Ver todas 
+</a>                 
                 </p>
             </div>
         <?php endif; ?>
@@ -564,9 +629,11 @@ const formAction = BASE_URL + 'views/reviews/create.php';
 const response = await fetch(formAction, {  // Usa formAction en lugar de this.action
     method: 'POST',
     body: formData,
+        credentials: 'include',
     headers: {
         'X-Requested-With': 'XMLHttpRequest'
     }
+  
 });
                 
                 // 1. PRIMERO obtener la respuesta como TEXTO

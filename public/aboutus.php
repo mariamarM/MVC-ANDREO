@@ -18,7 +18,7 @@ if (!defined('BASE_URL')) {
 
     <style>
         .titlesong h1 {
-            font-size: 100px;
+            font-size: 140px;
             font-weight: 900;
             margin-top: 20px;
             color: #ff0000;
