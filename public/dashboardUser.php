@@ -17,21 +17,153 @@ require_once __DIR__ . '/../config/config.php';
 // 3. Verificación SIMPLE con opción de forzar
 if (empty($_SESSION['user_id'])) {
     // Opción para forzar en desarrollo
+       // Opción para forzar en desarrollo
     if (isset($_GET['force']) && $_SERVER['REMOTE_ADDR'] === '127.0.0.1') {
         $_SESSION['user_id'] = 1;
         $_SESSION['user_name'] = 'Usuario Forzado';
         $_SESSION['user_role'] = 'user';
     } else {
-        // Mostrar error simple
+        // Mostrar opciones de login/register minimalistas
         ?>
         <!DOCTYPE html>
-        <html>
-        <head><title>Acceso Denegado</title></head>
-        <body style="padding:50px;text-align:center;">
-            <h2>🔐 No hay sesión activa</h2>
-            <p>Session ID: <?php echo session_id(); ?></p>
-            <p><a href="<?php echo BASE_URL; ?>login.php">Ir al Login</a></p>
-            <p><small><a href="?force=1">Forzar acceso (solo local)</a></small></p>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Acceso Requerido</title>
+            <link rel="stylesheet" href="<?= BASE_URL ?>/css/app.css">
+            <script src="<?php echo BASE_URL; ?>/js/cursor-effect.js" defer></script>
+            <style>
+                body {
+                    margin: 0;
+                    padding: 0;
+                    font-family: "Manrope", sans-serif;
+                    background: #f5f5f5;
+                    min-height: 100vh;
+                    display: flex;
+                    flex-direction: column;
+                }
+                
+                .unauthorized-container {
+                    flex: 1;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 20px;
+                }
+                
+                .access-box {
+                    background: white;
+                    padding: 40px;
+                    width: 100%;
+                    max-width: 400px;
+                    text-align: center;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                }
+                
+                .access-box h2 {
+                    margin: 0 0 20px 0;
+                    color: #333;
+                    font-weight: 600;
+                    font-size: 24px;
+                }
+                
+                .access-box p {
+                    color: #666;
+                    margin: 0 0 30px 0;
+                    line-height: 1.5;
+                }
+                
+                .buttons-container {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                    margin-bottom: 20px;
+                }
+                
+                .btn {
+                    padding: 14px;
+                    text-decoration: none;
+                    font-weight: 500;
+                    border-radius: 4px;
+                    transition: all 0.2s ease;
+                    border: none;
+                    cursor: pointer;
+                    font-size: 16px;
+                }
+                
+                .btn-login {
+                    background: #ff0000;
+                    color: white;
+                }
+                
+                .btn-login:hover {
+                    background: #e60000;
+                }
+                
+                .btn-register {
+                    background: transparent;
+                    color: #333;
+                    border: 1px solid #ddd;
+                }
+                
+                .btn-register:hover {
+                    background: #f9f9f9;
+                    border-color: #ccc;
+                }
+                
+                .dev-link {
+                    margin-top: 20px;
+                    padding-top: 20px;
+                    border-top: 1px solid #eee;
+                }
+                
+                .dev-link a {
+                    color: #666;
+                    text-decoration: none;
+                    font-size: 14px;
+                }
+                
+                .dev-link a:hover {
+                    text-decoration: underline;
+                }
+                
+                @media (max-width: 480px) {
+                    .access-box {
+                        padding: 30px 20px;
+                        margin: 0 10px;
+                    }
+                    
+                    .btn {
+                        padding: 12px;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <?php require_once __DIR__ . '/../views/layout/nav.php'; ?>
+            
+            <div class="unauthorized-container">
+                <div class="access-box">
+                    <h2>Acceso requerido</h2>
+                    <p>Necesitas iniciar sesión para continuar</p>
+                    
+                    <div class="buttons-container">
+                        <a href="<?php echo BASE_URL; ?>login.php" class="btn btn-login">
+                            Iniciar sesión
+                        </a>
+                        <a href="<?php echo BASE_URL; ?>register.php" class="btn btn-register">
+                            Crear cuenta
+                        </a>
+                    </div>
+                    
+                    <div class="dev-link">
+                        <?php if ($_SERVER['REMOTE_ADDR'] === '127.0.0.1'): ?>
+                            <a href="?force=1">Forzar acceso (solo desarrollo)</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
         </body>
         </html>
         <?php

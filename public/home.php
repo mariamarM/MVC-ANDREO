@@ -6,12 +6,10 @@ if (!isset($songs) || !is_array($songs)) {
         require_once __DIR__ . '/../config/config.php';
     }
 
-    // Cargar modelo y obtener canciones
+    // Cargar modelo y obtener TODAS las canciones
     require_once __DIR__ . '/../models/Cancion.php';
     $cancionModel = new Cancion();
-    $allSongs = $cancionModel->getAll();
-    $songs = !empty($allSongs) ? array_slice($allSongs, 0, 4) : [];
-
+    $songs = $cancionModel->getAll(); // Obtener TODAS las canciones
 }
 
 
@@ -52,6 +50,10 @@ $base_url = $protocol . "://" . $host . "/";
             --color-rojo: #ff0000;
         }
 
+        body {
+            overflow: hidden;
+        }
+
         h1,
         h3 {
             color: var(--color-rojo);
@@ -62,26 +64,26 @@ $base_url = $protocol . "://" . $host . "/";
             line-height: 0;
             letter-spacing: 0.15px;
             text-align: center;
-         
+
         }
 
-         h3 {
-            color: #29ECF3;
+        h3 {
+            color: var(--color-rojo);
             margin: -2% 10%;
             text-align: left;
- mix-blend-mode: difference;
+            mix-blend-mode: difference;
         }
 
 
         .articlehome {
             position: absolute;
             right: 10%;
-            top: 15%;
+            top: 14%;
         }
 
         section,
         h2 {
-            border-radius: 4px 40px 4px 10px;
+            border-radius: 15px 60px 5px 20px;
             width: 100%;
             background-color: var(--color-rojo);
             color: #FFF;
@@ -89,6 +91,11 @@ $base_url = $protocol . "://" . $host . "/";
             font-size: 24px;
             font-style: normal;
             font-weight: 400;
+        }
+
+        section {
+
+            padding: 12px;
         }
 
         .song {
@@ -120,9 +127,11 @@ $base_url = $protocol . "://" . $host . "/";
         }
 
         .song-ranking {
-            font-size: 20px;
+            font-size: 60px;
             font-weight: 800;
             margin-bottom: -2px;
+            color: var(--color-rojo);
+
         }
 
         .song-timer {
@@ -244,6 +253,62 @@ $base_url = $protocol . "://" . $host . "/";
         body.animating {
             overflow: hidden;
         }
+
+        /* ===== ESTILOS PARA EL SCROLL OCULTO ===== */
+        /* Estos son los ÚNICOS cambios que hice: */
+
+        .containermusic {
+            position: relative;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .musicTop {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        /* Contenedor para el scroll */
+        .scroll-container {
+            width: 100%;
+            max-height: 500px;
+            /* Altura máxima para el scroll */
+            overflow-y: hidden;
+            /* Ocultamos la barra de scroll */
+            position: relative;
+            padding-right: 20px;
+            /* Espacio para el scroll invisible */
+        }
+
+        .scroll-container:hover {
+            overflow-y: scroll;
+            /* Mostrar scroll solo al hover */
+        }
+
+        /* Ocultar completamente la barra de scroll */
+        .scroll-container::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
+
+        .scroll-container {
+            -ms-overflow-style: none;
+            /* IE y Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        /* Estilos para el contenido dentro del contenedor de scroll */
+        .songs-wrapper {
+            margin-top: 2%;
+            width: 50%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 
@@ -257,41 +322,46 @@ $base_url = $protocol . "://" . $host . "/";
         ?>
         <main>
             <h1>GREATEST HITS</h1>
-            <h3>MVC</h3> 
+            <h3>MVC</h3>
             <div class="containermusic">
                 <?php if (!empty($songs) && is_array($songs)): ?>
 
-                    <?php foreach ($songs as $index => $song): ?>
-                        <div class="musicTop">
-                            <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover">
-                            <div class="song">
-                                <p class="song-title"><?php echo htmlspecialchars($song['title']); ?></p>
-                                <p class="song-artist"><?php echo htmlspecialchars($song['artist']); ?></p>
-                                <p class="song-ranking">#<?php echo $index + 1; ?></p>
-                                <p class="song-timer">
-                                    <?php
-                                    // Formatear duración de HH:MM:SS a MM:SS
-                                    $duration = $song['duration'];
-                                    if (preg_match('/^(\d+):(\d{2}):(\d{2})$/', $duration, $matches)) {
-                                        $hours = (int) $matches[1];
-                                        $minutes = (int) $matches[2];
-                                        $seconds = $matches[3];
+                    <!-- Contenedor con scroll oculto -->
+                    <div class="scroll-container">
+                        <div class="songs-wrapper">
+                            <?php foreach ($songs as $index => $song): ?>
+                                <div class="musicTop">
+                                    <p class="song-ranking">#<?php echo $index + 1; ?></p>
 
-                                        // Convertir horas a minutos
-                                        if ($hours > 0) {
-                                            $minutes = ($hours * 60) + $minutes;
-                                        }
+                                    <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover">
+                                    <div class="song">
+                                        <p class="song-title"><?php echo htmlspecialchars($song['title']); ?></p>
+                                        <p class="song-artist"><?php echo htmlspecialchars($song['artist']); ?></p>
+                                        <p class="song-timer">
+                                            <?php
+                                            $duration = $song['duration'] ?? '00:00';
+                                            $duration = trim($duration);
 
-                                        echo $minutes . ':' . $seconds;
-                                    } else {
-                                        echo htmlspecialchars($duration);
-                                    }
-                                    ?>
-                                </p>
-                                <p><small>Álbum: <?php echo htmlspecialchars($song['album']); ?></small></p>
-                            </div>
+                                            // Dividir por :
+                                            $parts = explode(':', $duration);
+
+                                            // Si tiene al menos 2 partes (horas:minutos o minutos:segundos)
+                                            if (count($parts) >= 2) {
+                                                // Mostrar solo las primeras 2 partes
+                                                echo $parts[0] . ':' . $parts[1];
+                                            } else {
+                                                // Si no tiene formato :, mostrar tal cual
+                                                echo htmlspecialchars($duration);
+                                            }
+                                            ?>
+                                        </p>
+                                        <p><small>Álbum: <?php echo htmlspecialchars($song['album']); ?></small></p>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
                         </div>
-                    <?php endforeach; ?>
+                    </div>
+                    <!-- Fin del contenedor con scroll -->
 
                 <?php else: ?>
                     <div style="background: #ffebee; padding: 20px; text-align: center; border: 2px solid #f44336;">

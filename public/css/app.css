@@ -19,7 +19,7 @@ nav {
   bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #f5f5f598;
+  background-color: #f5f5f57a;
   border: 1px solid var(--color-borders);
   backdrop-filter: blur(30px);
   border-radius: 18px;
@@ -551,17 +551,18 @@ h2 {
 
 /*HOME TODO SECCION*/
 .containermusic {
-  position: absolute;
-  top: 30%;
-  left: 14%;
-  display: flex;
-  width: 842px;
-  height: 462px;
-  align-items: flex-start;
-  align-content: flex-start;
-  flex-direction: column;
-  gap: 10px;
-  flex-wrap: wrap;
+position: absolute;
+    top: 30%;
+    left: 19%;
+    display: flex;
+    width: 775px;
+    height: 462px;
+    align-items: flex-start;
+    align-content: flex-start;
+    flex-direction: column;
+    gap: 10px;
+    flex-wrap: wrap;
+
 }
 .articlehome {
   display: flex;
@@ -573,7 +574,7 @@ h2 {
 }
 .musicTop {
   display: flex;
-  width: 60%;
+  width: 45%;
   height: 188px;
   padding: 10px;
   align-items: center;
