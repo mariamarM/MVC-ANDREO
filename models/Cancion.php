@@ -52,5 +52,26 @@ class Cancion extends Model {
             return [];
         }
     }
+        public function getAlbumInfo($albumName) {
+        $sql = "SELECT 
+                    album,
+                    artist,
+                    COUNT(*) as total_songs
+                FROM canciones 
+                WHERE album = :album 
+                GROUP BY album, artist
+                LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':album', $albumName);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+        public function getSongsByAlbum($albumName) {
+        $sql = "SELECT * FROM canciones WHERE album = :album ORDER BY id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':album', $albumName);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>

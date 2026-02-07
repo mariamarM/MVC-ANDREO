@@ -1,13 +1,35 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
 
-// Cargar modelo de canciones
+// Cargar modelos
 require_once __DIR__ . '/../models/Cancion.php';
+require_once __DIR__ . '/../models/Review.php';
+
 $cancionModel = new Cancion();
+$reviewModel = new Review();
 
 // Obtener todas las canciones de la base de datos
 $allSongs = $cancionModel->getAll();
 $songs = is_array($allSongs) ? $allSongs : [];
+
+// Obtener porcentaje de reviews positivas para cada canción
+$songsWithStats = [];
+foreach ($songs as $song) {
+    $stats = $reviewModel->getReviewStats($song['id']);
+    
+    // Calcular porcentaje positivo
+    $positivePercentage = 0;
+    if ($stats && $stats['total'] > 0) {
+        $positivePercentage = ($stats['positive'] / $stats['total']) * 100;
+    }
+    
+    $songsWithStats[] = [
+        'song' => $song,
+        'stats' => $stats,
+        'positive_percentage' => $positivePercentage,
+        'total_reviews' => $stats['total'] ?? 0
+    ];
+}
 
 if (!defined('BASE_URL')) {
     define('BASE_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/');
@@ -30,9 +52,12 @@ if (!defined('BASE_URL')) {
     :root {
         --color-rojo: #ff0000;
         --color-bg: #F5F5F5;
-        --color-texto: #000000;
-        --color-gris: #E0E0E0;
-        --color-gris-oscuro: #CCCCCC;
+        --color-texto: #302F2F;
+        --color-gris: #dfdddd;
+        --color-gris-oscuro: #989898;
+        --color-verde: #1ead5a;
+        --color-naranja: #ff9800;
+        --color-rojo-oscuro: #d32f2f;
     }
 
     * {
@@ -144,7 +169,7 @@ if (!defined('BASE_URL')) {
     }
 
     .songs-container {
-    display: flex;
+      display: flex;
     flex-direction: row;
     align-items: center;
     gap: 15px;
@@ -162,7 +187,7 @@ if (!defined('BASE_URL')) {
         display: none;
     }
 
-    /* NUEVO ESTILO PARA CANCIONES EN ROW */
+    /* CONTENEDOR DE CANCIÓN CON PORCENTAJE */
     .song-row {
         display: flex;
         align-items: center;
@@ -172,18 +197,17 @@ if (!defined('BASE_URL')) {
         padding: 15px;
         border-radius: 10px;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         border: 1px solid var(--color-gris-oscuro);
         text-decoration: none;
         color: inherit;
         gap: 20px;
         cursor: pointer;
+        position: relative;
     }
 
     .song-row:hover {
         transform: translateY(-3px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        border-color: var(--color-rojo);
+     
     }
 
     .song-img {
@@ -199,6 +223,7 @@ if (!defined('BASE_URL')) {
         display: flex;
         flex-direction: column;
         justify-content: center;
+        padding-right: 100px; /* Espacio para el badge de porcentaje */
     }
 
     .song-title {
@@ -221,12 +246,67 @@ if (!defined('BASE_URL')) {
         margin-bottom: 8px;
     }
 
-    .song-duration {
-        font-size: 16px;
-        color: var(--color-rojo);
+    /* PORCENTAJE DE REVIEWS POSITIVAS */
+    .positive-percentage-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 70px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 10px;
+        z-index: 2;
+        transition: all 0.3s ease;
+    }
+
+    /* Colores según el porcentaje */
+    .percentage-excellent {
+        color: var(--color-verde);
+    }
+
+    .percentage-good {
+        color: var(--color-naranja);
+    }
+
+    .percentage-poor {
+        color: var(--color-rojo-oscuro);
+    }
+
+    .percentage-none {
+        color: #9e9e9e;
+    }
+
+    .percentage-value {
+        font-size: 18px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .percentage-label {
+        font-size: 10px;
         font-weight: 600;
-        min-width: 60px;
-        text-align: right;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 2px;
+        opacity: 0.9;
+    }
+
+    /* Total reviews badge */
+    .total-reviews-badge {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        background: rgba(0, 0, 0, 0.05);
+        color: #666;
+        font-size: 8px;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-weight: 600;
     }
 
     .song-meta {
@@ -242,6 +322,13 @@ if (!defined('BASE_URL')) {
         background: var(--color-gris);
         padding: 3px 10px;
         border-radius: 12px;
+    }
+
+    .song-duration {
+        font-size: 16px;
+        color: var(--color-rojo);
+        font-weight: 600;
+        min-width: 60px;
     }
 
     .indie-highlight {
@@ -275,6 +362,7 @@ if (!defined('BASE_URL')) {
             flex-direction: column;
             align-items: flex-start;
             gap: 15px;
+            padding-bottom: 50px; /* Más espacio para badges en móvil */
         }
 
         .song-img {
@@ -282,9 +370,20 @@ if (!defined('BASE_URL')) {
             height: 60px;
         }
 
-        .song-duration {
-            align-self: flex-end;
-            margin-top: 10px;
+        .song-content {
+            padding-right: 0;
+            width: 100%;
+        }
+
+        .positive-percentage-badge {
+            top: auto;
+            bottom: 15px;
+            right: 15px;
+        }
+
+        .total-reviews-badge {
+            bottom: 15px;
+            right: 90px; /* Mover para no solaparse con percentage badge */
         }
 
         .container-search {
@@ -306,6 +405,15 @@ if (!defined('BASE_URL')) {
         
         .songs-container {
             padding: 0 20px;
+        }
+        
+        .positive-percentage-badge {
+            min-width: 60px;
+            padding: 6px 8px;
+        }
+        
+        .percentage-value {
+            font-size: 16px;
         }
     }
 </style>
@@ -344,10 +452,45 @@ if (!defined('BASE_URL')) {
         </div>
 
         <div class="songs-container">
-            <?php if (!empty($songs)): ?>
-                <?php foreach ($songs as $index => $song): ?>
-                    <a href="SongDetail.php?album=<?php echo urlencode($song['album'] ?? ''); ?>&song_id=<?php echo $song['id'] ?? ''; ?>" 
+            <?php if (!empty($songsWithStats)): ?>
+                <?php foreach ($songsWithStats as $item): 
+                    $song = $item['song'];
+                    $positivePercentage = $item['positive_percentage'];
+                    $totalReviews = $item['total_reviews'];
+                    
+                    // Determinar clase CSS según el porcentaje
+                    $percentageClass = 'percentage-none';
+                    if ($positivePercentage > 0) {
+                        if ($positivePercentage >= 80) {
+                            $percentageClass = 'percentage-excellent';
+                        } elseif ($positivePercentage >= 60) {
+                            $percentageClass = 'percentage-good';
+                        } else {
+                            $percentageClass = 'percentage-poor';
+                        }
+                    }
+                ?>
+                    <a href="SongsDetail.php?album=<?php echo urlencode($song['album'] ?? ''); ?>&song_id=<?php echo $song['id'] ?? ''; ?>" 
                        class="song-row">
+                        
+                        <!-- Badge de porcentaje de reviews positivas -->
+                        <div class="positive-percentage-badge <?php echo $percentageClass; ?>">
+                            <div class="percentage-value">
+                                <?php if ($positivePercentage > 0): ?>
+                                    +<?php echo number_format($positivePercentage, 1); ?>%
+                                <?php else: ?>
+                                    NR
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        
+                        <!-- Badge de total de reviews -->
+                        <?php if ($totalReviews > 0): ?>
+                            <div class="total-reviews-badge">
+                                <?php echo $totalReviews; ?> review<?php echo $totalReviews != 1 ? 's' : ''; ?>
+                            </div>
+                        <?php endif; ?>
+                        
                         <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover" class="song-img">
                         
                         <div class="song-content">
@@ -365,11 +508,10 @@ if (!defined('BASE_URL')) {
                                     if (preg_match('/^(\d{1,2}):(\d{2}):(\d{2})$/', $duration, $matches)) {
                                         $hours = (int) $matches[1];
                                         $minutes = (int) $matches[2];
-                                        $seconds = $matches[3];
                                         if ($hours > 0) {
                                             echo sprintf('%d:%02d', $hours, $minutes);
                                         } else {
-                                            echo sprintf('%d:%02d', $minutes, $seconds);
+                                            echo sprintf('%d:%02d', $minutes, $matches[3]);
                                         }
                                     } elseif (preg_match('/^(\d{1,2}):(\d{2})$/', $duration, $matches)) {
                                         echo sprintf('%d:%02d', $matches[1], $matches[2]);
@@ -461,17 +603,38 @@ if (!defined('BASE_URL')) {
             }
         });
         
-        // Añadir funcionalidad para los clics en las canciones
+        // Efecto hover mejorado para porcentajes
         document.querySelectorAll('.song-row').forEach(row => {
-            row.addEventListener('click', function(e) {
-                // La navegación ya se hace con el enlace, esto es para efectos adicionales
-                this.style.transform = 'scale(0.98)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 150);
+            row.addEventListener('mouseenter', function() {
+                const percentageBadge = this.querySelector('.positive-percentage-badge');
+                if (percentageBadge) {
+                    percentageBadge.style.transform = 'scale(1.1)';
+                }
+            });
+            
+            row.addEventListener('mouseleave', function() {
+                const percentageBadge = this.querySelector('.positive-percentage-badge');
+                if (percentageBadge) {
+                    percentageBadge.style.transform = 'scale(1)';
+                }
             });
         });
+        
+        // Filtrar por porcentaje de reviews (opcional - se puede activar)
+        function filterByRating(minPercentage) {
+            const songRows = document.querySelectorAll('.song-row');
+            
+            songRows.forEach(row => {
+                const percentageText = row.querySelector('.percentage-value').textContent;
+                const percentage = parseFloat(percentageText.replace('+', '').replace('%', ''));
+                
+                if (!isNaN(percentage) && percentage >= minPercentage) {
+                    row.style.display = 'flex';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
     </script>
 </body>
-
 </html>
