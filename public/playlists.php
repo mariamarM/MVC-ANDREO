@@ -67,6 +67,18 @@
         letter-spacing: 0.15px;
     }
 
+    .containerLog {
+        display: flex;
+        width: 554px;
+        height: 287px;
+        padding: 47px 10px;
+        flex-direction: column;
+        align-items: center;
+        gap: 53px;
+        border-radius: 20px;
+        border: 1px solid #F00;
+    }
+
     .btnsLog a {
         display: flex;
         padding: 10px 21px;
