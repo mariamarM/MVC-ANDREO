@@ -68,24 +68,6 @@ if (!defined('BASE_URL')) {
         mix-blend-mode: difference;
     }
 
-    .articlehome {
-        position: absolute;
-        right: 10%;
-        top: 15%;
-    }
-
-    section,
-    h2 {
-        border-radius: 4px 40px 4px 10px;
-        width: 100%;
-        background-color: var(--color-rojo);
-        color: #FFF;
-        font-family: "Manrope", sans-serif;
-        font-size: 24px;
-        font-style: normal;
-        font-weight: 400;
-    }
-
     .titlesong {
         font-size: 140px;
         font-weight: 900;
@@ -101,7 +83,6 @@ if (!defined('BASE_URL')) {
     .container-search {
         display: flex;
         margin: 43px 30%;
-
         width: 756px;
         height: 62px;
         padding: 11px 23px 11px 693px;
@@ -118,17 +99,14 @@ if (!defined('BASE_URL')) {
         font-size: 18px;
         width: 30%;
         color: var(--color-texto);
-            position: absolute;
-    left: 32%;
-
+        position: absolute;
+        left: 32%;
         background-color: transparent;
-       
     }
 
     #searchButton {
         color: var(--color-rojo);
         border: none;
-
         cursor: pointer;
         font-size: 20px;
     }
@@ -166,86 +144,104 @@ if (!defined('BASE_URL')) {
     }
 
     .songs-container {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: stretch;
-        gap: 25px;
-        padding: 0 40px;
-        margin-bottom: 60px;
-        max-height: 500px;
-        overflow-y: auto;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+    padding: 0 40px;
+    margin-bottom: 60px;
+    max-height: 500px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex-wrap: wrap;
+    justify-content: center;
     }
 
     .songs-container::-webkit-scrollbar {
         display: none;
     }
 
-    .song-card {
+    /* NUEVO ESTILO PARA CANCIONES EN ROW */
+    .song-row {
+        display: flex;
+        align-items: center;
         background-color: white;
-        width: calc(50% - 25px);
-        min-width: 300px;
-        max-width: 400px;
-        padding: 20px;
+        width: 20%;
+        max-width: 800px;
+        padding: 15px;
         border-radius: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--color-gris-oscuro);
+        text-decoration: none;
+        color: inherit;
+        gap: 20px;
+        cursor: pointer;
+    }
+
+    .song-row:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-color: var(--color-rojo);
+    }
+
+    .song-img {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .song-content {
+        flex-grow: 1;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        transition: transform 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        border: 1px solid var(--color-gris-oscuro);
-    }
-
-    .song-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .song-info {
-        flex-grow: 1;
-        margin-bottom: 15px;
+        justify-content: center;
     }
 
     .song-title {
-        font-size: 24px;
+        font-size: 20px;
         font-weight: 700;
         color: var(--color-texto);
         margin-bottom: 5px;
+        line-height: 1.2;
     }
 
     .song-artist {
-        font-size: 18px;
+        font-size: 16px;
         color: #666;
         margin-bottom: 5px;
     }
 
     .song-album {
-        font-size: 16px;
+        font-size: 14px;
         color: #888;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
 
     .song-duration {
-        font-size: 18px;
+        font-size: 16px;
         color: var(--color-rojo);
         font-weight: 600;
+        min-width: 60px;
         text-align: right;
     }
 
-    .song-rating {
-        margin: 10px 0;
+    .song-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 5px;
     }
 
-    .star {
-        color: var(--color-rojo);
-        font-size: 20px;
-    }
-
-    .star.empty {
-        color: var(--color-gris-oscuro);
+    .song-genre {
+        font-size: 14px;
+        color: #666;
+        background: var(--color-gris);
+        padding: 3px 10px;
+        border-radius: 12px;
     }
 
     .indie-highlight {
@@ -262,19 +258,8 @@ if (!defined('BASE_URL')) {
         background-color: var(--color-rojo);
     }
 
-    .song-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 15px;
-        padding-top: 15px;
-        border-top: 1px solid var(--color-gris);
-    }
-
     @media (max-width: 768px) {
-
-        h1,
-        h3 {
+        h1, h3 {
             font-size: 80px;
         }
 
@@ -286,13 +271,41 @@ if (!defined('BASE_URL')) {
             padding: 20px;
         }
 
-        .song-card {
-            width: 100%;
-            max-width: 100%;
+        .song-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
         }
 
+        .song-img {
+            width: 60px;
+            height: 60px;
+        }
+
+        .song-duration {
+            align-self: flex-end;
+            margin-top: 10px;
+        }
+
+        .container-search {
+            width: 90%;
+            margin: 43px auto;
+            padding: 11px 20px;
+        }
+        
+        #searchInput {
+            left: 5%;
+            width: 80%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .container-search {
+            width: 95%;
+        }
+        
         .songs-container {
-            max-height: 400px;
+            padding: 0 20px;
         }
     }
 </style>
@@ -333,61 +346,44 @@ if (!defined('BASE_URL')) {
         <div class="songs-container">
             <?php if (!empty($songs)): ?>
                 <?php foreach ($songs as $index => $song): ?>
-                    <div class="song-card">
-                        <div class="song-info">
+                    <a href="SongDetail.php?album=<?php echo urlencode($song['album'] ?? ''); ?>&song_id=<?php echo $song['id'] ?? ''; ?>" 
+                       class="song-row">
+                        <img src="<?php echo BASE_URL; ?>img/placeholder.jpg" alt="Song cover" class="song-img">
+                        
+                        <div class="song-content">
                             <div class="song-title"><?php echo htmlspecialchars($song['title'] ?? 'Sin título'); ?></div>
-                            <div class="song-artist"><?php echo htmlspecialchars($song['artist'] ?? 'Artista desconocido'); ?>
-                            </div>
+                            <div class="song-artist"><?php echo htmlspecialchars($song['artist'] ?? 'Artista desconocido'); ?></div>
                             <div class="song-album"><?php echo htmlspecialchars($song['album'] ?? 'Sin álbum'); ?></div>
-                            <div class="song-rating">
-                                <?php
-                                // Generar estrellas basadas en rating (si existe)
-                                $rating = $song['rating'] ?? 0;
-                                $maxStars = 5;
-                                for ($i = 1; $i <= $maxStars; $i++): ?>
-                                    <span class="star <?php echo $i > $rating ? 'empty' : ''; ?>">★</span>
-                                <?php endfor; ?>
+                            
+                            <div class="song-meta">
+                                <div class="song-genre"><?php echo htmlspecialchars($song['genre'] ?? 'Sin género'); ?></div>
+                                <div class="song-duration">
+                                    <?php
+                                    $duration = $song['duration'] ?? '00:00';
+                                    $duration = trim($duration);
+                                    
+                                    if (preg_match('/^(\d{1,2}):(\d{2}):(\d{2})$/', $duration, $matches)) {
+                                        $hours = (int) $matches[1];
+                                        $minutes = (int) $matches[2];
+                                        $seconds = $matches[3];
+                                        if ($hours > 0) {
+                                            echo sprintf('%d:%02d', $hours, $minutes);
+                                        } else {
+                                            echo sprintf('%d:%02d', $minutes, $seconds);
+                                        }
+                                    } elseif (preg_match('/^(\d{1,2}):(\d{2})$/', $duration, $matches)) {
+                                        echo sprintf('%d:%02d', $matches[1], $matches[2]);
+                                    } else {
+                                        echo '00:00';
+                                    }
+                                    ?>
+                                </div>
                             </div>
                         </div>
-                        <div class="song-footer">
-                            <div class="song-genre"><?php echo htmlspecialchars($song['genre'] ?? 'Sin género'); ?></div>
-                            <div class="song-duration">
-                                <?php
-                                // Formatear duración
-                                $duration = $song['duration'] ?? '00:00';
-
-                                // Si la duración está en formato HH:MM:SS
-                                if (preg_match('/^(\d{1,2}):(\d{2}):(\d{2})$/', $duration, $matches)) {
-                                    $hours = (int) $matches[1];
-                                    $minutes = (int) $matches[2];
-                                    $seconds = $matches[3];
-
-                                    // Si hay horas, mostrar en formato HH:MM:SS
-                                    if ($hours > 0) {
-                                        echo sprintf('%d:%02d', $hours, $minutes);
-                                    }
-                                    // Si no hay horas, mostrar en formato MM:SS
-                                    else {
-                                        echo sprintf('%d:%02d', $minutes, $seconds);
-                                    }
-                                }
-                                // Si la duración está en formato MM:SS
-                                elseif (preg_match('/^(\d{1,2}):(\d{2})$/', $duration, $matches)) {
-                                    $minutes = (int) $matches[1];
-                                    $seconds = $matches[2];
-                                    echo sprintf('%d:%02d', $minutes, $seconds);
-                                }
-                                // Si el formato no es reconocido
-                                else {
-                                    echo '00:00';
-                                }
-                                ?>
-                            </div>
-                        </div>
-                    </div>
+                    </a>
                 <?php endforeach; ?>
             <?php else: ?>
-                <div class="song-card" style="width: 100%; text-align: center; padding: 40px;">
+                <div class="song-row" style="text-align: center; padding: 40px; flex-direction: column;">
                     <h3>No hay canciones disponibles</h3>
                     <p>No se encontraron canciones en la base de datos.</p>
                 </div>
@@ -406,34 +402,53 @@ if (!defined('BASE_URL')) {
 
                 // Agregar la clase active al tag clickeado
                 this.classList.add('active');
+                
+                // Filtrar canciones por género
+                const genre = this.textContent.toLowerCase();
+                const songRows = document.querySelectorAll('.song-row');
+                
+                if (genre === 'todos' || genre === 'all') {
+                    songRows.forEach(row => {
+                        row.style.display = 'flex';
+                    });
+                } else {
+                    songRows.forEach(row => {
+                        const songGenre = row.querySelector('.song-genre').textContent.toLowerCase();
+                        if (songGenre.includes(genre)) {
+                            row.style.display = 'flex';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                }
             });
         });
 
         // Interactividad para el botón de búsqueda
         document.getElementById('searchButton').addEventListener('click', function () {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const songCards = document.querySelectorAll('.song-card');
+            const songRows = document.querySelectorAll('.song-row');
 
             if (searchTerm.trim() === '') {
                 // Mostrar todas las canciones si la búsqueda está vacía
-                songCards.forEach(card => {
-                    card.style.display = 'flex';
+                songRows.forEach(row => {
+                    row.style.display = 'flex';
                 });
             } else {
                 // Filtrar canciones
-                songCards.forEach(card => {
-                    const title = card.querySelector('.song-title').textContent.toLowerCase();
-                    const artist = card.querySelector('.song-artist').textContent.toLowerCase();
-                    const album = card.querySelector('.song-album').textContent.toLowerCase();
-                    const genre = card.querySelector('.song-genre').textContent.toLowerCase();
+                songRows.forEach(row => {
+                    const title = row.querySelector('.song-title').textContent.toLowerCase();
+                    const artist = row.querySelector('.song-artist').textContent.toLowerCase();
+                    const album = row.querySelector('.song-album').textContent.toLowerCase();
+                    const genre = row.querySelector('.song-genre').textContent.toLowerCase();
 
                     if (title.includes(searchTerm) ||
                         artist.includes(searchTerm) ||
                         album.includes(searchTerm) ||
                         genre.includes(searchTerm)) {
-                        card.style.display = 'flex';
+                        row.style.display = 'flex';
                     } else {
-                        card.style.display = 'none';
+                        row.style.display = 'none';
                     }
                 });
             }
@@ -444,6 +459,17 @@ if (!defined('BASE_URL')) {
             if (e.key === 'Enter') {
                 document.getElementById('searchButton').click();
             }
+        });
+        
+        // Añadir funcionalidad para los clics en las canciones
+        document.querySelectorAll('.song-row').forEach(row => {
+            row.addEventListener('click', function(e) {
+                // La navegación ya se hace con el enlace, esto es para efectos adicionales
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
         });
     </script>
 </body>
