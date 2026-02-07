@@ -67,11 +67,17 @@ class Cancion extends Model {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
         public function getSongsByAlbum($albumName) {
-        $sql = "SELECT * FROM canciones WHERE album = :album ORDER BY id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindParam(':album', $albumName);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+       $sql = "SELECT * FROM canciones WHERE album = :album ORDER BY id";
+    $stmt = $this->db->prepare($sql);
+    $stmt->bindParam(':album', $albumName, PDO::PARAM_STR);
+    $stmt->execute();
+    
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // DEBUG: Ver qué devuelve
+    error_log("getSongsByAlbum('$albumName'): " . count($results) . " resultados");
+    
+    return $results;
     }
 }
 ?>

@@ -1,38 +1,3 @@
-<?php
-// SongDetail.php
-require_once __DIR__ . '/../config/config.php';
-
-// Cargar modelos
-require_once __DIR__ . '/../models/Cancion.php';
-require_once __DIR__ . '/../models/Review.php';
-
-$cancionModel = new Cancion();
-$reviewModel = new Review();
-
-// Obtener parámetros de la URL
-$albumName = isset($_GET['album']) ? urldecode($_GET['album']) : '';
-$highlightSongId = $_GET['song_id'] ?? '';
-
-if (empty($albumName)) {
-    header('Location: buscarCanciones.php');
-    exit;
-}
-
-// Obtener datos REALES de la base de datos
-try {
-    $albumSongs = $cancionModel->getSongsByAlbum($albumName);
-    $albumInfo = $cancionModel->getAlbumInfo($albumName);
-    $albumReviews = $reviewModel->getReviewsByAlbum($albumName);
-    
-    if (empty($albumSongs)) {
-        throw new Exception("No se encontraron canciones para el álbum");
-    }
-    
-} catch (Exception $e) {
-    $error = $e->getMessage();
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,33 +31,30 @@ try {
             overflow-x: hidden;
         }
         
-        /* CONTENEDOR PRINCIPAL CON SCROLL HORIZONTAL */
-        .main-container {
+        /* VERSIÓN SIMPLIFICADA - SIN SCROLL COMPLEJO */
+        .page-wrapper {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+        }
+        
+        /* CONTENEDOR PRINCIPAL SIMPLE */
+        .content-sections {
             display: flex;
-            width: 200vw;
-            height: 100vh;
-            overflow-x: scroll;
-            scroll-behavior: smooth;
-            scroll-snap-type: x mandatory;
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
         }
         
-        /* OCULTAR SCROLLBAR */
-        .main-container {
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        
-        .main-container::-webkit-scrollbar {
-            display: none;
-        }
-        
-        /* CADA SECCIÓN OCUPA 100vw */
+        /* CADA SECCIÓN OCUPA 100% DEL VIEWPORT */
         .section {
-            width: 100vw;
+            min-width: 100vw;
             height: 100vh;
             padding: 40px;
-            scroll-snap-align: start;
             overflow-y: auto;
+            flex-shrink: 0;
+            transition: transform 0.5s ease;
         }
         
         .section::-webkit-scrollbar {
@@ -310,7 +272,7 @@ try {
             background: rgba(255, 0, 0, 0.1);
         }
         
-        /* PUNTOS DE NAVEGACIÓN */
+        /* PUNTOS DE NAVEGACIÓN MEJORADOS */
         .nav-dots {
             position: fixed;
             top: 50%;
@@ -319,54 +281,79 @@ try {
             display: flex;
             flex-direction: column;
             gap: 15px;
-            z-index: 100;
+            z-index: 1000; /* MAYOR Z-INDEX */
         }
         
         .nav-dot {
-            width: 12px;
-            height: 12px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.3);
             cursor: pointer;
             transition: all 0.3s ease;
+            border: 2px solid transparent;
         }
         
         .nav-dot.active {
             background: var(--color-rojo);
             transform: scale(1.3);
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+            border: 2px solid white;
         }
         
-        /* FLECHAS DE NAVEGACIÓN */
+        .nav-dot:hover {
+            transform: scale(1.2);
+            background: rgba(255, 0, 0, 0.5);
+        }
+        
+        /* FLECHAS DE NAVEGACIÓN MEJORADAS */
         .nav-arrows {
             position: fixed;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 20px;
-            z-index: 100;
+            gap: 30px;
+            z-index: 1000; /* MAYOR Z-INDEX */
         }
         
         .nav-arrow {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.2);
             color: var(--color-texto);
             border: none;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 24px;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
         
         .nav-arrow:hover {
             background: var(--color-rojo);
-            transform: scale(1.1);
+            transform: scale(1.15);
+            border-color: white;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+        
+        /* INDICADOR DE SECCIÓN */
+        .section-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 1000;
+            display: none; /* Oculto por defecto */
         }
         
         /* RESPONSIVE */
@@ -381,16 +368,43 @@ try {
             
             .nav-arrows {
                 bottom: 20px;
+                gap: 20px;
             }
             
             .nav-arrow {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
             }
             
             .nav-dots {
                 right: 10px;
+            }
+            
+            .nav-dot {
+                width: 14px;
+                height: 14px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .album-title {
+                font-size: 36px;
+            }
+            
+            .nav-arrows {
+                bottom: 15px;
+                gap: 15px;
+            }
+            
+            .nav-arrow {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+            
+            .section-title {
+                font-size: 24px;
             }
         }
     </style>
@@ -400,22 +414,34 @@ try {
         <i class="fas fa-arrow-left"></i> Back to Search
     </a>
     
-    <!-- Puntos de navegación -->
-    <div class="nav-dots">
-        <div class="nav-dot active" data-section="0"></div>
-        <div class="nav-dot" data-section="1"></div>
-    </div>
-    
-    <?php if (isset($error)): ?>
+    <?php if (!empty($error)): ?>
         <div style="text-align: center; padding: 100px 20px;">
             <h2 style="color: var(--color-rojo);">Error</h2>
             <p><?php echo htmlspecialchars($error); ?></p>
+            <p><strong>Album buscado:</strong> <?php echo htmlspecialchars($albumName); ?></p>
             <p><a href="buscadorCanciones.php" style="color: var(--color-azul);">Return to search</a></p>
+        </div>
+    <?php elseif (empty($albumSongs)): ?>
+        <div style="text-align: center; padding: 100px 20px;">
+            <h2 style="color: var(--color-naranja);">Álbum vacío</h2>
+            <p>No se encontraron canciones para el álbum: <?php echo htmlspecialchars($albumName); ?></p>
+            <p><a href="buscarCanciones.php" style="color: var(--color-azul);">Return to search</a></p>
         </div>
     <?php else: ?>
     
-    <!-- Contenedor principal -->
-    <div class="main-container" id="mainContainer">
+    <!-- Indicador de sección -->
+    <div class="section-indicator" id="sectionIndicator">
+        Section <span id="currentSection">1</span>/2
+    </div>
+    
+    <!-- Puntos de navegación -->
+    <div class="nav-dots">
+        <div class="nav-dot active" data-section="0" title="Songs"></div>
+        <div class="nav-dot" data-section="1" title="Reviews"></div>
+    </div>
+    
+    <!-- Contenedor principal SIMPLIFICADO -->
+    <div class="content-sections" id="contentSections">
         <!-- Sección 1: Canciones -->
         <section class="section songs-section">
             <div class="album-header">
@@ -518,10 +544,10 @@ try {
     
     <!-- Flechas de navegación -->
     <div class="nav-arrows">
-        <button class="nav-arrow" id="prevBtn">
+        <button class="nav-arrow" id="prevBtn" title="Previous section">
             <i class="fas fa-chevron-left"></i>
         </button>
-        <button class="nav-arrow" id="nextBtn">
+        <button class="nav-arrow" id="nextBtn" title="Next section">
             <i class="fas fa-chevron-right"></i>
         </button>
     </div>
@@ -529,28 +555,43 @@ try {
     <?php endif; ?>
     
     <script>
-        // Elementos del DOM
-        const mainContainer = document.getElementById('mainContainer');
+        // VERSIÓN SIMPLIFICADA DEL JAVASCRIPT
+        const contentSections = document.getElementById('contentSections');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         const navDots = document.querySelectorAll('.nav-dot');
+        const sectionIndicator = document.getElementById('sectionIndicator');
+        const currentSectionSpan = document.getElementById('currentSection');
         
         let currentSection = 0;
-        const sectionWidth = window.innerWidth;
         const totalSections = 2;
+        let isAnimating = false;
         
         // Función para navegar a una sección
         function goToSection(sectionIndex) {
+            if (isAnimating || sectionIndex < 0 || sectionIndex >= totalSections) return;
+            
+            isAnimating = true;
             currentSection = sectionIndex;
-            mainContainer.scrollTo({
-                left: sectionWidth * sectionIndex,
-                behavior: 'smooth'
-            });
-            updateNavDots();
+            
+            // Mover el contenedor
+            contentSections.style.transform = `translateX(-${sectionIndex * 100}vw)`;
+            
+            // Actualizar UI
+            updateNavigation();
+            
+            // Mostrar indicador temporalmente
+            showSectionIndicator();
+            
+            // Resetear animación
+            setTimeout(() => {
+                isAnimating = false;
+            }, 500);
         }
         
-        // Actualizar puntos de navegación
-        function updateNavDots() {
+        // Actualizar navegación
+        function updateNavigation() {
+            // Actualizar puntos
             navDots.forEach((dot, index) => {
                 if (index === currentSection) {
                     dot.classList.add('active');
@@ -558,16 +599,38 @@ try {
                     dot.classList.remove('active');
                 }
             });
+            
+            // Actualizar indicador
+            currentSectionSpan.textContent = currentSection + 1;
+            
+            // Mostrar/ocultar flechas según posición
+            prevBtn.style.opacity = currentSection === 0 ? '0.5' : '1';
+            prevBtn.style.cursor = currentSection === 0 ? 'not-allowed' : 'pointer';
+            
+            nextBtn.style.opacity = currentSection === totalSections - 1 ? '0.5' : '1';
+            nextBtn.style.cursor = currentSection === totalSections - 1 ? 'not-allowed' : 'pointer';
         }
         
-        // Botón anterior
+        // Mostrar indicador de sección
+        function showSectionIndicator() {
+            sectionIndicator.style.display = 'block';
+            sectionIndicator.style.opacity = '1';
+            
+            setTimeout(() => {
+                sectionIndicator.style.opacity = '0';
+                setTimeout(() => {
+                    sectionIndicator.style.display = 'none';
+                }, 300);
+            }, 1500);
+        }
+        
+        // Event listeners
         prevBtn.addEventListener('click', () => {
             if (currentSection > 0) {
                 goToSection(currentSection - 1);
             }
         });
         
-        // Botón siguiente
         nextBtn.addEventListener('click', () => {
             if (currentSection < totalSections - 1) {
                 goToSection(currentSection + 1);
@@ -577,22 +640,10 @@ try {
         // Puntos de navegación
         navDots.forEach((dot, index) => {
             dot.addEventListener('click', () => {
-                goToSection(index);
+                if (index !== currentSection) {
+                    goToSection(index);
+                }
             });
-        });
-        
-        // Detectar scroll manual
-        let isScrolling = false;
-        mainContainer.addEventListener('scroll', () => {
-            if (!isScrolling) {
-                isScrolling = true;
-                setTimeout(() => {
-                    const scrollPosition = mainContainer.scrollLeft;
-                    currentSection = Math.round(scrollPosition / sectionWidth);
-                    updateNavDots();
-                    isScrolling = false;
-                }, 100);
-            }
         });
         
         // Navegación con teclado
@@ -601,61 +652,84 @@ try {
                 goToSection(currentSection - 1);
             } else if (e.key === 'ArrowRight' && currentSection < totalSections - 1) {
                 goToSection(currentSection + 1);
+            } else if (e.key === '1' || e.key === '&') {
+                goToSection(0);
+            } else if (e.key === '2' || e.key === 'é') {
+                goToSection(1);
             }
         });
         
         // Swipe en móvil
         let touchStartX = 0;
         let touchEndX = 0;
+        const swipeThreshold = 50;
         
-        mainContainer.addEventListener('touchstart', (e) => {
+        contentSections.addEventListener('touchstart', (e) => {
             touchStartX = e.changedTouches[0].screenX;
         });
         
-        mainContainer.addEventListener('touchend', (e) => {
+        contentSections.addEventListener('touchend', (e) => {
             touchEndX = e.changedTouches[0].screenX;
             handleSwipe();
         });
         
         function handleSwipe() {
-            const swipeThreshold = 50;
             const diff = touchStartX - touchEndX;
             
             if (Math.abs(diff) > swipeThreshold) {
                 if (diff > 0 && currentSection < totalSections - 1) {
+                    // Swipe izquierda - siguiente
                     goToSection(currentSection + 1);
                 } else if (diff < 0 && currentSection > 0) {
+                    // Swipe derecha - anterior
                     goToSection(currentSection - 1);
                 }
             }
         }
         
-        // Scroll con rueda del mouse (horizontal)
-        mainContainer.addEventListener('wheel', (e) => {
-            if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-                // Scroll horizontal ya manejado por el contenedor
-                return;
+        // Rueda del mouse
+        let wheelTimeout;
+        contentSections.addEventListener('wheel', (e) => {
+            clearTimeout(wheelTimeout);
+            
+            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                // Scroll vertical - cambiar sección
+                if (e.deltaY > 0 && currentSection < totalSections - 1) {
+                    // Scroll abajo - siguiente
+                    goToSection(currentSection + 1);
+                    e.preventDefault();
+                } else if (e.deltaY < 0 && currentSection > 0) {
+                    // Scroll arriba - anterior
+                    goToSection(currentSection - 1);
+                    e.preventDefault();
+                }
             }
             
-            if (e.deltaY > 0 && currentSection < totalSections - 1) {
-                goToSection(currentSection + 1);
-                e.preventDefault();
-            } else if (e.deltaY < 0 && currentSection > 0) {
-                goToSection(currentSection - 1);
-                e.preventDefault();
-            }
+            wheelTimeout = setTimeout(() => {}, 100);
         }, { passive: false });
         
-        // Resaltar canción si hay highlightSongId
+        // Auto-scroll a canción destacada
         window.addEventListener('load', function() {
             const highlightedSong = document.querySelector('.song-item.highlighted');
             if (highlightedSong) {
-                highlightedSong.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => {
+                    highlightedSong.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
             }
+            
+            // Inicializar navegación
+            updateNavigation();
+            
+            // Forzar redibujado para evitar problemas de render
+            contentSections.style.transform = 'translateX(0)';
         });
         
-        // Inicializar
-        updateNavDots();
+        // Prevenir selección de texto durante swipe
+        contentSections.addEventListener('selectstart', (e) => {
+            if (isAnimating) {
+                e.preventDefault();
+            }
+        });
     </script>
 </body>
 </html>

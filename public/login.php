@@ -16,7 +16,7 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
     error_log("Ya logueado como: " . $_SESSION['user_name'] . " - Rol: " . $_SESSION['user_role']);
 
     if ($_SESSION['user_role'] === 'admin') {
-        header('Location: ' . BASE_URL . 'views/admin/dashboard.php');
+        header('Location: ' . BASE_URL . 'views/admin/dashboard.php');  // AQUÍ TAMBIÉN
     } else {
         header('Location: ' . BASE_URL . 'dashboardUser.php');
     }
@@ -43,42 +43,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$username, $username]);
             $user = $stmt->fetch();
 
-            if ($user) {
-                error_log("Usuario encontrado: " . $user['username'] . ", Rol: " . $user['role']);
 
-                // VERIFICAR CONTRASEÑA - SOLO UNA VEZ
-                if (password_verify($password, $user['password_hash'])) {
-                    // ¡LOGIN EXITOSO!
-                    $_SESSION['user_id'] = (int)$user['id'];
-                    $_SESSION['user_name'] = $user['username'];
-                    $_SESSION['user_role'] = $user['role'];
-                    $_SESSION['logged_in'] = true;
-                    $_SESSION['login_time'] = time();
 
-                    // DEBUG
-                    error_log("Login EXITOSO para: " . $user['username']);
-                    error_log("User ID guardado: " . $_SESSION['user_id']);
-                    error_log("Session ID: " . session_id());
+if ($user) {
+    error_log("Usuario encontrado: " . $user['username'] . ", Rol: " . $user['role']);
 
-                    // ESTABLECER COOKIE MANUALMENTE (IMPORTANTE PARA DOCKER)
-                    setcookie(session_name(), session_id(), time() + 86400, '/', '', false, false);
+    // VERIFICAR CONTRASEÑA - SOLO UNA VEZ
+    if (password_verify($password, $user['password_hash'])) {
+    // ¡LOGIN EXITOSO!
+    $_SESSION['user_id'] = (int)$user['id'];
+    $_SESSION['user_name'] = $user['username'];
+    $_SESSION['user_role'] = $user['role'];
+    $_SESSION['logged_in'] = true;
+    $_SESSION['login_time'] = time();
 
-                    // IMPORTANTE: Guardar sesión inmediatamente
-                    session_write_close();
+    // DEBUG
+    error_log("Login EXITOSO para: " . $user['username']);
+    error_log("User ID guardado: " . $_SESSION['user_id']);
+    error_log("Session ID: " . session_id());
 
-                    // Redirigir con parámetros de debug
-                    $redirect_url = BASE_URL . 'dashboardUser.php?login=1&sid=' . session_id();
-                    header('Location: ' . $redirect_url);
-                    exit;
+    // ESTABLECER COOKIE MANUALMENTE
+    setcookie(session_name(), session_id(), time() + 86400, '/', '', false, false);
 
-                } else {
-                    $error = 'Contraseña incorrecta';
-                    error_log("Password verify FALLÓ para: " . $username);
-                }
-            } else {
-                $error = 'Usuario no encontrado';
-                error_log("Usuario NO encontrado: " . $username);
-            }
+    // IMPORTANTE: Guardar sesión inmediatamente
+    session_write_close();
+
+    // ***MISMA RUTA QUE ARRIBA***
+    if ($user['role'] === 'admin') {
+        $redirect_url = BASE_URL . 'views/admin/dashboard.php?login=1&sid=' . session_id();
+    } else {
+        $redirect_url = BASE_URL . 'dashboardUser.php?login=1&sid=' . session_id();
+    }
+    
+    header('Location: ' . $redirect_url);
+    exit;
+}
+} else {
+    $error = 'Usuario no encontrado';
+    error_log("Usuario NO encontrado: " . $username);
+}
+
+// ... resto del código se mantiene igual ...
 
         } catch (Exception $e) {
             $error = 'Error de conexión: ' . $e->getMessage();

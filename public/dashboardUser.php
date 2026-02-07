@@ -4,15 +4,10 @@
 // 1. Incluir config (que ahora inicia sesión)
 require_once __DIR__ . '/../config/config.php';
 
-// // 2. DEBUG inmediato
-// if (isset($_GET['debug']) || isset($_GET['login'])) {
-//     echo "<div style='background:#000;color:#0f0;padding:10px;font-family:monospace;'>";
-//     echo "DEBUG: User ID = " . ($_SESSION['user_id'] ?? 'NULL') . " | ";
-//     echo "Session = " . session_id() . " | ";
-//     echo "Cookie = " . ($_COOKIE[session_name()] ?? 'NO') . " | ";
-//     echo "<a href='?force=1' style='color:#0ff;'>Forzar login</a>";
-//     echo "</div>";
-// }
+if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+    header('Location: ' . BASE_URL . 'views/admin/dashboard.php');
+    exit;
+}
 
 // 3. Verificación SIMPLE con opción de forzar
 if (empty($_SESSION['user_id'])) {
