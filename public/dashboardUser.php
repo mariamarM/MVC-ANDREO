@@ -332,7 +332,9 @@ try {
     * {
         box-sizing: border-box;
     }
-
+nav{
+    width: 52%;;
+}
     .action-buttons {
         display: flex;
         gap: 10px;
