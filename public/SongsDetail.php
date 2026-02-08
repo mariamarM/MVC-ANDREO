@@ -1,9 +1,72 @@
+<?php
+session_start();
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../models/Cancion.php';
+require_once __DIR__ . '/../models/Review.php';
+
+// Inicializar variables
+$error = null;
+$albumSongs = [];
+$albumReviews = [];
+$albumInfo = [];
+$highlightSongId = null;
+$albumName = '';
+$albumArtist = '';
+
+// Obtener parámetros de la URL
+$albumName = isset($_GET['album']) ? urldecode($_GET['album']) : '';
+$highlightSongId = isset($_GET['song_id']) ? (int)$_GET['song_id'] : null;
+
+// Validar que tenemos nombre de álbum
+if (empty($albumName)) {
+    $error = "No album specified";
+} else {
+    // Inicializar modelos
+    $cancionModel = new Cancion();
+    $reviewModel = new Review();
+    
+    try {
+        // 1. OBTENER TODAS LAS CANCIONES DEL ÁLBUM desde la tabla canciones
+        $albumSongs = $cancionModel->getSongsByAlbum($albumName);
+        
+        // Si no encontramos canciones, mostrar error
+        if (empty($albumSongs)) {
+            $error = "No songs found for album: " . htmlspecialchars($albumName);
+        } else {
+            // 2. OBTENER INFORMACIÓN DEL ÁLBUM desde la primera canción
+            $firstSong = $albumSongs[0];
+            $albumArtist = $firstSong['artist'] ?? 'Unknown Artist';
+            $albumInfo = [
+                'artist' => $albumArtist,
+                'total_songs' => count($albumSongs),
+                'genre' => $firstSong['genre'] ?? 'Various'
+            ];
+            
+            // Si no hay song_id destacado, usar el primero
+            if (!$highlightSongId && !empty($albumSongs[0]['id'])) {
+                $highlightSongId = $albumSongs[0]['id'];
+            }
+            
+            // 3. OBTENER REVIEWS DEL ÁLBUM desde la tabla reviews
+            $albumReviews = $reviewModel->getReviewsByAlbum($albumName);
+        }
+        
+    } catch (Exception $e) {
+        $error = "Error loading album data: " . $e->getMessage();
+        error_log("Error in SongsDetail.php: " . $e->getMessage());
+    }
+}
+
+// Asegurar que $albumName esté definida para el título
+$displayAlbumName = !empty($albumName) ? $albumName : 'Unknown Album';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($albumName); ?> | Music Virtual Closet</title>
+    <title><?php echo htmlspecialchars($displayAlbumName); ?> | Music Virtual Closet</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -31,30 +94,66 @@
             overflow-x: hidden;
         }
         
-        /* VERSIÓN SIMPLIFICADA - SIN SCROLL COMPLEJO */
-        .page-wrapper {
-            position: relative;
+        /* FONDO CON BLUR EFFECT */
+        .album-background {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            min-height: 100vh;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
         }
         
-        /* CONTENEDOR PRINCIPAL SIMPLE */
-        .content-sections {
+        .background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(0, 0, 0, 0.85) 0%, 
+                rgba(20, 20, 20, 0.80) 50%,
+                rgba(0, 0, 0, 0.85) 100%);
+            z-index: 1;
+        }
+        
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: blur(10px) brightness(0.4);
+            transform: scale(1.1);
+            z-index: 0;
+        }
+        
+        /* CONTENEDOR PRINCIPAL */
+        .main-container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
             display: flex;
-            width: 100%;
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
+            flex-direction: column;
         }
         
-        /* CADA SECCIÓN OCUPA 100% DEL VIEWPORT */
+        /* SECCIONES EN SCROLL HORIZONTAL */
+        .horizontal-scroll-container {
+            display: flex;
+            width: 200vw; /* 2 secciones */
+            height: calc(100vh - 80px);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 80px;
+        }
+        
         .section {
-            min-width: 100vw;
-            height: 100vh;
+            width: 100vw;
+            height: 100%;
             padding: 40px;
             overflow-y: auto;
             flex-shrink: 0;
-            transition: transform 0.5s ease;
         }
         
         .section::-webkit-scrollbar {
@@ -63,12 +162,14 @@
         
         /* SECCIÓN CANCIONES */
         .songs-section {
-            background: linear-gradient(135deg, rgba(10, 10, 10, 0.98), rgba(20, 20, 20, 0.97));
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
         }
         
         /* SECCIÓN REVIEWS */
         .reviews-section {
-            background: linear-gradient(135deg, rgba(15, 15, 15, 0.98), rgba(25, 25, 25, 0.97));
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
         }
         
         /* HEADER */
@@ -85,6 +186,7 @@
             margin-bottom: 5px;
             letter-spacing: -1px;
             line-height: 1;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
         
         .album-artist {
@@ -92,6 +194,7 @@
             color: var(--color-azul);
             font-weight: 500;
             margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
         
         .section-title {
@@ -101,79 +204,123 @@
             margin-bottom: 25px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
         }
         
-        /* LISTA DE CANCIONES */
-        .songs-list {
+        /* LISTA DE CANCIONES - AHORA HORIZONTAL */
+        .songs-scroll-container {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            overflow-x: auto;
+            gap: 20px;
+            padding: 20px 10px 40px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--color-rojo) transparent;
         }
         
-        .song-item {
-            display: flex;
-            align-items: center;
-            padding: 18px 20px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
+        .songs-scroll-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .songs-scroll-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .songs-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--color-rojo);
+            border-radius: 10px;
+        }
+        
+        .song-card {
+            min-width: 280px;
+            max-width: 280px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
             transition: all 0.3s ease;
-            border-left: 4px solid transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
         }
         
-        .song-item.highlighted {
+        .song-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--color-rojo);
+            box-shadow: 0 10px 20px rgba(255, 0, 0, 0.2);
+        }
+        
+        .song-card.highlighted {
             background: rgba(255, 0, 0, 0.15);
-            border-left: 4px solid var(--color-rojo);
-        }
-        
-        .song-item:hover {
-            background: rgba(255, 255, 255, 0.07);
-            transform: translateX(5px);
+            border-color: var(--color-rojo);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
         }
         
         .song-number {
-            font-size: 20px;
-            font-weight: 700;
+            font-size: 14px;
             color: var(--color-rojo);
-            min-width: 40px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            opacity: 0.8;
         }
         
-        .song-details {
-            flex-grow: 1;
-        }
-        
-        .song-details-title {
+        .song-title {
             font-size: 22px;
             font-weight: 600;
             color: var(--color-texto);
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            line-height: 1.3;
         }
         
         .song-duration {
             font-size: 16px;
             color: var(--color-azul);
             font-weight: 500;
-            min-width: 60px;
-            text-align: right;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        /* REVIEWS */
-        .reviews-list {
+        /* REVIEWS - SCROLL HORIZONTAL */
+        .reviews-scroll-container {
             display: flex;
-            flex-direction: column;
-            gap: 18px;
+            overflow-x: auto;
+            gap: 25px;
+            padding: 20px 10px 40px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--color-azul) transparent;
         }
         
-        .review-item {
-            background: rgba(255, 255, 255, 0.03);
+        .reviews-scroll-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .reviews-scroll-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            padding: 22px;
-            border-left: 4px solid var(--color-verde);
+        }
+        
+        .reviews-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--color-azul);
+            border-radius: 10px;
+        }
+        
+        .review-card {
+            min-width: 320px;
+            max-width: 320px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             transition: all 0.3s ease;
         }
         
-        .review-item:hover {
-            background: rgba(255, 255, 255, 0.06);
-            transform: translateX(5px);
+        .review-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--color-azul);
+            box-shadow: 0 10px 20px rgba(41, 236, 243, 0.2);
         }
         
         .review-header {
@@ -194,22 +341,30 @@
             font-weight: 700;
             font-size: 20px;
             color: white;
+            flex-shrink: 0;
         }
         
         .review-user {
             flex-grow: 1;
+            min-width: 0;
         }
         
         .review-username {
             font-size: 18px;
             font-weight: 600;
             color: var(--color-texto);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .review-song {
             font-size: 14px;
             color: #aaa;
             margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .review-rating {
@@ -219,6 +374,7 @@
             background: rgba(0, 200, 83, 0.1);
             padding: 5px 12px;
             border-radius: 20px;
+            flex-shrink: 0;
         }
         
         .review-comment {
@@ -226,9 +382,9 @@
             line-height: 1.5;
             color: #ddd;
             margin-bottom: 10px;
-            padding: 10px;
+            padding: 15px;
             background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
+            border-radius: 10px;
             border-left: 3px solid var(--color-azul);
         }
         
@@ -238,42 +394,35 @@
             text-align: right;
         }
         
-        /* FOOTER */
-        .album-footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #aaa;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        
-        /* NAVEGACIÓN SIMPLE */
+        /* NAVEGACIÓN */
         .back-button {
             position: fixed;
             top: 20px;
             left: 20px;
-            z-index: 100;
+            z-index: 1000;
             color: var(--color-texto);
             text-decoration: none;
             font-size: 18px;
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: color 0.3s;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 10px 20px;
+            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 12px 24px;
             border-radius: 25px;
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .back-button:hover {
             color: var(--color-rojo);
-            background: rgba(255, 0, 0, 0.1);
+            background: rgba(255, 0, 0, 0.2);
+            border-color: var(--color-rojo);
+            transform: translateX(-5px);
         }
         
-        /* PUNTOS DE NAVEGACIÓN MEJORADOS */
-        .nav-dots {
+        /* INDICADORES DE SECCIÓN */
+        .section-indicators {
             position: fixed;
             top: 50%;
             right: 20px;
@@ -281,68 +430,60 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            z-index: 1000; /* MAYOR Z-INDEX */
+            z-index: 1000;
         }
         
-        .nav-dot {
-            width: 16px;
-            height: 16px;
+        .section-indicator {
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.3);
             cursor: pointer;
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            position: relative;
         }
         
-        .nav-dot.active {
+        .section-indicator.active {
             background: var(--color-rojo);
             transform: scale(1.3);
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
-            border: 2px solid white;
-        }
-        
-        .nav-dot:hover {
-            transform: scale(1.2);
-            background: rgba(255, 0, 0, 0.5);
-        }
-        
-        /* FLECHAS DE NAVEGACIÓN MEJORADAS */
-        .nav-arrows {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 30px;
-            z-index: 1000; /* MAYOR Z-INDEX */
-        }
-        
-        .nav-arrow {
-            background: rgba(255, 255, 255, 0.2);
-            color: var(--color-texto);
-            border: none;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 24px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .nav-arrow:hover {
-            background: var(--color-rojo);
-            transform: scale(1.15);
             border-color: white;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
         }
         
-        /* INDICADOR DE SECCIÓN */
-        .section-indicator {
+        .section-indicator:nth-child(2).active {
+            background: var(--color-azul);
+            box-shadow: 0 0 15px rgba(41, 236, 243, 0.7);
+        }
+        
+        .section-indicator:hover {
+            transform: scale(1.2);
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .section-indicator::after {
+            content: attr(data-title);
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .section-indicator:hover::after {
+            opacity: 1;
+        }
+        
+        /* CONTADOR DE SECCIÓN */
+        .section-counter {
             position: fixed;
             top: 20px;
             right: 20px;
@@ -353,7 +494,31 @@
             font-size: 14px;
             font-weight: 600;
             z-index: 1000;
-            display: none; /* Oculto por defecto */
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* NO DATA STATES */
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+        }
+        
+        .no-data i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .no-data h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--color-texto);
         }
         
         /* RESPONSIVE */
@@ -366,24 +531,25 @@
                 padding: 20px;
             }
             
-            .nav-arrows {
-                bottom: 20px;
-                gap: 20px;
+            .song-card {
+                min-width: 250px;
+                max-width: 250px;
+                padding: 20px;
             }
             
-            .nav-arrow {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
+            .review-card {
+                min-width: 280px;
+                max-width: 280px;
+                padding: 20px;
             }
             
-            .nav-dots {
+            .section-indicators {
                 right: 10px;
             }
             
-            .nav-dot {
-                width: 14px;
-                height: 14px;
+            .back-button {
+                padding: 10px 20px;
+                font-size: 16px;
             }
         }
         
@@ -392,182 +558,188 @@
                 font-size: 36px;
             }
             
-            .nav-arrows {
-                bottom: 15px;
-                gap: 15px;
-            }
-            
-            .nav-arrow {
-                width: 45px;
-                height: 45px;
-                font-size: 18px;
+            .album-artist {
+                font-size: 20px;
             }
             
             .section-title {
                 font-size: 24px;
             }
+            
+            .song-card {
+                min-width: 220px;
+                max-width: 220px;
+            }
+            
+            .review-card {
+                min-width: 260px;
+                max-width: 260px;
+            }
+            
+            .section-counter {
+                top: 70px;
+                right: 10px;
+                font-size: 12px;
+            }
         }
     </style>
 </head>
 <body>
-    <a href="buscarCanciones.php" class="back-button">
+    <!-- Fondo con blur effect -->
+    <div class="album-background">
+        <div class="background-overlay"></div>
+        <img src="https://source.unsplash.com/random/1920x1080/?music,album,concert" 
+             alt="Album Background" 
+             class="background-image">
+    </div>
+    
+    <a href="buscadorCanciones.php" class="back-button">
         <i class="fas fa-arrow-left"></i> Back to Search
     </a>
     
+    <div class="section-counter" id="sectionCounter">
+        <span id="currentSection">1</span>/2 • <span id="sectionName">Songs</span>
+    </div>
+    
     <?php if (!empty($error)): ?>
-        <div style="text-align: center; padding: 100px 20px;">
+        <div style="text-align: center; padding: 100px 20px; position: relative; z-index: 2;">
             <h2 style="color: var(--color-rojo);">Error</h2>
             <p><?php echo htmlspecialchars($error); ?></p>
-            <p><strong>Album buscado:</strong> <?php echo htmlspecialchars($albumName); ?></p>
-            <p><a href="buscadorCanciones.php" style="color: var(--color-azul);">Return to search</a></p>
+            <p><a href="buscarCanciones.php" style="color: var(--color-azul); text-decoration: underline;">Return to search</a></p>
         </div>
     <?php elseif (empty($albumSongs)): ?>
-        <div style="text-align: center; padding: 100px 20px;">
+        <div style="text-align: center; padding: 100px 20px; position: relative; z-index: 2;">
             <h2 style="color: var(--color-naranja);">Álbum vacío</h2>
             <p>No se encontraron canciones para el álbum: <?php echo htmlspecialchars($albumName); ?></p>
-            <p><a href="buscarCanciones.php" style="color: var(--color-azul);">Return to search</a></p>
+            <p><a href="buscarCanciones.php" style="color: var(--color-azul); text-decoration: underline;">Return to search</a></p>
         </div>
     <?php else: ?>
     
-    <!-- Indicador de sección -->
-    <div class="section-indicator" id="sectionIndicator">
-        Section <span id="currentSection">1</span>/2
+    <!-- Indicadores de sección -->
+    <div class="section-indicators">
+        <div class="section-indicator active" data-section="0" data-title="Songs" onclick="goToSection(0)"></div>
+        <div class="section-indicator" data-section="1" data-title="Reviews" onclick="goToSection(1)"></div>
     </div>
     
-    <!-- Puntos de navegación -->
-    <div class="nav-dots">
-        <div class="nav-dot active" data-section="0" title="Songs"></div>
-        <div class="nav-dot" data-section="1" title="Reviews"></div>
-    </div>
-    
-    <!-- Contenedor principal SIMPLIFICADO -->
-    <div class="content-sections" id="contentSections">
-        <!-- Sección 1: Canciones -->
-        <section class="section songs-section">
-            <div class="album-header">
-                <h1 class="album-title"><?php echo htmlspecialchars($albumName); ?></h1>
-                <?php if (!empty($albumInfo['artist'])): ?>
-                    <div class="album-artist"><?php echo htmlspecialchars($albumInfo['artist']); ?></div>
-                <?php endif; ?>
-                <?php if (!empty($albumInfo['total_songs'])): ?>
-                    <div style="color: #aaa; font-size: 16px;">
-                        <?php echo $albumInfo['total_songs']; ?> songs
-                    </div>
-                <?php endif; ?>
-            </div>
-            
-            <h3 class="section-title">Songs from this album</h3>
-            
-            <div class="songs-list">
-                <?php foreach ($albumSongs as $index => $song): ?>
-                    <div class="song-item <?php echo ($song['id'] == $highlightSongId) ? 'highlighted' : ''; ?>">
-                        <div class="song-number"><?php echo $index + 1; ?></div>
-                        <div class="song-details">
-                            <div class="song-details-title">
-                                <strong><?php echo htmlspecialchars($song['title'] ?? 'Sin título'); ?></strong>
+    <!-- Contenedor principal con scroll horizontal -->
+    <div class="main-container">
+        <div class="horizontal-scroll-container" id="scrollContainer">
+            <!-- Sección 1: Canciones -->
+            <section class="section songs-section">
+                <div class="album-header">
+                    <h1 class="album-title"><?php echo htmlspecialchars($displayAlbumName); ?></h1>
+                    <?php if (!empty($albumArtist)): ?>
+                        <div class="album-artist"><?php echo htmlspecialchars($albumArtist); ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($albumInfo['total_songs'])): ?>
+                        <div style="color: #aaa; font-size: 16px; margin-top: 10px;">
+                            <?php echo $albumInfo['total_songs']; ?> songs • <?php echo $albumInfo['genre'] ?? 'Various'; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                
+                <h3 class="section-title">Album Tracks</h3>
+                
+                <?php if (!empty($albumSongs)): ?>
+                    <div class="songs-scroll-container">
+                        <?php foreach ($albumSongs as $index => $song): ?>
+                            <div class="song-card <?php echo ($song['id'] == $highlightSongId) ? 'highlighted' : ''; ?>"
+                                 onclick="location.href='?album=<?php echo urlencode($albumName); ?>&song_id=<?php echo $song['id']; ?>'">
+                                <div class="song-number">Track #<?php echo $index + 1; ?></div>
+                                <div class="song-title"><?php echo htmlspecialchars($song['title'] ?? 'Sin título'); ?></div>
+                                <div class="song-duration">
+                                    <?php
+                                    $duration = $song['duration'] ?? '00:00';
+                                    if (preg_match('/^(\d{1,2}):(\d{2}):(\d{2})$/', $duration, $matches)) {
+                                        $hours = (int) $matches[1];
+                                        $minutes = (int) $matches[2];
+                                        $seconds = $matches[3];
+                                        if ($hours > 0) {
+                                            echo sprintf('%d:%02d', $hours, $minutes);
+                                        } else {
+                                            echo sprintf('%d:%02d', $minutes, $seconds);
+                                        }
+                                    } elseif (preg_match('/^(\d{1,2}):(\d{2})$/', $duration, $matches)) {
+                                        echo sprintf('%d:%02d', $matches[1], $matches[2]);
+                                    } else {
+                                        echo '00:00';
+                                    }
+                                    ?>
+                                </div>
                             </div>
-                        </div>
-                        <div class="song-duration">
-                            <?php
-                            $duration = $song['duration'] ?? '00:00';
-                            if (preg_match('/^(\d{1,2}):(\d{2}):(\d{2})$/', $duration, $matches)) {
-                                $hours = (int) $matches[1];
-                                $minutes = (int) $matches[2];
-                                $seconds = $matches[3];
-                                if ($hours > 0) {
-                                    echo sprintf('%d:%02d', $hours, $minutes);
-                                } else {
-                                    echo sprintf('%d:%02d', $minutes, $seconds);
-                                }
-                            } elseif (preg_match('/^(\d{1,2}):(\d{2})$/', $duration, $matches)) {
-                                echo sprintf('%d:%02d', $matches[1], $matches[2]);
-                            } else {
-                                echo '00:00';
-                            }
-                            ?>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
-                <?php endforeach; ?>
-            </div>
-            
-            <div class="album-footer">
-                <?php if (!empty($albumInfo['artist'])): ?>
-                    <p>All songs written, produced and arranged by <?php echo htmlspecialchars($albumInfo['artist']); ?></p>
+                <?php else: ?>
+                    <div class="no-data">
+                        <i class="fas fa-music"></i>
+                        <h3>No songs found</h3>
+                        <p>This album appears to be empty</p>
+                    </div>
                 <?php endif; ?>
-            </div>
-        </section>
-        
-        <!-- Sección 2: Reviews -->
-        <section class="section reviews-section">
-            <h3 class="section-title">Album Reviews</h3>
+            </section>
             
-            <?php if (!empty($albumReviews)): ?>
-                <div class="reviews-list">
-                    <?php foreach ($albumReviews as $review): ?>
-                        <div class="review-item">
-                            <div class="review-header">
-                                <div class="review-avatar">
-                                    <?php echo strtoupper(substr($review['username'] ?? 'U', 0, 1)); ?>
+            <!-- Sección 2: Reviews -->
+            <section class="section reviews-section">
+                <h3 class="section-title">Album Reviews</h3>
+                
+                <?php if (!empty($albumReviews)): ?>
+                    <div class="reviews-scroll-container">
+                        <?php foreach ($albumReviews as $review): ?>
+                            <div class="review-card">
+                                <div class="review-header">
+                                    <div class="review-avatar">
+                                        <?php echo strtoupper(substr($review['username'] ?? 'U', 0, 1)); ?>
+                                    </div>
+                                    <div class="review-user">
+                                        <div class="review-username"><?php echo htmlspecialchars($review['username'] ?? 'Anonymous'); ?></div>
+                                        <div class="review-song">on "<?php echo htmlspecialchars($review['song_title'] ?? $albumSongs[0]['title'] ?? 'Unknown Song'); ?>"</div>
+                                    </div>
+                                    <?php if (!empty($review['rating'])): ?>
+                                        <div class="review-rating"><?php echo number_format($review['rating'], 1); ?>★</div>
+                                    <?php endif; ?>
                                 </div>
-                                <div class="review-user">
-                                    <div class="review-username"><?php echo htmlspecialchars($review['username'] ?? 'Anonymous'); ?></div>
-                                    <div class="review-song">on "<?php echo htmlspecialchars($review['song_title'] ?? 'Unknown Song'); ?>"</div>
-                                </div>
-                                <?php if (!empty($review['rating'])): ?>
-                                    <div class="review-rating"><?php echo number_format($review['rating'], 1); ?>★</div>
+                                
+                                <?php if (!empty($review['comment'])): ?>
+                                    <div class="review-comment">
+                                        <?php echo htmlspecialchars($review['comment']); ?>
+                                    </div>
+                                <?php endif; ?>
+                                
+                                <?php if (!empty($review['created_at'])): ?>
+                                    <div class="review-date">
+                                        <?php echo date('F j, Y', strtotime($review['created_at'])); ?>
+                                    </div>
                                 <?php endif; ?>
                             </div>
-                            
-                            <?php if (!empty($review['comment'])): ?>
-                                <div class="review-comment">
-                                    <?php echo htmlspecialchars($review['comment']); ?>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <?php if (!empty($review['created_at'])): ?>
-                                <div class="review-date">
-                                    <?php echo date('F j, Y', strtotime($review['created_at'])); ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <div style="text-align: center; padding: 100px 20px; color: #aaa;">
-                    <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 20px; opacity: 0.5;"></i>
-                    <h3>No reviews yet</h3>
-                    <p>Be the first to review this album!</p>
-                </div>
-            <?php endif; ?>
-        </section>
-    </div>
-    
-    <!-- Flechas de navegación -->
-    <div class="nav-arrows">
-        <button class="nav-arrow" id="prevBtn" title="Previous section">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <button class="nav-arrow" id="nextBtn" title="Next section">
-            <i class="fas fa-chevron-right"></i>
-        </button>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="no-data">
+                        <i class="fas fa-comments"></i>
+                        <h3>No reviews yet</h3>
+                        <p>Be the first to review this album!</p>
+                    </div>
+                <?php endif; ?>
+            </section>
+        </div>
     </div>
     
     <?php endif; ?>
     
     <script>
-        // VERSIÓN SIMPLIFICADA DEL JAVASCRIPT
-        const contentSections = document.getElementById('contentSections');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const navDots = document.querySelectorAll('.nav-dot');
-        const sectionIndicator = document.getElementById('sectionIndicator');
+        // CONFIGURACIÓN
+        const scrollContainer = document.getElementById('scrollContainer');
+        const sectionIndicators = document.querySelectorAll('.section-indicator');
+        const sectionCounter = document.getElementById('sectionCounter');
         const currentSectionSpan = document.getElementById('currentSection');
+        const sectionNameSpan = document.getElementById('sectionName');
         
         let currentSection = 0;
         const totalSections = 2;
+        const sectionNames = ['Songs', 'Reviews'];
         let isAnimating = false;
         
-        // Función para navegar a una sección
+        // FUNCIÓN PARA IR A UNA SECCIÓN
         function goToSection(sectionIndex) {
             if (isAnimating || sectionIndex < 0 || sectionIndex >= totalSections) return;
             
@@ -575,13 +747,10 @@
             currentSection = sectionIndex;
             
             // Mover el contenedor
-            contentSections.style.transform = `translateX(-${sectionIndex * 100}vw)`;
+            scrollContainer.style.transform = `translateX(-${sectionIndex * 100}vw)`;
             
             // Actualizar UI
             updateNavigation();
-            
-            // Mostrar indicador temporalmente
-            showSectionIndicator();
             
             // Resetear animación
             setTimeout(() => {
@@ -589,86 +758,45 @@
             }, 500);
         }
         
-        // Actualizar navegación
+        // ACTUALIZAR NAVEGACIÓN
         function updateNavigation() {
-            // Actualizar puntos
-            navDots.forEach((dot, index) => {
+            // Actualizar indicadores
+            sectionIndicators.forEach((indicator, index) => {
                 if (index === currentSection) {
-                    dot.classList.add('active');
+                    indicator.classList.add('active');
                 } else {
-                    dot.classList.remove('active');
+                    indicator.classList.remove('active');
                 }
             });
             
-            // Actualizar indicador
+            // Actualizar contador
             currentSectionSpan.textContent = currentSection + 1;
-            
-            // Mostrar/ocultar flechas según posición
-            prevBtn.style.opacity = currentSection === 0 ? '0.5' : '1';
-            prevBtn.style.cursor = currentSection === 0 ? 'not-allowed' : 'pointer';
-            
-            nextBtn.style.opacity = currentSection === totalSections - 1 ? '0.5' : '1';
-            nextBtn.style.cursor = currentSection === totalSections - 1 ? 'not-allowed' : 'pointer';
+            sectionNameSpan.textContent = sectionNames[currentSection];
         }
         
-        // Mostrar indicador de sección
-        function showSectionIndicator() {
-            sectionIndicator.style.display = 'block';
-            sectionIndicator.style.opacity = '1';
-            
-            setTimeout(() => {
-                sectionIndicator.style.opacity = '0';
-                setTimeout(() => {
-                    sectionIndicator.style.display = 'none';
-                }, 300);
-            }, 1500);
-        }
-        
-        // Event listeners
-        prevBtn.addEventListener('click', () => {
-            if (currentSection > 0) {
-                goToSection(currentSection - 1);
-            }
-        });
-        
-        nextBtn.addEventListener('click', () => {
-            if (currentSection < totalSections - 1) {
-                goToSection(currentSection + 1);
-            }
-        });
-        
-        // Puntos de navegación
-        navDots.forEach((dot, index) => {
-            dot.addEventListener('click', () => {
-                if (index !== currentSection) {
-                    goToSection(index);
-                }
-            });
-        });
-        
-        // Navegación con teclado
+        // NAVEGACIÓN CON TECLADO
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft' && currentSection > 0) {
                 goToSection(currentSection - 1);
             } else if (e.key === 'ArrowRight' && currentSection < totalSections - 1) {
                 goToSection(currentSection + 1);
-            } else if (e.key === '1' || e.key === '&') {
+            } else if (e.key === '1') {
                 goToSection(0);
-            } else if (e.key === '2' || e.key === 'é') {
+            } else if (e.key === '2') {
                 goToSection(1);
             }
         });
         
-        // Swipe en móvil
+        // SWIPE EN MÓVIL
         let touchStartX = 0;
         let touchEndX = 0;
         const swipeThreshold = 50;
         
-        contentSections.addEventListener('touchstart', (e) => {
+        scrollContainer.addEventListener('touchstart', (e) => {
             touchStartX = e.changedTouches[0].screenX;
         });
         
-        contentSections.addEventListener('touchend', (e) => {
+        scrollContainer.addEventListener('touchend', (e) => {
             touchEndX = e.changedTouches[0].screenX;
             handleSwipe();
         });
@@ -687,19 +815,17 @@
             }
         }
         
-        // Rueda del mouse
+        // SCROLL CON RUEDA DEL MOUSE
         let wheelTimeout;
-        contentSections.addEventListener('wheel', (e) => {
+        scrollContainer.addEventListener('wheel', (e) => {
             clearTimeout(wheelTimeout);
             
+            // Solo cambiar sección con scroll vertical
             if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-                // Scroll vertical - cambiar sección
                 if (e.deltaY > 0 && currentSection < totalSections - 1) {
-                    // Scroll abajo - siguiente
                     goToSection(currentSection + 1);
                     e.preventDefault();
                 } else if (e.deltaY < 0 && currentSection > 0) {
-                    // Scroll arriba - anterior
                     goToSection(currentSection - 1);
                     e.preventDefault();
                 }
@@ -708,26 +834,29 @@
             wheelTimeout = setTimeout(() => {}, 100);
         }, { passive: false });
         
-        // Auto-scroll a canción destacada
-        window.addEventListener('load', function() {
-            const highlightedSong = document.querySelector('.song-item.highlighted');
-            if (highlightedSong) {
-                setTimeout(() => {
-                    highlightedSong.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 300);
-            }
-            
-            // Inicializar navegación
+        // INICIALIZAR
+        document.addEventListener('DOMContentLoaded', function() {
             updateNavigation();
             
-            // Forzar redibujado para evitar problemas de render
-            contentSections.style.transform = 'translateX(0)';
+            // Destacar canción si está especificada
+            const highlightedSong = document.querySelector('.song-card.highlighted');
+            if (highlightedSong) {
+                setTimeout(() => {
+                    highlightedSong.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'nearest',
+                        inline: 'center' 
+                    });
+                }, 500);
+            }
         });
         
-        // Prevenir selección de texto durante swipe
-        contentSections.addEventListener('selectstart', (e) => {
-            if (isAnimating) {
-                e.preventDefault();
+        // EFECTO PARALLAX PARA EL FONDO
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const background = document.querySelector('.background-image');
+            if (background) {
+                background.style.transform = `scale(1.1) translateY(${scrolled * 0.5}px)`;
             }
         });
     </script>
