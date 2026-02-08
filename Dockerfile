@@ -28,3 +28,4 @@ RUN chown -R www-data:www-data /var/www/html
 
 WORKDIR /var/www/html
 EXPOSE 80
+

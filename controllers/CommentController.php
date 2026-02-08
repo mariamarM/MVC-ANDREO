@@ -1,29 +1,26 @@
 <?php
 require_once __DIR__ . '/Controller.php';
+require_once __DIR__ . '/../models/Review.php';  // ¡IMPORTANTE! Agregar esta línea
 
 class CommentController extends Controller {
     
-    // Agregar una nueva review
+    // Agregar una nueva review (usando el modelo actualizado)
     public function add() {
-        // Verificar si el usuario está logueado
         if (!isset($_SESSION['user_id'])) {
             $this->redirect('/login');
             return;
         }
         
-        // Solo permitir método POST
         if (!$this->isPost()) {
             $this->redirect('/home');
             return;
         }
         
-        // Obtener datos del formulario
         $song_id = $this->getPost('song_id');
         $comment_text = $this->getPost('comment');
         $rating = $this->getPost('rating');
         $user_id = $_SESSION['user_id'];
         
-        // Validar datos
         $errors = [];
         
         if (empty($song_id) || !is_numeric($song_id)) {
@@ -38,7 +35,6 @@ class CommentController extends Controller {
             $errors[] = "La calificación debe ser entre 1 y 5 estrellas";
         }
         
-        // Si hay errores, mostrar mensaje
         if (!empty($errors)) {
             $_SESSION['error'] = implode(', ', $errors);
             $this->redirect('/songs?id=' . $song_id);
@@ -46,54 +42,46 @@ class CommentController extends Controller {
         }
         
         try {
-            // Conectar a la base de datos
-            $db = $this->getDatabase();
+            $reviewModel = new Review();
             
             // Verificar si ya existe una review del usuario para esta canción
-            $stmt = $db->prepare("SELECT id FROM reviews WHERE song_id = ? AND user_id = ?");
-            $stmt->execute([$song_id, $user_id]);
+            $existingReview = $reviewModel->getUserReviewForSong($user_id, $song_id);
             
-            if ($stmt->rowCount() > 0) {
+            if ($existingReview) {
                 // Ya existe una review, actualizar
-                $stmt = $db->prepare("
-                    UPDATE reviews 
-                    SET comment = ?, rating = ?, created_at = NOW() 
-                    WHERE song_id = ? AND user_id = ?
-                ");
-                $stmt->execute([$comment_text, $rating, $song_id, $user_id]);
+                $result = $reviewModel->update($existingReview['id'], $rating, $comment_text, $user_id);
                 $action = "actualizada";
             } else {
                 // No existe, insertar nueva
-                $stmt = $db->prepare("
-                    INSERT INTO reviews (user_id, song_id, rating, comment) 
-                    VALUES (?, ?, ?, ?)
-                ");
-                $stmt->execute([$user_id, $song_id, $rating, $comment_text]);
+                $result = $reviewModel->create($user_id, $song_id, $rating, $comment_text);
                 $action = "guardada";
             }
             
-            // Actualizar el promedio de rating de la canción
-            $this->updateSongRating($song_id);
-            
-            $_SESSION['success'] = "¡Tu reseña se ha $action correctamente!";
+            if ($result) {
+                // Actualizar el promedio de rating de la canción
+                $this->updateSongRating($song_id);
+                
+                $_SESSION['success'] = "¡Tu reseña se ha $action correctamente!";
+                
+                // El webhook se envía automáticamente desde el modelo
+            } else {
+                $_SESSION['error'] = "Error al guardar la reseña";
+            }
             
         } catch (PDOException $e) {
             $_SESSION['error'] = "Error al guardar la reseña: " . $e->getMessage();
         }
-        
-        // Redirigir de vuelta a la canción
+            
         $this->redirect('/songs?id=' . $song_id);
     }
     
-    // Eliminar una review
+    // Eliminar una review (usando el modelo actualizado) - ¡SOLO UN MÉTODO DELETE!
     public function delete() {
-        // Verificar si el usuario está logueado
         if (!isset($_SESSION['user_id'])) {
             $this->redirect('/login');
             return;
         }
         
-        // Obtener ID de la review
         $review_id = $_GET['id'] ?? null;
         
         if (!$review_id || !is_numeric($review_id)) {
@@ -103,12 +91,19 @@ class CommentController extends Controller {
         }
         
         try {
-            $db = $this->getDatabase();
+            $reviewModel = new Review();
             
-            // Primero obtener la review para verificar autoría y obtener song_id
-            $stmt = $db->prepare("SELECT user_id, song_id FROM reviews WHERE id = ?");
-            $stmt->execute([$review_id]);
-            $review = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Obtener la review usando el método del modelo
+            $review = $reviewModel->find($review_id); // Necesitas agregar este método al modelo
+            
+            // Si no existe find(), usa este enfoque alternativo:
+            if (!method_exists($reviewModel, 'find')) {
+                // Enfoque alternativo: buscar en las reviews de la canción
+                $db = $this->getDatabase();
+                $stmt = $db->prepare("SELECT * FROM reviews WHERE id = ?");
+                $stmt->execute([$review_id]);
+                $review = $stmt->fetch(PDO::FETCH_ASSOC);
+            }
             
             if (!$review) {
                 $_SESSION['error'] = "Reseña no encontrada";
@@ -116,7 +111,7 @@ class CommentController extends Controller {
                 return;
             }
             
-            // Verificar que el usuario sea el autor o admin
+            // Verificar permisos
             $user_id = $_SESSION['user_id'];
             $is_admin = $_SESSION['role'] ?? 'user';
             
@@ -126,23 +121,22 @@ class CommentController extends Controller {
                 return;
             }
             
-            // Guardar el song_id antes de eliminar
             $song_id = $review['song_id'];
             
-            // Eliminar la review
-            $stmt = $db->prepare("DELETE FROM reviews WHERE id = ?");
-            $stmt->execute([$review_id]);
-            
-            // Actualizar el promedio de rating de la canción
-            $this->updateSongRating($song_id);
-            
-            $_SESSION['success'] = "Reseña eliminada correctamente";
+            // Eliminar usando el modelo (envía webhook automáticamente)
+            if ($reviewModel->delete($review_id)) {
+                // Actualizar el promedio de rating
+                $this->updateSongRating($song_id);
+                
+                $_SESSION['success'] = "Reseña eliminada correctamente";
+            } else {
+                $_SESSION['error'] = "Error al eliminar la reseña";
+            }
             
         } catch (PDOException $e) {
             $_SESSION['error'] = "Error al eliminar la reseña: " . $e->getMessage();
         }
         
-        // Redirigir de vuelta
         $referer = $_SERVER['HTTP_REFERER'] ?? '/home';
         $this->redirect($referer);
     }
@@ -165,17 +159,24 @@ class CommentController extends Controller {
         }
         
         try {
-            $db = $this->getDatabase();
+            $reviewModel = new Review();
             
-            // Obtener la review desde la base de datos con datos del usuario
-            $stmt = $db->prepare("
-                SELECT r.*, u.username 
-                FROM reviews r
-                JOIN users u ON r.user_id = u.id
-                WHERE r.id = ?
-            ");
-            $stmt->execute([$review_id]);
-            $review = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Obtener la review usando el modelo
+            $review = null;
+            if (method_exists($reviewModel, 'find')) {
+                $review = $reviewModel->find($review_id);
+            } else {
+                // Enfoque alternativo
+                $db = $this->getDatabase();
+                $stmt = $db->prepare("
+                    SELECT r.*, u.username 
+                    FROM reviews r
+                    JOIN users u ON r.user_id = u.id
+                    WHERE r.id = ?
+                ");
+                $stmt->execute([$review_id]);
+                $review = $stmt->fetch(PDO::FETCH_ASSOC);
+            }
             
             if (!$review) {
                 $_SESSION['error'] = "Reseña no encontrada";
@@ -200,7 +201,7 @@ class CommentController extends Controller {
         }
     }
     
-    // **ACTUALIZAR UNA REVIEW EN LA BASE DE DATOS**
+    // **ACTUALIZAR UNA REVIEW EN LA BASE DE DATOS** - Actualizado para usar el modelo
     public function update() {
         // Verificar si el usuario está logueado
         if (!isset($_SESSION['user_id'])) {
@@ -247,13 +248,23 @@ class CommentController extends Controller {
         }
         
         try {
-            // Conectar a la base de datos
-            $db = $this->getDatabase();
+            $reviewModel = new Review();
             
             // Verificar que la review existe y pertenece al usuario
-            $stmt = $db->prepare("SELECT user_id FROM reviews WHERE id = ?");
-            $stmt->execute([$review_id]);
-            $review = $stmt->fetch(PDO::FETCH_ASSOC);
+            $review = null;
+            if (method_exists($reviewModel, 'getUserReviewForSong')) {
+                // Primero verificar si es la review del usuario
+                $existingReview = $reviewModel->getUserReviewForSong($user_id, $song_id);
+                if ($existingReview && $existingReview['id'] == $review_id) {
+                    $review = $existingReview;
+                }
+            } else {
+                // Enfoque alternativo
+                $db = $this->getDatabase();
+                $stmt = $db->prepare("SELECT user_id FROM reviews WHERE id = ?");
+                $stmt->execute([$review_id]);
+                $review = $stmt->fetch(PDO::FETCH_ASSOC);
+            }
             
             if (!$review) {
                 $_SESSION['error'] = "Reseña no encontrada";
@@ -267,16 +278,10 @@ class CommentController extends Controller {
                 return;
             }
             
-            $stmt = $db->prepare("
-                UPDATE reviews 
-                SET comment = ?, rating = ?, created_at = NOW() 
-                WHERE id = ?
-            ");
+            // Actualizar usando el modelo (envía webhook automáticamente)
+            $result = $reviewModel->update($review_id, $rating, $comment_text, $user_id);
             
-            $stmt->execute([$comment_text, $rating, $review_id]);
-            
-            // Verificar si se actualizó correctamente
-            if ($stmt->rowCount() > 0) {
+            if ($result) {
                 // Actualizar el promedio de rating de la canción
                 $this->updateSongRating($song_id);
                 
@@ -332,7 +337,6 @@ class CommentController extends Controller {
             $total_reviews = $result['total_reviews'] ?? 0;
             
             // Actualizar la tabla canciones (si tienes las columnas)
-            // Primero verificar si la tabla tiene las columnas
             try {
                 $stmt = $db->prepare("
                     UPDATE canciones 
