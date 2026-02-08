@@ -1,5 +1,6 @@
 <?php
 
+require_once __DIR__ . '/../n8n/utils/HTTPClient.php'; // Para enviar webhooks
 class Review extends Model {
        private $http;
     

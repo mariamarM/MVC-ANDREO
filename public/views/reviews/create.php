@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_review'])) {
         if ($existing_review) {
             // Actualizar review existente
             error_log("Actualizando review existente ID: " . $existing_review['id']);
-            $stmt = $pdo->prepare("UPDATE reviews SET rating = ?, comment = ?, updated_at = NOW() WHERE id = ?");
+            $stmt = $pdo->prepare("UPDATE reviews SET rating = ?, comment = ?, created_at = NOW() WHERE id = ?");
             $stmt->execute([$rating, $comment, $existing_review['id']]);
             $review_id = $existing_review['id'];
             $action = 'actualizada';
