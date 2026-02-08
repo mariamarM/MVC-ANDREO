@@ -12,7 +12,7 @@ if (!defined('BASE_URL')) {
    <li><a href="<?php echo BASE_URL; ?>dashboardUser.php">MyMusic</a></li>
 <li><a href="<?php echo BASE_URL; ?>buscadorCanciones.php">songs</a></li>
 <li><a href="<?php echo BASE_URL; ?>dashboardUser.php">playlists</a></li>
-<li><a href="<?php echo BASE_URL; ?>lastfm.php">lastweek</a></li>
+<!-- <li><a href="<?php echo BASE_URL; ?>lastfm.php">lastweek</a></li> -->
 <li><a href="<?php echo BASE_URL; ?>aboutus.php">about us</a></li>
   </ul>
 

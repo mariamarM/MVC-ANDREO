@@ -15,17 +15,17 @@ body {
 }
 /* ===== NAV GENERAL ===== */
 nav {
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #f5f5f57a;
-  border: 1px solid var(--color-borders);
-  backdrop-filter: blur(15px);
-  border-radius: 18px;
-  padding: 14px 28px;
-  z-index: 1000;
-  width: 62%;
+ position: absolute;
+    bottom: 30px;
+    left: 51%;
+    transform: translateX(-50%);
+    background-color: #f5f5f57a;
+    border: 1px solid var(--color-borders);
+    backdrop-filter: blur(15px);
+    border-radius: 18px;
+    padding: 14px 28px;
+    z-index: 1000;
+    width: 47%;
 
   height: 10%;
   display: flex;
