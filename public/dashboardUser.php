@@ -205,43 +205,96 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.4.0/css/all.css">
     <script src="<?php echo BASE_URL; ?>/js/cursor-effect.js" defer></script>
 
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f5f5f5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .box {
-            background: #fff;
-            padding: 40px;
-            border-radius: 16px;
-            border: 1px solid #cfcfcf;
-            text-align: center;
-            width: 360px;
-        }
-        .box a {
-            display: inline-block;
-            margin: 10px;
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-    </style>
+ <style>
+    h1 {
+        font-size: 140px;
+        font-weight: 900;
+        margin-top: 20px;
+        color: #ff0000;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: -2px;
+        line-height: 1;
+    }
+
+    p {
+        color: #DA1E28;
+        font-family: "Konkhmer Sleokchher";
+        font-size: 21px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 0;
+        /* 0% */
+        letter-spacing: 0.15px;
+    }
+
+    .containerLog {
+        display: flex;
+        width: 554px;
+        height: 287px;
+        padding: 47px 10px;
+        flex-direction: column;
+        align-items: center;
+        gap: 53px;
+    }
+
+    h2 {
+        color: #000;
+        font-family: Milker;
+        font-size: 30px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 0;
+        /* 0% */
+        letter-spacing: 0.15px;
+    }
+
+    h5 {
+        color: #000;
+        text-align: center;
+        font-family: "Konkhmer Sleokchher";
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 28px;
+        /* 155.556% */
+        letter-spacing: 0.15px;
+    }
+
+    .containerLog {
+        display: flex;
+        width: 554px;
+        height: 287px;
+        padding: 47px 10px;
+        flex-direction: column;
+        align-items: center;
+        gap: 53px;
+        border-radius: 20px;
+        border: 1px solid #F00;
+    }
+
+    .btnsLog a {
+        display: flex;
+        padding: 10px 21px;
+        align-items: flex-start;
+        gap: 19px;
+    }
+</style>
 </head>
 <body class="userdashboard">
 <?php require_once __DIR__ . '/../views/layout/nav.php'; ?>
-    <div class="box">
-        <h2>Get logged in</h2>
-        <p>You need an account to access your dashboard.</p>
-        <a href="<?php echo BASE_URL; ?>login.php">Log in</a>
-        <a href="<?php echo BASE_URL; ?>register.php">Create account</a>
-    </div>
+   <div class="containerPL">
+            <p>These section is to see what you heard off these week</p>
+            <div class="contenedorlog">
+                <h2>GET YOUR ACCOUNT
+                </h2>
+                <h5>To see these webpage you need to have an account :(</h5>
+                <div class="btnsLog">
+                    <a href="<?php echo BASE_URL; ?>login.php" class="btnLogin">Log in</a>
+                    <a href="<?php echo BASE_URL; ?>register.php" class="btnRegister">Get an account</a>
+                </div>
+            </div>
+        </div>
 </body>
 </html>
 <?php
