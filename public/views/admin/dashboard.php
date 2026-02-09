@@ -12,7 +12,37 @@ if ($_SESSION['user_role'] !== 'admin') {
     header('Location: ' . BASE_URL . 'dashboardUser.php');
     exit;
 }
+$usuarios = [];
+
+try {
+    // Intenta cargar usuarios desde el modelo Admin si lo tienes
+    require_once __DIR__ . '/../../../models/Admin.php';
+    $adminModel = new Admin();
+    $usuarios = $adminModel->getAllUsers(); // O getUsersForSelect()
+    
+} catch (Exception $e) {
+    // Si falla, intenta conexión directa
+    try {
+        // Ajusta según tu configuración de base de datos
+        require_once __DIR__ . '/../../../config/database.php';
+        
+        // Si usas PDO
+        if (class_exists('PDO')) {
+            $pdo = new PDO("mysql:host=localhost;dbname=blog_db", "usuario", "password");
+            $sql = "SELECT id, username, email, role FROM users ORDER BY username ASC";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute();
+            $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    } catch (Exception $e2) {
+        // Si todo falla, usa array vacío
+        $usuarios = [];
+        error_log("Error al cargar usuarios: " . $e->getMessage());
+    }
+}
+
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -86,7 +116,7 @@ if ($_SESSION['user_role'] !== 'admin') {
 
         /* ===== CONTENIDO PRINCIPAL ===== */
         .admin-container {
-            margin: 43px 30px;
+            margin: 39px 30px;
             display: flex;
             width: 95%;
             height: 664px;
@@ -154,11 +184,7 @@ if ($_SESSION['user_role'] !== 'admin') {
             background: #141418;
         }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(225, 29, 46, 0.5);
-            box-shadow: 0 10px 30px rgba(225, 29, 46, 0.2);
-        }
+        
 
 
 
@@ -171,8 +197,9 @@ if ($_SESSION['user_role'] !== 'admin') {
         }
 
         .stat-icon {
-            width: 50px;
-            height: 50px;
+            width: 70px;
+            height: 55px;
+            padding: 3px 7px;
             border-radius: 12px;
             background: rgba(225, 29, 46, 0.1);
             display: flex;
@@ -182,14 +209,42 @@ if ($_SESSION['user_role'] !== 'admin') {
             color: #e11d2e;
         }
 
-        .stat-change {
-            color: #2ecc71;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 4px 12px;
+    .stat-change {
+    color: #2ecc71;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 4px 12px;
+    position: absolute;
+    top: 28%;
+}
 
-        }
+/* Posiciones left diferentes para cada tarjeta */
+.stats-grid .stat-card:nth-child(1) .stat-change {
+    left: 13%;
+}
 
+.stats-grid .stat-card:nth-child(2) .stat-change {
+    left: 31%; /* Un poco más a la derecha */
+}
+
+.stats-grid .stat-card:nth-child(3) .stat-change {
+    left: 50%; /* Un poco más a la izquierda */
+}
+
+.stats-grid .stat-card:nth-child(4) .stat-change {
+    left: 68%; /* Valor intermedio */
+}
+
+/* Para las flechas negativas */
+.stat-change.negative {
+    color: #e74c3c;
+}
+
+/* Opcional: ajustar las imágenes dentro */
+.stat-change img {
+    margin-right: 5px;
+    vertical-align: middle;
+}
         .stat-change.negative {
             color: #e74c3c;
         }
@@ -209,52 +264,62 @@ if ($_SESSION['user_role'] !== 'admin') {
         }
 
         /* ===== GRÁFICO DE INGRESOS ===== */
-        .chart-section {
-            width: 100%;
-            margin-top: -30px;
-        }
+     .chart-section {
+    width: 100%;
+    margin-top: -30px;
+}
 
+.chart-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-        .chart-container {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -25px;
+}
 
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: -25px;
-        }
+.chart-title {
+    font-size: 16px;
+    color: white;
+}
 
-        .chart-title {
-            font-size: 16px;
-            color: white;
-        }
+/* ============ NUEVO ESTILO PARA EL SELECT ============ */
+.chart-selector {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    min-width: 200px; /* Ancho mínimo */
+    appearance: none; /* Quita estilo nativo */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px; /* Espacio para la flecha */
+}
 
-        .chart-selector {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 8px 16px;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-        }
+.chart-selector option {
+    background: #1e1e24;
+    color: white;
+    padding: 10px;
+}
+/* ============ FIN NUEVO ESTILO ============ */
 
-        .chart-placeholder {
-            height: 210px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-           
-            font-size: 1.1rem;
-        }
- .chart-placeholder img{
-    width: 120%;
-    margin-left:-20%;
- }
+.chart-placeholder {
+    height: 210px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
         .chart-footer {
             display: flex;
             justify-content: center;
@@ -426,7 +491,10 @@ if ($_SESSION['user_role'] !== 'admin') {
 
                         </div>
                         <div class="stat-label">Tracks Listened</div>
-                        <div class="stat-change">+6.1%</div>
+                        <div class="stat-change">
+                            <img src="./img/flechaverde.png">
+                            +6.1%
+                        </div>
                     </div>
                     <div class="stat-value">3,201</div>
 
@@ -441,7 +509,7 @@ if ($_SESSION['user_role'] !== 'admin') {
                         </div>
                         <div class="stat-label">Descubrimientos de Artistas</div>
                         <div class="stat-change">
-                            <img src="../img/flechaverde.png">
+                            <img src="./img/flechaverde.png">
                             +11%
                         </div>
                     </div>
@@ -458,7 +526,10 @@ if ($_SESSION['user_role'] !== 'admin') {
 
                         </div>
                         <div class="stat-label">Minutos de Escucha</div>
-                        <div class="stat-change negative">-0.2%</div>
+                        <div class="stat-change negative">
+                            <img src="./img/flecharoja.png">
+                            -2.3%
+                        </div>
                     </div>
                     <div class="stat-value">43,781</div>
 
@@ -493,43 +564,70 @@ if ($_SESSION['user_role'] !== 'admin') {
             <i class="fas fa-download"></i>
 
         </section>
-        <section class="chart-section">
-            <div class="chart-container">
-                <div class="chart-header">
-                    <h3 class="chart-title">Datos de Ingresos</h3>
-                    <select class="chart-selector">
-                        <option>Usuario A</option>
-                        <option>Usuario B</option>
-                        <option>Usuario C</option>
-                    </select>
-                </div>
-
-                <div class="chart-placeholder">
-                    <div style="text-align: center;">
-                        <img src="./img/BarLineChart.png" >
-                        <!-- <p>Gráfico de ingresos mensuales</p> -->
-                    </div>
-                </div>
-
-                <div class="chart-footer">
-                    <div class="year-selector">
-                        <button class="year-btn">2020</button>
-                        <button class="year-btn active">2021</button>
-                        <button class="year-btn">2022</button>
-                    </div>
-                </div>
+       <!-- BUSCA ESTA SECCIÓN EN TU CÓDIGO: -->
+<section class="chart-section">
+    <div class="chart-container">
+        <div class="chart-header">
+            <h3 class="chart-title">Datos de Ingresos</h3>
+            
+          
+            
+            <!-- CON ESTO: -->
+            <select class="chart-selector" id="userSelector">
+                <option value="">-- Selecciona un usuario --</option>
+                <?php if (!empty($usuarios)): ?>
+                    <?php foreach ($usuarios as $usuario): ?>
+                        <option value="<?php echo htmlspecialchars($usuario['id']); ?>">
+                            <?php echo htmlspecialchars($usuario['username']); ?> 
+                            (<?php echo htmlspecialchars($usuario['email']); ?>)
+                        </option>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <option value="">No hay usuarios registrados</option>
+                <?php endif; ?>
+            </select>
+        </div>
+        
+        <div class="chart-placeholder">
+            <div style="text-align: center;">
+                <img src="./img/BarLineChart.png" alt="Gráfico de ingresos">
             </div>
-        </section>
+        </div>
+        
+        <div class="chart-footer">
+            <div class="year-selector">
+                <button class="year-btn">2020</button>
+                <button class="year-btn active">2021</button>
+                <button class="year-btn">2022</button>
+            </div>
+        </div>
+    </div>
+</section>
 
 
     </div>
 
     <script>
-        document.querySelectorAll('.year-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-            });
+ 
+        const userSelector = document.getElementById('userSelector');
+    if (userSelector) {
+        userSelector.addEventListener('change', function() {
+            const userId = this.value;
+            if (userId) {
+                console.log('Usuario seleccionado ID:', userId);
+                console.log('Usuario:', this.options[this.selectedIndex].text);
+                
+                // Aquí puedes agregar código para cargar datos del usuario
+                // Por ejemplo, usando fetch para obtener datos específicos
+                /*
+                fetch('/admin/get-user-data/' + userId)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Datos del usuario:', data);
+                        // Actualizar gráfico o mostrar información
+                    });
+                */
+            }
         });
     </script>
 </body>
