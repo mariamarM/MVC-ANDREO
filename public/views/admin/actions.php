@@ -21,6 +21,10 @@ $songs = $adminModel->getSongsForSelect();
 $albums = $adminModel->getAlbumsForSelect();
 $genres = $adminModel->getGenresForSelect();
 $stats = $adminModel->getStats();
+
+// Datos para JavaScript (esto es NUEVO, añádelo)
+$users_js = json_encode($users);
+$songs_js = json_encode($songs);
 ?>
 
 <!DOCTYPE html>
@@ -415,7 +419,6 @@ textarea.form-control {
 
     <div class="adminContainer">
        
-
         <!-- Modal 1: Registrar Nueva Canción -->
         <div class="modal-section">
             <div class="modal-header" onclick="toggleModal('newSongModal', this)">
@@ -425,8 +428,10 @@ textarea.form-control {
                 <span class="toggle-icon">+</span>
             </div>
             <div class="modal-content" id="newSongModal">
-                <form action="/admin/create-song" method="post" enctype="multipart/form-data">
-                    <div class="form-group">
+                <form action="posts.php" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="action" value="create-song">
+    
+                <div class="form-group">
                         <label for="title">Título de la Canción *</label>
                         <input type="text" id="title" name="title" class="form-control" placeholder="Insertar título de la canción" required>
                     </div>
@@ -501,7 +506,8 @@ textarea.form-control {
                 <span class="toggle-icon">+</span>
             </div>
             <div class="modal-content" id="changeRoleModal">
-                <form action="/admin/change-role" method="post">
+                <form action="posts.php" method="post">
+                    <input type="hidden" name="action" value="change-role">
                     <div class="form-group">
                         <label for="user_id">Seleccionar Usuario *</label>
                         <select id="user_id" name="user_id" class="select-control" required>
@@ -548,7 +554,8 @@ textarea.form-control {
         <span class="toggle-icon">+</span>
     </div>
     <div class="modal-content" id="editUserModal">
-        <form action="/admin/update-user" method="post">
+        <form action="posts.php" method="post">
+            <input type="hidden" name="action" value="edit-user">
             <div class="form-group">
                 <label for="edit_user_id">Seleccionar Usuario *</label>
                 <select id="edit_user_id" name="user_id" class="select-control" required onchange="loadUserData(this.value)">
@@ -604,8 +611,10 @@ textarea.form-control {
                 <span class="toggle-icon">+</span>
             </div>
             <div class="modal-content" id="updateSongModal">
-                <form action="/admin/update-song" method="post" enctype="multipart/form-data">
-                    <div class="form-group">
+                <form action="posts.php" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="action" value="update-song">
+                   
+                <div class="form-group">
                         <label for="update_song_id">Seleccionar Canción *</label>
                         <select id="update_song_id" name="song_id" class="select-control" required onchange="loadSongData(this.value)">
                             <option value="">-- Selecciona una canción --</option>
@@ -665,7 +674,8 @@ textarea.form-control {
                 <span class="toggle-icon">+</span>
             </div>
             <div class="modal-content" id="createAdminModal">
-                <form action="/admin/create-admin" method="post">
+                <form action="posts.php" method="post">
+                    <input type="hidden" name="action" value="create-admin">
                     <div class="form-group">
                         <label for="admin_username">Nombre de Administrador *</label>
                         <input type="text" id="admin_username" name="username" class="form-control" placeholder="Ingresa el nombre de usuario" required>
@@ -703,7 +713,8 @@ textarea.form-control {
         <span class="toggle-icon">+</span>
     </div>
     <div class="modal-content" id="createUserModal">
-        <form action="/admin/create-user" method="post">
+        <form action="posts.php" method="post">
+            <input type="hidden" name="action" value="create-user">
             <div class="form-group">
                 <label for="new_username">Nombre de Usuario *</label>
                 <input type="text" id="new_username" name="username" class="form-control" placeholder="Ingresa el nombre de usuario" required>
@@ -854,36 +865,189 @@ textarea.form-control {
         }
     });
     
-    // Validación de formularios
-    document.querySelectorAll('form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            const requiredFields = this.querySelectorAll('[required]');
-            let isValid = true;
+   function handleFormSubmit(event) {
+    // 1. Detener el envío normal del formulario
+    event.preventDefault();
+    
+    // 2. Obtener el formulario
+    const form = event.target;
+    const submitBtn = form.querySelector('.btn-submit');
+    
+    // 3. Cambiar botón a "Procesando..."
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+    submitBtn.disabled = true;
+    
+    // 4. Crear datos para enviar
+    const formData = new FormData(form);
+    
+    // 5. Enviar a posts.php
+    fetch('posts.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        // 6. Restaurar botón
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        
+        // 7. Mostrar resultado
+        if (data.success) {
+            alert('✅ ' + data.message);
             
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    isValid = false;
-                    field.style.borderColor = '#FF1717';
-                } else {
-                    field.style.borderColor = '';
-                }
-            });
-            
-            // Validar confirmación de contraseña
-            const password = this.querySelector('input[name="password_hash"]');
-            const confirmPassword = this.querySelector('input[name="confirm_password"]');
-            if (password && confirmPassword && password.value !== confirmPassword.value) {
-                isValid = false;
-                confirmPassword.style.borderColor = '#FF1717';
-                alert('Las contraseñas no coinciden.');
+            // 8. Cerrar modal
+            const modal = form.closest('.modal-content');
+            if (modal && modal.classList.contains('active')) {
+                const header = modal.closest('.modal-section').querySelector('.modal-header');
+                toggleModal(modal.id, header);
             }
             
-            if (!isValid) {
-                e.preventDefault();
-                alert('Por favor, completa todos los campos requeridos correctamente.');
-            }
-        });
+            // 9. Limpiar formulario
+            form.reset();
+            
+            // 10. Recargar página después de 2 segundos
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+            
+        } else {
+            alert('❌ Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        // 11. Si hay error de conexión
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        alert('❌ Error de conexión. Intenta de nuevo.');
+        console.error('Error:', error);
     });
+}
+
+// ============================================
+// CONFIGURAR TODOS LOS FORMULARIOS
+// ============================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Formulario Crear Usuario
+    const formCreateUser = document.getElementById('formCreateUser');
+    if (formCreateUser) {
+        formCreateUser.addEventListener('submit', handleFormSubmit);
+    }
+    
+    // 2. Formulario Crear Administrador
+    const formCreateAdmin = document.getElementById('formCreateAdmin');
+    if (formCreateAdmin) {
+        formCreateAdmin.addEventListener('submit', handleFormSubmit);
+    }
+    
+    // 3. Formulario Editar Usuario
+    const formEditUser = document.getElementById('formEditUser');
+    if (formEditUser) {
+        formEditUser.addEventListener('submit', handleFormSubmit);
+    }
+    
+    // 4. Formulario Cambiar Rol
+    const formChangeRole = document.getElementById('formChangeRole');
+    if (formChangeRole) {
+        formChangeRole.addEventListener('submit', handleFormSubmit);
+    }
+    
+    // 5. Formulario Crear Canción
+    const formCreateSong = document.getElementById('formCreateSong');
+    if (formCreateSong) {
+        formCreateSong.addEventListener('submit', handleFormSubmit);
+    }
+    
+    // 6. Formulario Actualizar Canción
+    const formUpdateSong = document.getElementById('formUpdateSong');
+    if (formUpdateSong) {
+        formUpdateSong.addEventListener('submit', handleFormSubmit);
+    }
+});
+
+// ============================================
+// FUNCIONES PARA CARGAR DATOS
+// ============================================
+
+// Datos de usuarios (desde PHP)
+const usersData = <?php echo $users_js; ?>;
+
+// Datos de canciones (desde PHP)
+const songsData = <?php echo $songs_js; ?>;
+
+// Cargar datos de usuario al seleccionar
+function loadUserData(userId) {
+    if (!userId) {
+        document.getElementById('edit_username').value = '';
+        document.getElementById('edit_email').value = '';
+        document.getElementById('edit_password').value = '';
+        return;
+    }
+    
+    const user = usersData.find(u => u.id == userId);
+    if (user) {
+        document.getElementById('edit_username').value = user.username;
+        document.getElementById('edit_email').value = user.email;
+        document.getElementById('edit_password').value = '';
+    }
+}
+
+// Cargar datos de canción al seleccionar
+function loadSongData(songId) {
+    if (!songId) {
+        document.getElementById('update_title').value = '';
+        document.getElementById('update_artist').value = '';
+        document.getElementById('update_album').value = '';
+        document.getElementById('update_release_year').value = '';
+        document.getElementById('update_genre').value = '';
+        document.getElementById('update_duration').value = '';
+        return;
+    }
+    
+    const song = songsData.find(s => s.id == songId);
+    if (song) {
+        document.getElementById('update_title').value = song.title;
+        document.getElementById('update_artist').value = song.artist;
+        document.getElementById('update_album').value = song.album || '';
+        document.getElementById('update_release_year').value = song.release_year || '';
+        document.getElementById('update_genre').value = song.genre || '';
+        
+        // Convertir duración de "03:45:00" a "03:45"
+        if (song.duration) {
+            const timeParts = song.duration.split(':');
+            document.getElementById('update_duration').value = timeParts[0] + ':' + timeParts[1];
+        }
+    }
+}
+
+// ============================================
+// FUNCIONES PARA NUEVO ÁLBUM/GÉNERO
+// ============================================
+
+// Mostrar/ocultar campo para nuevo álbum
+document.getElementById('album')?.addEventListener('change', function() {
+    const newAlbumInput = document.getElementById('newAlbum');
+    if (this.value === '_new') {
+        newAlbumInput.style.display = 'block';
+        newAlbumInput.required = true;
+    } else {
+        newAlbumInput.style.display = 'none';
+        newAlbumInput.required = false;
+    }
+});
+
+// Mostrar/ocultar campo para nuevo género
+document.getElementById('genre')?.addEventListener('change', function() {
+    const newGenreInput = document.getElementById('newGenre');
+    if (this.value === '_new') {
+        newGenreInput.style.display = 'block';
+        newGenreInput.required = true;
+    } else {
+        newGenreInput.style.display = 'none';
+        newGenreInput.required = false;
+    }
+});
 </script>
 </body>
 </html>

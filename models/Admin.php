@@ -212,5 +212,70 @@ class Admin extends Model
         $stmt->execute($params);
         return $stmt->fetchColumn() > 0;
     }
+     public function createUser($userData)
+    {
+        $sql = "INSERT INTO users (username, email, password_hash, role, created_at) 
+                VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([
+            $userData['username'],
+            $userData['email'],
+            $userData['password_hash'],
+            $userData['role']
+        ]);
+    }
+    
+    /**
+     * Actualizar información de usuario (sin rol)
+     */
+    public function updateUser($userId, $userData)
+    {
+        // Construir consulta dinámica
+        $fields = [];
+        $params = [];
+        
+        foreach ($userData as $field => $value) {
+            if ($field === 'username') {
+                $fields[] = "username = ?";
+                $params[] = $value;
+            } elseif ($field === 'email') {
+                $fields[] = "email = ?";
+                $params[] = $value;
+            } elseif ($field === 'password_hash') {
+                $fields[] = "password_hash = ?";
+                $params[] = $value;
+            }
+        }
+        
+        if (empty($fields)) {
+            return false;
+        }
+        
+        $fields[] = "updated_at = CURRENT_TIMESTAMP";
+        $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = ?";
+        $params[] = $userId;
+        
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute($params);
+    }
+    
+    /**
+     * Obtener último ID insertado
+     */
+    public function getLastInsertId()
+    {
+        return $this->db->lastInsertId();
+    }
+    
+    /**
+     * Método auxiliar para crear usuario normal
+     */
+    public function createNormalUser($userData)
+    {
+        $userData['role'] = 'user';
+        return $this->createUser($userData);
+    }
+    
+    
 }
 ?>
