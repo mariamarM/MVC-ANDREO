@@ -55,7 +55,6 @@ if ($filtro == 'usuarios') {
 }
 
 $totalRegistros = is_array($data) ? count($data) : 0;
-
 // Obtener estadísticas
 try {
     $stats = $adminModel->getStats();
@@ -72,6 +71,22 @@ try {
         'total_reviews' => 0,
         'total_songs' => 0
     ];
+}
+$orden = isset($_GET['orden']) ? $_GET['orden'] : 'desc';
+
+$statsArray = [
+    ['label' => 'Total Users', 'value' => $stats['total_users'], 'icon' => 'fa-users', 'key' => 'total_users'],
+    ['label' => 'Total Reviews', 'value' => $stats['total_reviews'], 'icon' => 'fa-comments', 'key' => 'total_reviews'],
+    ['label' => 'Total Songs', 'value' => $stats['total_songs'], 'icon' => 'fa-music', 'key' => 'total_songs']
+];
+if ($orden == 'asc') {
+    usort($statsArray, function ($a, $b) {
+        return $a['value'] <=> $b['value'];
+    });
+} else {
+    usort($statsArray, function ($a, $b) {
+        return $b['value'] <=> $a['value'];
+    });
 }
 ?>
 
@@ -126,8 +141,12 @@ try {
         width: 75%;
         height: 600px;
         overflow-y: auto;
+         scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;
     }
-
+.contenedorTablas::-webkit-scrollbar {
+    display: none;
+}
     .stats-container {
         display: flex;
         gap: 20px;
@@ -374,27 +393,35 @@ try {
 
     }
 
-.add-admin-btn {
-    background: transparent; /* Sin fondo */
-    border: none; /* Sin borde */
-    padding: 0; /* Sin padding interno */
-    color: white; /* Texto blanco */
-    font-family: 'Manrope', sans-serif;
-    font-size: 21px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-    text-decoration: none; /* Quitar subrayado si es enlace */
-    box-shadow: none; /* Sin sombra/relieve */
-}
-.add-admin-btn .fa-plus {
-    color: #FF1717; /* Rojo */
-    font-size: 24px;
-    transition: all 0.3s ease;
-}
+    .add-admin-btn {
+        background: transparent;
+        /* Sin fondo */
+        border: none;
+        /* Sin borde */
+        padding: 0;
+        /* Sin padding interno */
+        color: white;
+        /* Texto blanco */
+        font-family: 'Manrope', sans-serif;
+        font-size: 21px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        /* Quitar subrayado si es enlace */
+        box-shadow: none;
+        /* Sin sombra/relieve */
+    }
+
+    .add-admin-btn .fa-plus {
+        color: #FF1717;
+        /* Rojo */
+        font-size: 24px;
+        transition: all 0.3s ease;
+    }
 
     .crearadmin:hover {
         transform: translateY(-3px);
@@ -490,10 +517,7 @@ try {
         transition: all 0.3s;
     }
 
-    .close-modal:hover {
-        background: rgba(255, 23, 23, 0.3);
-        transform: rotate(90deg);
-    }
+   
 
     /* Body del modal */
     .modal-body {
@@ -598,6 +622,126 @@ try {
         .modal-header h2 {
             font-size: 20px;
         }
+    }
+
+    /* Añadir al final de tu CSS existente */
+
+    /* Estilos para el menú desplegable */
+    .tituloinfo {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 20px;
+        font-weight: 600;
+        margin-top: -20px;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: rgba(30, 30, 35, 0.95);
+        border: 1px solid rgba(255, 23, 23, 0.3);
+        border-radius: 8px;
+        padding: 10px 0;
+        min-width: 180px;
+        z-index: 100;
+        display: none;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+    }
+
+    .dropdown-menu.active {
+        display: block;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        color: #e0e0e0;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+
+    .dropdown-item i {
+        width: 20px;
+        text-align: center;
+        color: #DA1E28;
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+        margin: 5px 0;
+    }
+
+    .tituloinfo i.fa-ellipsis-v {
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+
+    /* Estilos para los items de estadísticas */
+    .estadistica-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .estadistica-item:last-child {
+        border-bottom: none;
+    }
+
+    .estadistica-icon {
+        font-size: 24px;
+        color: #DA1E28;
+        width: 40px;
+    }
+
+    .estadisticas {
+        display: flex;
+             flex-direction: column;
+                gap: 30px;
+    }
+
+    .estadistica-info {
+        display: flex;
+   
+        gap: 30px;
+        align-items: center;
+        padding-left: 15px;
+    }
+
+    .estadistica-label {
+        font-size: 20px;
+        color: #5f5f5f;
+        font-family: "Manrope", sans-serif;
+        display: block;
+    }
+
+    .estadistica-value {
+        font-size: 20px;
+        font-weight: 600;
+        color: white;
+        display: block;
+        color: white;
+    }
+
+    .orden-indicator {
+        font-size: 12px;
+        color: #DA1E28;
+        margin-left: 5px;
+        font-weight: bold;
     }
 </style>
 
@@ -760,18 +904,42 @@ try {
         </div>
 
         <div class="contenedor-vertical">
+            <!-- Reemplaza el div con clase "infoDetallada" por este código -->
+
             <div class="infoDetallada">
                 <div class="tituloinfo">
-                    <p>Detaled Info</p>
-                    <i class="fas fa-ellipsis-v"></i>
-                </div>
-                <i class="fas fa-music icon"></i>
-                <div class="estadisticas">
-                    <p>Total Users: <?php echo $stats['total_users']; ?></p>
-                    <p>Total Reviews: <?php echo $stats['total_reviews']; ?></p>
-                    <p>Total Songs: <?php echo $stats['total_songs']; ?></p>
+                    <p>Detailed Info
+                     
+                    </p>
+                    <i class="fas fa-ellipsis-v" id="dropdownToggle"></i>
+
+                    <!-- Menú desplegable -->
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="?orden=desc<?php echo isset($_GET['filtro']) ? '&filtro=' . $_GET['filtro'] : ''; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>"
+                            class="dropdown-item">
+                            <i class="fas fa-sort-amount-down"></i> Mayor a menor
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="?orden=asc<?php echo isset($_GET['filtro']) ? '&filtro=' . $_GET['filtro'] : ''; ?><?php echo !empty($search) ? '&search=' . urlencode($search) : ''; ?>"
+                            class="dropdown-item">
+                            <i class="fas fa-sort-amount-up"></i> Menor a mayor
+                        </a>
+                    </div>
                 </div>
 
+                <i class="fas fa-chart-line icon"></i>
+
+                <div class="estadisticas">
+                    <?php foreach ($statsArray as $stat): ?>
+
+
+                        <div class="estadistica-info">
+                            <span class="estadistica-label"><?php echo $stat['label']; ?></span>
+                            <span class="estadistica-value"><?php echo $stat['value']; ?></span>
+                        </div>
+
+                    <?php endforeach; ?>
+                </div>
             </div>
 
             <!-- <div class="generarLyrcs">
@@ -844,6 +1012,39 @@ try {
     </div>
 
     <script>
+        // Añadir dentro de tu script existente, al final del document.addEventListener('DOMContentLoaded')
+
+        // Añade este script para manejar el menú desplegable
+        const dropdownToggle = document.getElementById('dropdownToggle');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+
+        if (dropdownToggle && dropdownMenu) {
+            // Toggle del menú desplegable
+            dropdownToggle.addEventListener('click', function (e) {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('active');
+            });
+
+            // Cerrar el menú al hacer clic fuera
+            document.addEventListener('click', function (e) {
+                if (!dropdownMenu.contains(e.target) && e.target !== dropdownToggle) {
+                    dropdownMenu.classList.remove('active');
+                }
+            });
+
+            // Evitar que el menú se cierre al hacer clic dentro de él
+            dropdownMenu.addEventListener('click', function (e) {
+                e.stopPropagation();
+            });
+
+            // Cerrar el menú al seleccionar una opción (opcional)
+            const dropdownItems = dropdownMenu.querySelectorAll('.dropdown-item');
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', function () {
+                    dropdownMenu.classList.remove('active');
+                });
+            });
+        }
         function changeFilter(filtro) {
             // Mantener parámetros actuales de búsqueda
             const urlParams = new URLSearchParams(window.location.search);
