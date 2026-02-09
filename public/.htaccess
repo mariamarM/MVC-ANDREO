@@ -18,3 +18,6 @@ RewriteRule ^(views/|admin/|css/|js/|images/) - [L]
 
 # 4. Redirigir todo lo demás a index.php
 RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+RewriteRule ^rag/ask$ index.php?action=rag_ask [L]
+RewriteRule ^rag/answer$ index.php?action=rag_answer [L]
+RewriteRule ^rag/history$ index.php?action=rag_history [L]

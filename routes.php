@@ -4,7 +4,6 @@
 // Ajustar las rutas según tu estructura
 require_once __DIR__ . '/controllers/MusicController.php';
 require_once __DIR__ . '/controllers/UserController.php';
-
 $request_uri = $_SERVER['REQUEST_URI'];
 $script_name = $_SERVER['SCRIPT_NAME'];
 
@@ -72,8 +71,7 @@ switch ($path) {
         $controller->logout();
         break;
         
-    case 'playlists':
-    case 'lastweek':
+  
     case 'aboutus':
         // Páginas pendientes de implementar
         echo "Página en construcción";
