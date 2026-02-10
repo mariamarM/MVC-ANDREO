@@ -30,7 +30,15 @@ nav {
   height: 10%;
   display: flex;
 }
-
+.nav-item li a{
+  color:var(--color-primary);
+  text-decoration: none;
+  font-size: 35px;
+  position:absolute;
+  bottom: 8%;
+  left: 6%;
+  text-transform: uppercase;
+}
 .userCon i {
   display: flex;
   font-weight: 900;

@@ -1,67 +1,61 @@
-
-
 <?php
+// nav.php - VERSIÓN SIMPLE SIN LOGIN
 if (!defined('BASE_URL')) {
     define('BASE_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/');
 }
 ?>
 <nav>
     <div class="containerNav">
-
         <ul class="nav-list">
-   <li><a href="<?php echo BASE_URL; ?>dashboardUser.php">MyMusic</a></li>
-<li><a href="<?php echo BASE_URL; ?>buscadorCanciones.php">songs</a></li>
-<li><a href="<?php echo BASE_URL; ?>dashboardUser.php">playlists</a></li>
-<!-- <li><a href="<?php echo BASE_URL; ?>lastfm.php">lastweek</a></li> -->
-<li><a href="<?php echo BASE_URL; ?>aboutus.php">about us</a></li>
-  </ul>
-
+            <li><a href="<?php echo BASE_URL; ?>dashboardUser.php">MyMusic</a></li>
+            <li><a href="<?php echo BASE_URL; ?>buscadorCanciones.php">songs</a></li>
+            <li><a href="<?php echo BASE_URL; ?>dashboardUser.php">playlists</a></li>
+            <li><a href="<?php echo BASE_URL; ?>aboutus.php">about us</a></li>
+            
+            
+        </ul>
     </div>
-
 </nav>
+<!-- Botón del asistente IA - ACCESO LIBRE -->
+            <li>
+                <a href="#" onclick="openRagAssistant(event)" class="nav-link" style="cursor: pointer;">
+                    <span>Get assistance</span>
+                </a>
+            </li>
+<!-- INCLUIR FONT AWESOME -->
 
-<?php if (isset($_SESSION['user_id'])): ?>
-    <ul class="userCon">
-        <li>
-            <a href="<?= BASE_URL ?>logout.php" title="Cerrar sesión">
-                <i class="fas fa-power-off"></i>
-            </a>
-        </li>
-    </ul>
-    <!-- INCLUIR EL POPUP DEL ASISTENTE -->
-    <?php 
-    // Incluir Font Awesome
-    echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">';
-    
-    // Incluir el popup
-    $popupFile = __DIR__ . '/../../views/rag/chat_popup.php';
-    if (file_exists($popupFile)) {
-        include $popupFile;
-    } else {
-        echo '<!-- Archivo chat_popup.php no encontrado -->';
-    }
-    ?>
-    <?php endif; ?>
-
-    <li class="nav-item">
-    <a href="<?php echo BASE_URL; ?>rag/ask" onclick="openRagChat()" class="nav-link">
-        <i class="fas fa-robot"></i>
-        <span class="d-none d-md-inline">Get asistence</span>
-    </a>
-</li>
+<!-- INCLUIR EL POPUP DEL ASISTENTE (SIEMPRE) -->
+<?php
+$popupFile = __DIR__ . '/../views/rag/chat_popup.php';
+if (file_exists($popupFile)) {
+    include $popupFile;
+    echo '<!-- Popup del asistente incluido -->';
+} else {
+    echo '<!-- ❌ ERROR: chat_popup.php no encontrado -->';
+}
+?>
 
 <script>
-function openRagChat() {
-    // Abre el chat programáticamente
-    if (typeof toggleChat === 'function') {
-        if (!isChatOpen) {
-            toggleChat();
+// Depuración en consola
+console.log("=== NAV DEBUG ===");
+console.log("✅ Nav cargado");
+console.log("✅ Botón 'Get assistance' disponible");
+console.log("✅ Función openRagAssistant:", typeof openRagAssistant);
+
+// Función de respaldo si algo falla
+if (typeof openRagAssistant === 'undefined') {
+    console.log("⚠️  openRagAssistant no definida, creando versión de emergencia");
+    
+    window.openRagAssistant = function(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
         }
-        // Enfocar el input
-        document.getElementById('ragChatInput').focus();
-    } else {
-        // Si el chat no está cargado, redirigir a la página completa
+        
+        console.log("🆘 Usando función de emergencia");
+        alert("Asistente Musical\n\nAcceso libre - Puedes preguntar sobre música sin login.\n\nRedirigiendo a la página completa...");
         window.location.href = '/rag/ask';
-    }
+        return false;
+    };
 }
 </script>

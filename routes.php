@@ -78,6 +78,12 @@ switch ($path) {
         $controller->ask();
         break;
 
+    case 'rag/answer':
+        // Para el formulario POST tradicional
+        require_once __DIR__ . '/controllers/RagController.php';
+        $controller = new RagController();
+        $controller->answer();
+        break;
     case 'rag/answer-api':
     require_once __DIR__ . '/controllers/RagController.php';
     $controller = new RagController();

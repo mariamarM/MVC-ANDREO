@@ -1,5 +1,5 @@
 <?php
-// views/rag/ask.php (página completa)
+// views/rag/ask.php (widget flotante)
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -17,145 +17,205 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        
+        /* Estilos para el widget flotante */
+        .rag-widget-container {
+            position: fixed;
+            bottom: 20px;
+            left: -400px; /* Inicialmente fuera de la pantalla */
+            z-index: 1000;
+            width: 380px;
+            transition: left 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        
+        .rag-widget-container.active {
+            left: 20px; /* Posición final */
+        }
+        
+        .rag-widget-toggle {
+            position: absolute;
+            bottom: 0;
+            left: 380px; /* Al lado derecho del widget */
+            background: linear-gradient(135deg, #4cc9f0, #4361ee);
             color: white;
-            min-height: 100vh;
-            padding: 20px;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 0 10px 10px 0;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform-origin: left center;
+            transform: rotate(-90deg) translateX(100%);
+            transform-origin: left bottom;
+            white-space: nowrap;
         }
         
-        .rag-full-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px 20px;
+        .rag-widget-toggle:hover {
+            background: linear-gradient(135deg, #3ab8df, #3250e8);
         }
         
-        .rag-full-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
+        .rag-widget-content {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: fadeIn 0.8s ease;
+            border-radius: 15px 15px 0 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            height: 500px;
+            display: flex;
+            flex-direction: column;
         }
         
-        .rag-full-header h1 {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            background: linear-gradient(45deg, #4cc9f0, #4361ee, #f72585);
+        .rag-widget-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .rag-widget-header h3 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            background: linear-gradient(45deg, #4cc9f0, #4361ee);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
         
-        .rag-full-header p {
+        .rag-widget-header p {
             color: #a0a0c0;
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.6;
+            font-size: 0.9rem;
         }
         
-        .rag-full-form {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 30px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 30px;
-            animation: slideUp 0.6s ease 0.2s both;
-        }
-        
-        .rag-full-textarea {
-            width: 100%;
-            min-height: 150px;
+        .rag-widget-form {
             padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .rag-widget-textarea {
+            flex: 1;
+            min-height: 120px;
+            padding: 15px;
             background: rgba(255, 255, 255, 0.08);
             border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
+            border-radius: 10px;
             color: white;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-family: inherit;
-            resize: vertical;
-            margin-bottom: 20px;
+            resize: none;
+            margin-bottom: 15px;
             transition: all 0.3s;
         }
         
-        .rag-full-textarea:focus {
+        .rag-widget-textarea:focus {
             outline: none;
             border-color: #4cc9f0;
             background: rgba(255, 255, 255, 0.12);
             box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.2);
         }
         
-        .rag-full-submit {
+        .rag-widget-submit {
             background: linear-gradient(135deg, #4cc9f0, #4361ee);
             color: white;
             border: none;
-            padding: 15px 40px;
-            font-size: 1.1rem;
+            padding: 12px 30px;
+            font-size: 1rem;
             border-radius: 50px;
             cursor: pointer;
             font-weight: 600;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
-            margin: 0 auto;
             transition: all 0.3s;
+            width: 100%;
         }
         
-        .rag-full-submit:hover {
+        .rag-widget-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(76, 201, 240, 0.3);
+            box-shadow: 0 5px 15px rgba(76, 201, 240, 0.3);
         }
         
-        .rag-full-examples {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 25px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: slideUp 0.6s ease 0.4s both;
+        .rag-widget-examples {
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
         
-        .rag-full-examples h3 {
+        .rag-widget-examples h4 {
             color: #4cc9f0;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         
-        .example-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
+        .example-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
         
-        .example-card {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 4px solid #4361ee;
+        .example-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.3s;
+            border-left: 3px solid #4361ee;
         }
         
-        .example-card:hover {
-            background: rgba(255, 255, 255, 0.12);
-            transform: translateX(5px);
+        .example-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(3px);
+            border-left-color: #f72585;
         }
         
-        .rag-full-back {
-            margin-top: 30px;
+        .rag-widget-response {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .rag-widget-response.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .response-content {
+            color: #e0e0ff;
+            line-height: 1.5;
+        }
+        
+        .rag-widget-loading {
+            display: none;
             text-align: center;
+            padding: 20px;
         }
         
-        .rag-full-back a {
-            color: #4cc9f0;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
+        .rag-widget-loading.active {
+            display: block;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(76, 201, 240, 0.3);
+            border-top: 4px solid #4cc9f0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
         }
         
         @keyframes fadeIn {
@@ -163,104 +223,175 @@
             to { opacity: 1; }
         }
         
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .rag-widget-container {
+                width: 320px;
+                bottom: 10px;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            
+            .rag-widget-container.active {
+                left: 10px;
+            }
+            
+            .rag-widget-toggle {
+                left: 320px;
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .rag-widget-content {
+                height: 450px;
             }
         }
         
-        @media (max-width: 768px) {
-            .rag-full-container {
-                padding: 20px 10px;
+        @media (max-width: 480px) {
+            .rag-widget-container {
+                width: calc(100vw - 20px);
+                left: calc(-100vw + 20px);
             }
             
-            .rag-full-header h1 {
-                font-size: 2.2rem;
+            .rag-widget-container.active {
+                left: 10px;
             }
             
-            .example-grid {
-                grid-template-columns: 1fr;
+            .rag-widget-toggle {
+                left: calc(100vw - 20px);
             }
         }
     </style>
 </head>
 <body>
-    <div class="rag-full-container">
-        <div class="rag-full-header">
-            <h1><i class="fas fa-robot"></i> Asistente Musical RAG</h1>
-            <p>Pregunta sobre canciones, artistas, géneros musicales o reviews de nuestra comunidad</p>
-            <div style="
-                display: inline-block;
-                margin-top: 15px;
-                padding: 8px 20px;
-                background: rgba(67, 97, 238, 0.2);
-                border-radius: 50px;
-                font-size: 0.9rem;
-                color: #4cc9f0;
-            ">
-                <i class="fas fa-user"></i> Hola, <?php echo htmlspecialchars($username ?? 'Usuario'); ?>
-            </div>
-        </div>
+    <!-- Widget flotante RAG -->
+    <div class="rag-widget-container" id="ragWidget">
+        <button class="rag-widget-toggle" id="ragToggle">
+            <i class="fas fa-robot"></i> Get Assistant
+        </button>
         
-        <form method="POST" action="/rag/answer" class="rag-full-form">
-            <textarea 
-                name="question" 
-                class="rag-full-textarea" 
-                placeholder="Ej: ¿Qué canciones de pop tienen las mejores reviews? ¿Qué opinan los usuarios sobre Bad Bunny? ¿Puedes recomendarme música para estudiar?"
-                required
-                autofocus
-            ><?php echo isset($_POST['question']) ? htmlspecialchars($_POST['question']) : ''; ?></textarea>
+        <div class="rag-widget-content">
+            <div class="rag-widget-header">
+                <h3><i class="fas fa-robot"></i> Asistente Musical RAG</h3>
+                <p>Pregunta sobre canciones, artistas, géneros musicales</p>
+            </div>
             
-            <button type="submit" class="rag-full-submit">
-                <i class="fas fa-search"></i> Consultar al Asistente
-            </button>
-        </form>
-        
-        <div class="rag-full-examples">
-            <h3><i class="fas fa-lightbulb"></i> Ejemplos de preguntas:</h3>
-            <div class="example-grid">
-                <div class="example-card" onclick="setExample(this)">
-                    <p>"¿Qué canciones de reggaeton tienen rating 5 estrellas?"</p>
+            <form method="POST" action="/rag/answer" class="rag-widget-form" id="ragForm">
+                <textarea 
+                    name="question" 
+                    class="rag-widget-textarea" 
+                    placeholder="Ej: ¿Qué canciones de pop tienen las mejores reviews? ¿Qué opinan los usuarios sobre Bad Bunny?"
+                    required
+                    id="ragQuestion"
+                ></textarea>
+                
+                <div class="rag-widget-response" id="ragResponse">
+                    <div class="response-content" id="responseContent">
+                        <!-- La respuesta se cargará aquí -->
+                    </div>
                 </div>
-                <div class="example-card" onclick="setExample(this)">
-                    <p>"¿Cuáles son las mejores canciones de Dua Lipa según los usuarios?"</p>
+                
+                <div class="rag-widget-loading" id="ragLoading">
+                    <div class="loading-spinner"></div>
+                    <p>Procesando tu pregunta...</p>
                 </div>
-                <div class="example-card" onclick="setExample(this)">
-                    <p>"Recomiéndame música indie para relajarme"</p>
-                </div>
-                <div class="example-card" onclick="setExample(this)">
-                    <p>"¿Qué opinan los usuarios sobre el álbum Future Nostalgia?"</p>
+                
+                <button type="submit" class="rag-widget-submit">
+                    <i class="fas fa-search"></i> Consultar al Asistente
+                </button>
+            </form>
+            
+            <div class="rag-widget-examples">
+                <h4><i class="fas fa-lightbulb"></i> Ejemplos:</h4>
+                <div class="example-list">
+                    <div class="example-item" onclick="setExample('¿Qué canciones de reggaeton tienen rating 5 estrellas?')">
+                        "¿Qué canciones de reggaeton tienen rating 5 estrellas?"
+                    </div>
+                    <div class="example-item" onclick="setExample('Recomiéndame música indie para relajarme')">
+                        "Recomiéndame música indie para relajarme"
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="rag-full-back">
-            <a href="/">
-                <i class="fas fa-arrow-left"></i> Volver al inicio
-            </a>
         </div>
     </div>
-    
+
     <script>
-        function setExample(card) {
-            const text = card.querySelector('p').textContent;
-            const textarea = document.querySelector('.rag-full-textarea');
-            textarea.value = text;
-            textarea.focus();
-            
-            // Efecto visual
-            card.style.background = 'rgba(76, 201, 240, 0.2)';
-            card.style.borderLeft = '4px solid #f72585';
-            setTimeout(() => {
-                card.style.background = '';
-                card.style.borderLeft = '4px solid #4361ee';
-            }, 500);
+        // Toggle del widget
+        const ragWidget = document.getElementById('ragWidget');
+        const ragToggle = document.getElementById('ragToggle');
+        const ragForm = document.getElementById('ragForm');
+        const ragResponse = document.getElementById('ragResponse');
+        const responseContent = document.getElementById('responseContent');
+        const ragLoading = document.getElementById('ragLoading');
+        const ragQuestion = document.getElementById('ragQuestion');
+
+        // Inicialmente, mostrar el widget después de un breve retraso
+        setTimeout(() => {
+            ragWidget.classList.add('active');
+        }, 500);
+
+        ragToggle.addEventListener('click', () => {
+            ragWidget.classList.toggle('active');
+        });
+
+        // Función para establecer ejemplos
+        function setExample(text) {
+            ragQuestion.value = text;
+            ragQuestion.focus();
         }
+
+        // Manejo del formulario con AJAX
+        ragForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const question = formData.get('question');
+            
+            if (!question.trim()) return;
+            
+            // Mostrar loading
+            ragLoading.classList.add('active');
+            ragResponse.classList.remove('active');
+            
+            try {
+                const response = await fetch('/rag/answer-api', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(formData)
+                });
+                
+                const data = await response.json();
+                
+                // Ocultar loading
+                ragLoading.classList.remove('active');
+                
+                // Mostrar respuesta
+                responseContent.innerHTML = data.answer || 
+                    `<p>${data.error || 'No se pudo obtener una respuesta.'}</p>`;
+                ragResponse.classList.add('active');
+                
+                // Auto-scroll a la respuesta
+                ragResponse.scrollTop = 0;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                ragLoading.classList.remove('active');
+                responseContent.innerHTML = '<p>Error al conectar con el servidor. Intenta nuevamente.</p>';
+                ragResponse.classList.add('active');
+            }
+        });
+
+        // Cerrar widget al hacer clic fuera (opcional)
+        document.addEventListener('click', (e) => {
+            if (!ragWidget.contains(e.target) && !ragToggle.contains(e.target)) {
+                ragWidget.classList.remove('active');
+            }
+        });
     </script>
 </body>
 </html>
