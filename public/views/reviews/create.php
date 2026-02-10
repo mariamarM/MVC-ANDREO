@@ -1,6 +1,6 @@
 <?php
 // /var/www/html/views/reviews/create.php - VERSIÓN CORREGIDA
-
+require_once dirname(__DIR__, 3) . '/Helpers/WebhookHelper.php';
 // 1. CONFIGURACIÓN DE ERRORES
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -131,8 +131,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_review'])) {
         
         error_log("✅ Canción encontrada: " . $cancion['title'] . " - " . $cancion['artist']);
         
-        // Verificar si ya existe review del usuario para esta canción
+        // OBTENER EMAIL DEL USUARIO (IMPORTANTE PARA EL WEBHOOK)
         $user_id = $_SESSION['user_id'];
+        $stmt = $pdo->prepare("SELECT email, username FROM users WHERE id = ?");
+        $stmt->execute([$user_id]);
+        $usuario = $stmt->fetch();
+        
+        if (!$usuario) {
+            error_log("❌ Usuario no encontrado en BD: ID $user_id");
+            throw new Exception("Usuario no encontrado");
+        }
+        
+        $user_email = $usuario['email'];
+        $username = $usuario['username'];
+        error_log("✅ Usuario encontrado: $username ($user_email)");
+        
+        // Verificar si ya existe review del usuario para esta canción
         $stmt = $pdo->prepare("SELECT id FROM reviews WHERE user_id = ? AND song_id = ?");
         $stmt->execute([$user_id, $song_id]);
         $existing_review = $stmt->fetch();
@@ -156,6 +170,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_review'])) {
             error_log("✅ Review insertada con ID: $review_id");
         }
         
+       
+// =================== ENVIAR WEBHOOK A N8N ===================
+// Preparar datos para el webhook
+$webhookData = [
+    'review_id' => $review_id,                    // ✅ Ya lo tienes
+    'song_id' => $song_id,                        // ✅ De $_POST['song_id']
+    'song_title' => $cancion['title'],            // ✅ De tu query a canciones
+    'artist' => $cancion['artist'],               // ✅ De tu query a canciones
+    'rating' => $rating,                          // ✅ De $_POST['rating']
+    'comment' => $comment,                        // ✅ De $_POST['comment']
+    'user_id' => $user_id,                        // ✅ De $_SESSION['user_id']
+    'user_email' => $user_email,                  // ✅ De tu query a users
+    'username' => $username,                      // ✅ De tu query a users
+    'created_at' => date('Y-m-d H:i:s'),          // ✅ Ya lo usas
+    'action' => $action                           // ✅ 'creada' o 'actualizada'
+];
+
+// Enviar webhook a n8n usando el Helper
+try {
+    // Incluir el helper
+    $helperPath = dirname(__DIR__, 2) . '/helpers/WebhookHelper.php';
+    
+    if (file_exists($helperPath)) {
+        require_once $helperPath;
+        
+        if ($action === 'creada') {
+            $webhookResult = WebhookHelper::sendReviewCreated($webhookData);
+        } else {
+            $webhookResult = WebhookHelper::sendReviewUpdated($webhookData);
+        }
+        
+        // Log el resultado
+        error_log("✅ Webhook enviado usando Helper: " . ($webhookResult['success'] ? 'Éxito' : 'Falló'));
+        if (!$webhookResult['success']) {
+            error_log("❌ Error webhook: " . ($webhookResult['error'] ?? 'Desconocido'));
+        }
+    } else {
+        error_log("⚠️ WebhookHelper.php no encontrado en: $helperPath");
+    }
+} catch (Exception $e) {
+    error_log("⚠️ Error enviando webhook: " . $e->getMessage());
+    // No detener la aplicación por fallo de webhook
+}
+// =================== FIN WEBHOOK ===================
         // Obtener datos completos de la nueva/actualizada review
         $stmt = $pdo->prepare("
             SELECT r.*, c.title as song_title, c.artist 
@@ -182,7 +240,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_review'])) {
                 'comment' => $new_review['comment'],
                 'created_at' => $new_review['created_at'],
                 'formatted_date' => date('d/m/Y H:i', strtotime($new_review['created_at']))
-            ]
+            ],
+            'webhook_sent' => isset($webhookResult) ? $webhookResult['success'] : false
         ];
         
         error_log("✅ Review $action exitosamente - ID: $review_id");

@@ -1,15 +1,17 @@
 <?php
+// app/models/Review.php
 
-require_once __DIR__ . '/../n8n/utils/HTTPClient.php'; // Para enviar webhooks
+require_once __DIR__ . '/Model.php';
+require_once __DIR__ . '/../services/WebhookService.php';
+
 class Review extends Model {
-       private $http;
     
     public function __construct() {
         parent::__construct();
-        $this->http = new HTTPClient();
     }
+    
+    // Métodos existentes que ya tienes
     public function getReviewsByAlbum($albumName) {
-        // PRIMERO: Verificar que recibimos el nombre del álbum
         error_log("Buscando reviews para álbum: " . $albumName);
         
         $sql = "SELECT 
@@ -64,7 +66,6 @@ class Review extends Model {
         }
     }
     
-    // MÉTODO ADICIONAL PARA DEPURACIÓN: Ver reviews de una canción específica
     public function getReviewsBySong($songId) {
         $sql = "SELECT r.*, u.username 
                 FROM reviews r
@@ -82,7 +83,9 @@ class Review extends Model {
             return [];
         }
     }
-     public function create($userId, $songId, $rating, $comment) {
+    
+    // ✅ MÉTODO CORREGIDO: Solo crear review, NO enviar webhook aquí
+    public function create($userId, $songId, $rating, $comment) {
         $sql = "INSERT INTO reviews (user_id, song_id, rating, comment, created_at) 
                 VALUES (?, ?, ?, ?, NOW())";
         $stmt = $this->db->prepare($sql);
@@ -91,171 +94,123 @@ class Review extends Model {
         if ($result) {
             $reviewId = $this->db->lastInsertId();
             
-            // Obtener info del usuario y canción para el webhook
-            $user = $this->getUserInfo($userId);
-            $song = $this->getSongInfo($songId);
-            
-            // Enviar webhook de review creada
-            $this->sendReviewCreatedWebhook($reviewId, [
-                'review_id' => $reviewId,
-                'user_id' => $userId,
-                'user_email' => $user['email'] ?? '',
-                'user_username' => $user['username'] ?? '',
-                'song_id' => $songId,
-                'song_title' => $song['title'] ?? '',
-                'song_artist' => $song['artist'] ?? '',
-                'rating' => $rating,
-                'comment' => $comment,
-                'created_at' => date('Y-m-d H:i:s')
-            ]);
+            // 🔴 IMPORTANTE: NO enviar webhook desde aquí
+            // El webhook se enviará desde el Controller después de crear
+            error_log("✅ Review creada con ID: $reviewId (webhook se enviará desde controller)");
             
             return $reviewId;
         }
         
         return false;
-         }
+    }
     
-    // Actualizar review (con webhook)
+    // ✅ MÉTODO CORREGIDO: Solo actualizar, NO enviar webhook aquí
     public function update($reviewId, $rating, $comment, $userId) {
-        // Primero obtener la review actual
-        $sql = "SELECT * FROM reviews WHERE id = ?";
+        // Verificar que el usuario es dueño de la review
+        $sql = "SELECT user_id FROM reviews WHERE id = ?";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$reviewId]);
-        $oldReview = $stmt->fetch(PDO::FETCH_ASSOC);
+        $review = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        if (!$oldReview) {
+        if (!$review || $review['user_id'] != $userId) {
+            error_log("❌ Usuario $userId no puede actualizar review $reviewId");
             return false;
         }
         
         // Actualizar
         $sql = "UPDATE reviews SET rating = ?, comment = ?, updated_at = NOW() WHERE id = ?";
         $stmt = $this->db->prepare($sql);
-         $result = $stmt->execute([$rating, $comment, $reviewId]);
+        $result = $stmt->execute([$rating, $comment, $reviewId]);
         
         if ($result) {
-            // Obtener info del usuario y canción
-            $user = $this->getUserInfo($userId);
-            $song = $this->getSongInfo($oldReview['song_id']);
-            
-            // Enviar webhook de review actualizada
-            $this->sendReviewUpdatedWebhook($reviewId, [
-                'review_id' => $reviewId,
-                'user_id' => $userId,
-                'user_email' => $user['email'] ?? '',
-                'user_username' => $user['username'] ?? '',
-                'song_id' => $oldReview['song_id'],
-                'song_title' => $song['title'] ?? '',
-                'song_artist' => $song['artist'] ?? '',
-                'old_rating' => $oldReview['rating'],
-                'new_rating' => $rating,
-                'old_comment' => $oldReview['comment'],
-                'new_comment' => $comment,
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
-            
+            error_log("✅ Review $reviewId actualizada (webhook se enviará desde controller)");
             return true;
         }
         
         return false;
     }
-      public function delete($reviewId) {
-        // Primero obtener los datos de la review antes de eliminar
-        $sql = "SELECT r.*, u.email, u.username, c.title as song_title, c.artist 
-                FROM reviews r
-                LEFT JOIN users u ON r.user_id = u.id
-                LEFT JOIN canciones c ON r.song_id = c.id
-                WHERE r.id = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$reviewId]);
-        $review = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if (!$review) {
-            return false;
-        }
-        
-        // Guardar datos para el webhook
-        $reviewData = [
-            'review_id' => $reviewId,
-            'user_id' => $review['user_id'],
-            'user_email' => $review['email'] ?? '',
-            'user_username' => $review['username'] ?? '',
-            'song_id' => $review['song_id'],
-            'song_title' => $review['song_title'] ?? '',
-            'song_artist' => $review['artist'] ?? '',
-            'rating' => $review['rating'],
-            'comment' => $review['comment'],
-            'deleted_by' => $_SESSION['user_id'] ?? null,
-            'deleted_at' => date('Y-m-d H:i:s')
-        ];
-        
-        // Eliminar la review
+    
+    // ✅ MÉTODO CORREGIDO: Solo eliminar, NO enviar webhook aquí
+    public function delete($reviewId) {
         $sql = "DELETE FROM reviews WHERE id = ?";
         $stmt = $this->db->prepare($sql);
         $result = $stmt->execute([$reviewId]);
         
         if ($result) {
-            // Enviar webhook de review eliminada
-            $this->sendReviewDeletedWebhook($reviewId, $reviewData);
+            error_log("✅ Review $reviewId eliminada (webhook se enviará desde controller)");
             return true;
         }
         
         return false;
     }
     
-    // Métodos para enviar webhooks
-    private function sendReviewCreatedWebhook($reviewId, $data) {
-        $url = getenv('N8N_WEBHOOK_REVIEW_CREATED') ?: 'http://mvc_n8n:5678/webhook/review.created';
-        $token = getenv('N8N_SHARED_TOKEN') ?: 'default_token';
-        
-        return $this->http->post($url, [
-            'headers' => ['X-Shared-Token' => $token],
-            'json' => [
-                'event' => 'review.created',
-                'data' => $data
-            ]
-        ]);
+    // ✅ Métodos auxiliares que necesitas
+    public function getUserReviewForSong($userId, $songId) {
+        $sql = "SELECT * FROM reviews WHERE user_id = ? AND song_id = ? LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userId, $songId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
-    private function sendReviewUpdatedWebhook($reviewId, $data) {
-        $url = getenv('N8N_WEBHOOK_REVIEW_UPDATED') ?: 'http://mvc_n8n:5678/webhook/review.updated';
-        $token = getenv('N8N_SHARED_TOKEN') ?: 'default_token';
-        
-        return $this->http->post($url, [
-            'headers' => ['X-Shared-Token' => $token],
-            'json' => [
-                'event' => 'review.updated',
-                'data' => $data
-            ]
-        ]);
+    public function getReviewsByUserId($userId) {
+        $sql = "SELECT r.*, c.title as song_title, c.artist 
+                FROM reviews r
+                JOIN canciones c ON r.song_id = c.id
+                WHERE r.user_id = ?
+                ORDER BY r.created_at DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
-    private function sendReviewDeletedWebhook($reviewId, $data) {
-        $url = getenv('N8N_WEBHOOK_REVIEW_DELETED') ?: 'http://mvc_n8n:5678/webhook/review.deleted';
-        $token = getenv('N8N_SHARED_TOKEN') ?: 'default_token';
-        
-        return $this->http->post($url, [
-            'headers' => ['X-Shared-Token' => $token],
-            'json' => [
-                'event' => 'review.deleted',
-                'data' => $data
-            ]
-        ]);
+    public function findById($id) {
+        $sql = "SELECT r.*, u.username, c.title as song_title, c.artist 
+                FROM reviews r
+                LEFT JOIN users u ON r.user_id = u.id
+                LEFT JOIN canciones c ON r.song_id = c.id
+                WHERE r.id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
-    // Métodos auxiliares
-    private function getUserInfo($userId) {
+    public function getAll() {
+        $sql = "SELECT r.*, u.username, c.title as song_title, c.artist 
+                FROM reviews r
+                LEFT JOIN users u ON r.user_id = u.id
+                LEFT JOIN canciones c ON r.song_id = c.id
+                ORDER BY r.created_at DESC";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    // ✅ Métodos para obtener información (útil para webhooks)
+    public function getUserInfo($userId) {
         $sql = "SELECT username, email FROM users WHERE id = ?";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$userId]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
-    private function getSongInfo($songId) {
-        $sql = "SELECT title, artist FROM canciones WHERE id = ?";
+    public function getSongInfo($songId) {
+        $sql = "SELECT title, artist, album FROM canciones WHERE id = ?";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$songId]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+    
+    public function getReviewWithDetails($reviewId) {
+        $sql = "SELECT r.*, 
+                       u.username, u.email as user_email,
+                       c.title as song_title, c.artist, c.album
+                FROM reviews r
+                LEFT JOIN users u ON r.user_id = u.id
+                LEFT JOIN canciones c ON r.song_id = c.id
+                WHERE r.id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$reviewId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }
 ?>
-

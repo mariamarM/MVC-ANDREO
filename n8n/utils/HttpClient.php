@@ -1,78 +1,56 @@
 <?php
-
-
-
-class HTTPClient
-{
-    public function post(string $url, array $options = []): array
-    {
-        $headers = $options['headers'] ?? [];
-        $json = $options['json'] ?? [];
-        $timeout = $options['timeout'] ?? 10;
-
+class HttpClient {
+    public function post($url, $data) {
         $ch = curl_init($url);
         
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($json));
-        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge([
+        // Asegúrate de que el payload se codifica como JSON
+        $payload = json_encode($data['json'] ?? $data);
+       
+        $headers = [
             'Content-Type: application/json',
+            'Content-Length: ' . strlen($payload),
             'Accept: application/json'
-        ], $this->formatHeaders($headers)));
+        ];
+ 
+        // Añadimos headers personalizados (ej: Token)
+        if (isset($data['headers'])) {
+            foreach ($data['headers'] as $key => $value) {
+                $headers[] = "$key: $value";
+            }
+        }
         
-        $response = curl_exec($ch);
+        // DEBUG: Ver qué se envía
+        error_log("📤 HttpClient enviando a: $url");
+        error_log("📦 Payload: " . $payload);
+        error_log("📋 Headers: " . implode(', ', $headers));
+ 
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => 0
+        ]);
+ 
+        $result = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error = curl_error($ch);
         
         curl_close($ch);
-
+        
+        // DEBUG: Ver respuesta
+        error_log("📥 HttpClient respuesta HTTP: $httpCode");
+        error_log("📥 Error: " . ($error ?: 'Ninguno'));
+        error_log("📥 Result: " . substr($result, 0, 200));
+        
         return [
-            'success' => $httpCode >= 200 && $httpCode < 300,
-            'status_code' => $httpCode,
-            'body' => $response,
-            'error' => $error ?: null
+            'success' => ($httpCode >= 200 && $httpCode < 300),
+            'http_code' => $httpCode,
+            'response' => $result,
+            'error' => $error
         ];
-    }
-
-    public function get(string $url, array $options = []): array
-    {
-        $headers = $options['headers'] ?? [];
-        $query = $options['query'] ?? [];
-        $timeout = $options['timeout'] ?? 10;
-
-        if (!empty($query)) {
-            $url .= '?' . http_build_query($query);
-        }
-
-        $ch = curl_init($url);
-        
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge([
-            'Accept: application/json'
-        ], $this->formatHeaders($headers)));
-        
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
-        
-        curl_close($ch);
-
-        return [
-            'success' => $httpCode >= 200 && $httpCode < 300,
-            'status_code' => $httpCode,
-            'body' => $response,
-            'error' => $error ?: null
-        ];
-    }
-
-    private function formatHeaders(array $headers): array
-    {
-        $formatted = [];
-        foreach ($headers as $key => $value) {
-            $formatted[] = "$key: $value";
-        }
-        return $formatted;
     }
 }
+?>

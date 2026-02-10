@@ -15,11 +15,7 @@ if (!defined('BASE_URL')) {
 <!-- <li><a href="<?php echo BASE_URL; ?>lastfm.php">lastweek</a></li> -->
 <li><a href="<?php echo BASE_URL; ?>aboutus.php">about us</a></li>
   </ul>
-<li>
-    <a href="/index.php?action=rag_ask">
-        <i class="fas fa-robot"></i> Asistente RAG
-    </a>
-</li>
+
     </div>
 
 </nav>
