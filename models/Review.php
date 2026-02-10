@@ -2,7 +2,7 @@
 // app/models/Review.php
 
 require_once __DIR__ . '/Model.php';
-require_once __DIR__ . '/../services/WebhookService.php';
+// require_once __DIR__ . '/../services/WebhookService.php';
 
 class Review extends Model {
     

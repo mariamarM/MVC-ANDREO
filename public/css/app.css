@@ -64,7 +64,17 @@ nav {
   align-items: center;
   justify-content: center;
 }
-
+.nav-item a{
+  font-family:"Manrope", sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  position:absolute;
+  bottom:8%;
+  left:6%;
+  text-decoration: none;
+  color:var(--color-primary);
+  text-transform: uppercase;
+}
 /* ===== LISTA ===== */
 .nav-list {
   list-style: none;

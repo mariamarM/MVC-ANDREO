@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
+
 if (!isset($songs) || !is_array($songs)) {
     // Cargar configuración
     if (!defined('BASE_URL')) {
@@ -12,7 +13,7 @@ if (!isset($songs) || !is_array($songs)) {
     $songs = $cancionModel->getAll(); // Obtener TODAS las canciones
 }
 
-
+ob_start();
 
 // 3. Asegurar que $songs es array
 if (!is_array($songs)) {
@@ -260,7 +261,7 @@ $base_url = $protocol . "://" . $host . "/";
         .containermusic {
             position: relative;
             width: 100%;
-            padding: 40px;
+         padding:  133px 40px;
         }
 
         .musicTop {

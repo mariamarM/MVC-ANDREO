@@ -19,6 +19,7 @@ if (!defined('BASE_URL')) {
     </div>
 
 </nav>
+
 <?php if (isset($_SESSION['user_id'])): ?>
     <ul class="userCon">
         <li>
@@ -27,4 +28,40 @@ if (!defined('BASE_URL')) {
             </a>
         </li>
     </ul>
+    <!-- INCLUIR EL POPUP DEL ASISTENTE -->
+    <?php 
+    // Incluir Font Awesome
+    echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">';
+    
+    // Incluir el popup
+    $popupFile = __DIR__ . '/../../views/rag/chat_popup.php';
+    if (file_exists($popupFile)) {
+        include $popupFile;
+    } else {
+        echo '<!-- Archivo chat_popup.php no encontrado -->';
+    }
+    ?>
     <?php endif; ?>
+
+    <li class="nav-item">
+    <a href="<?php echo BASE_URL; ?>rag/ask" onclick="openRagChat()" class="nav-link">
+        <i class="fas fa-robot"></i>
+        <span class="d-none d-md-inline">Get asistence</span>
+    </a>
+</li>
+
+<script>
+function openRagChat() {
+    // Abre el chat programáticamente
+    if (typeof toggleChat === 'function') {
+        if (!isChatOpen) {
+            toggleChat();
+        }
+        // Enfocar el input
+        document.getElementById('ragChatInput').focus();
+    } else {
+        // Si el chat no está cargado, redirigir a la página completa
+        window.location.href = '/rag/ask';
+    }
+}
+</script>

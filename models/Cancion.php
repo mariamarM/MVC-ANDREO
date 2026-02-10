@@ -66,18 +66,42 @@ class Cancion extends Model {
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-        public function getSongsByAlbum($albumName) {
-       $sql = "SELECT * FROM canciones WHERE album = :album ORDER BY id";
-    $stmt = $this->db->prepare($sql);
-    $stmt->bindParam(':album', $albumName, PDO::PARAM_STR);
-    $stmt->execute();
-    
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // DEBUG: Ver qué devuelve
-    error_log("getSongsByAlbum('$albumName'): " . count($results) . " resultados");
-    
-    return $results;
+public function getSongsByAlbum($albumName) {
+    try {
+        error_log("=== Cancion::getSongsByAlbum('$albumName') INICIADO ===");
+        
+        // **CONSULTA CORREGIDA** - Usar $this->db en lugar de $this->conn
+        $sql = "SELECT *, 
+                       COALESCE(album_cover, '/img/albums/default_album.jpg') as album_cover 
+                FROM canciones 
+                WHERE album = :album 
+                ORDER BY id";
+        
+        error_log("Ejecutando consulta: " . $sql);
+        error_log("Con parámetro album: " . $albumName);
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':album', $albumName, PDO::PARAM_STR);
+        $stmt->execute();
+        
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        error_log("✅ Canciones encontradas para álbum '$albumName': " . count($result));
+        
+        // DEBUG: Ver primera canción si existe
+        if (!empty($result)) {
+            error_log("Primera canción del álbum:");
+            foreach ($result[0] as $key => $value) {
+                error_log("  $key = " . ($value !== null ? $value : "NULL"));
+            }
+        }
+        
+        return $result;
+        
+    } catch (PDOException $e) {
+        error_log("❌ ERROR en getSongsByAlbum(): " . $e->getMessage());
+        error_log("Consulta: " . $sql);
+        return [];
     }
+}
 }
 ?>

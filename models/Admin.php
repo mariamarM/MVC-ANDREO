@@ -6,7 +6,7 @@ class Admin extends Model
     // Métodos existentes
     public function getAllUsers()
     {
-        $sql = "SELECT id, username, email, role, created_at, updated_at 
+        $sql = "SELECT id, username, email, role, created_at 
                 FROM users 
                 ORDER BY username ASC";
         $stmt = $this->db->query($sql);
