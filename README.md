@@ -22,6 +22,6 @@ Docker Compose para orquestación de servicios
 Nginx con PHP-FPM
 
 # Cambios a Futuro:
-  - RAG en funcionamiento con tags para filtrar canciones a preferencia del usuario
+  - RAG en funcionamiento con tags para filtrar canciones a preferencia del usuario CHECK
   - Conversor de extension de arhciov de canciones, .wav, .mp3
 
