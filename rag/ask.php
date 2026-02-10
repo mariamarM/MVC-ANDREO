@@ -304,17 +304,7 @@
                 </button>
             </form>
             
-            <div class="rag-widget-examples">
-                <h4><i class="fas fa-lightbulb"></i> Ejemplos:</h4>
-                <div class="example-list">
-                    <div class="example-item" onclick="setExample('¿Qué canciones de reggaeton tienen rating 5 estrellas?')">
-                        "¿Qué canciones de reggaeton tienen rating 5 estrellas?"
-                    </div>
-                    <div class="example-item" onclick="setExample('Recomiéndame música indie para relajarme')">
-                        "Recomiéndame música indie para relajarme"
-                    </div>
-                </div>
-            </div>
+          
         </div>
     </div>
 
