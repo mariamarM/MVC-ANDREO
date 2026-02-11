@@ -275,8 +275,7 @@
         
         <div class="rag-widget-content">
             <div class="rag-widget-header">
-                <h3><i class="fas fa-robot"></i> Asistente Musical RAG</h3>
-                <p>Pregunta sobre canciones, artistas, géneros musicales</p>
+                <h3> Need some help ?</h3>
             </div>
             
             <form method="POST" action="/rag/answer" class="rag-widget-form" id="ragForm">

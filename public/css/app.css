@@ -30,15 +30,21 @@ nav {
   height: 10%;
   display: flex;
 }
-.nav-item li a{
-  color:var(--color-primary);
-  text-decoration: none;
-  font-size: 35px;
-  position:absolute;
-  bottom: 8%;
-  left: 6%;
-  text-transform: uppercase;
-}
+    .nav-link  a {
+   font-family: "Manrope", sans-serif;
+    font-size: 28px;
+    font-weight: 600;
+    position: absolute;
+    bottom: 28%;
+    left: -40%;
+    text-decoration: none;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    }
+    li{
+        text-decoration: none;
+        list-style:none;
+    }
 .userCon i {
   display: flex;
   font-weight: 900;
