@@ -2,12 +2,10 @@
 require_once __DIR__ . '/../config/config.php';
 
 if (!isset($songs) || !is_array($songs)) {
-    // Cargar configuración
     if (!defined('BASE_URL')) {
         require_once __DIR__ . '/../config/config.php';
     }
 
-    // Cargar modelo y obtener TODAS las canciones
     require_once __DIR__ . '/../models/Cancion.php';
     $cancionModel = new Cancion();
     $songs = $cancionModel->getAll(); // Obtener TODAS las canciones
@@ -15,13 +13,11 @@ if (!isset($songs) || !is_array($songs)) {
 
 ob_start();
 
-// 3. Asegurar que $songs es array
 if (!is_array($songs)) {
     error_log("❌ ERROR: \$songs no es array, forzando array vacío");
     $songs = [];
 }
 
-// 4. Definir BASE_URL si no existe
 if (!defined('BASE_URL')) {
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
     $host = $_SERVER['HTTP_HOST'];
@@ -466,8 +462,7 @@ $base_url = $protocol . "://" . $host . "/";
             // Iniciar animación al cargar la página
             createAnimation();
 
-            // Opcional: Botón para repetir animación
-            // Puedes agregar un botón en tu HTML con onclick="replayAnimation()"
+        
             window.replayAnimation = function () {
                 document.body.classList.add('animating');
                 animContainer.style.animation = '';
@@ -475,13 +470,10 @@ $base_url = $protocol . "://" . $host . "/";
                 animContainer.style.visibility = 'visible';
                 animContainer.style.display = 'flex';
 
-                // Ocultar contenido temporalmente
                 document.querySelector('main').style.opacity = '0';
 
-                // Recrear animación
                 setTimeout(() => {
                     createAnimation();
-                    // Volver a mostrar contenido después
                     setTimeout(() => {
                         document.querySelector('main').style.animation = 'fadeInContent 0.8s 3s forwards';
                     }, 100);

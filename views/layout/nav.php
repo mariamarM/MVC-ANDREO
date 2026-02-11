@@ -22,19 +22,8 @@ if (!defined('BASE_URL')) {
         </a>
     </li>
 </nav>
-<!-- Botón del asistente IA - ACCESO LIBRE -->
-
-<!-- INCLUIR FONT AWESOME -->
-
-<!-- INCLUIR EL POPUP DEL ASISTENTE (SIEMPRE) -->
-
 
 <script>
-    // Depuración en consola
-    console.log("=== NAV DEBUG ===");
-    console.log("✅ Nav cargado");
-    console.log("✅ Botón 'Get assistance' disponible");
-    console.log("✅ Función openRagAssistant:", typeof openRagAssistant);
 
     // Función de respaldo si algo falla
     if (typeof openRagAssistant === 'undefined') {
