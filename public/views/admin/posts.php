@@ -221,8 +221,7 @@ function processCreateUser($adminModel) {
     
     // Insertar en la base de datos
     try {
-        $success = $adminModel->createAdminUser($userData); // Reutilizar método
-        
+$success = $adminModel->createUser($userData);        
         if ($success) {
             echo json_encode([
                 'success' => true, 

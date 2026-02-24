@@ -1,6 +1,5 @@
 <?php
-var_dump("ROUTES.PHP EJECUTADO");
-exit;
+
 // Cargar controladores
 require_once __DIR__ . '/controllers/MusicController.php';
 require_once __DIR__ . '/controllers/UserController.php';
@@ -70,37 +69,37 @@ switch ($path) {
 
     default:
 if (str_starts_with($path, 'admin/')) {
-            $segments = explode('/', $path);
-            $controller = new AdminController();
+    $segments = explode('/', $path);
+    $controller = new AdminController();
 
-          if ($segments[1] === 'users' && ($segments[2] ?? '') === 'delete') {
-    $id = $segments[3] ?? null;
-    if ($id) {
-        (new AdminController())->deleteUser($id);
-    } else {
-        header("Location: /public/admin/users");
-        exit;
+    // admin/users/delete/ID
+    if (($segments[1] ?? '') === 'users' && ($segments[2] ?? '') === 'delete') {
+        $id = $segments[3] ?? null;
+        if ($id && is_numeric($id)) {
+            $controller->deleteUser((int)$id);
+            exit;
+        } else {
+            header("Location: /public/admin/users");
+            exit;
+        }
     }
-}
 
-            if ($segments[1] === 'reviews' && ($segments[2] ?? '') === 'delete') {
-                $id = $segments[3] ?? null;
-                if ($id) $controller->deleteReview($id);
-                exit;
-            }
+    // admin/reviews/delete/ID
+    if (($segments[1] ?? '') === 'reviews' && ($segments[2] ?? '') === 'delete') {
+        $id = $segments[3] ?? null;
+        if ($id && is_numeric($id)) {
+            $controller->deleteReview((int)$id);
+            exit;
+        }
+    }
 
-            if ($segments[1] === 'songs' && ($segments[2] ?? '') === 'delete') {
-                $id = $segments[3] ?? null;
-                if ($id) $controller->deleteSong($id);
-                exit;
-            }
-        
-
+    // admin/songs/delete/ID
     if (($segments[1] ?? '') === 'songs' && ($segments[2] ?? '') === 'delete') {
         $id = $segments[3] ?? null;
-        if ($id && is_numeric($id))
-            $controller->deleteSong($id);
-        exit;
+        if ($id && is_numeric($id)) {
+            $controller->deleteSong((int)$id);
+            exit;
+        }
     }
 }else{
         // --- Default 404 ---

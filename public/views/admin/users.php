@@ -799,10 +799,8 @@ if ($orden == 'asc') {
                                         </td>
                                         <td><?php echo date('d/m/Y', strtotime($usuario['created_at'])); ?></td>
                                         <td>
-                                            <a href="/admin/users/edit/<?php echo $usuario['id']; ?>" class="action-btn edit-btn">
-                                                <i class="fas fa-edit"></i> Editar
-                                            </a>
-                                         <a href="<?= '/public/admin/users/delete/' . $user['id'] ?>"
+
+                                            <a href="/public/admin/users/delete/<?= $user['id'] ?>"
                                                 class="action-btn delete-btn"
                                                 onclick="return confirm('¿Estás seguro de eliminar este usuario?')">
                                                 <i class="fas fa-trash"></i> Eliminar
@@ -950,70 +948,69 @@ if ($orden == 'asc') {
             <!-- <div class="generarLyrcs">
         </div> -->
 
-            <div class="crearadmin">
+            <!-- <div class="crearadmin">
                 <!-- Botón para abrir modal -->
-                <button class="add-admin-btn" id="openAdminModal">
+            <!-- <button class="add-admin-btn" id="openAdminModal">
                     <i class="fas fa-plus"></i> Crear Administrador
-                </button>
+                </button> -->
 
-                <!-- Modal para crear administrador -->
-                <div class="modal-overlay" id="adminModal">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h2><i class="fas fa-user-shield"></i> Crear Nuevo Administrador</h2>
-                            <button class="close-modal" id="closeAdminModal">&times;</button>
-                        </div>
+            <!-- Modal para crear administrador -->
+            <div class="modal-overlay" id="adminModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2><i class="fas fa-user-shield"></i> Crear Nuevo Administrador</h2>
+                        <button class="close-modal" id="closeAdminModal">&times;</button>
+                    </div>
 
-                        <div class="modal-body">
-                            <form id="createAdminForm">
-                                <div class="form-group">
-                                    <label for="username">
-                                        <i class="fas fa-user"></i> Nombre de Usuario
-                                    </label>
-                                    <input type="text" id="username" name="username"
-                                        placeholder="Ingresa el nombre de usuario" required>
-                                </div>
+                    <div class="modal-body">
+                        <form id="createAdminForm">
+                            <div class="form-group">
+                                <label for="username">
+                                    <i class="fas fa-user"></i> Nombre de Usuario
+                                </label>
+                                <input type="text" id="username" name="username"
+                                    placeholder="Ingresa el nombre de usuario" required>
+                            </div>
 
-                                <div class="form-group">
-                                    <label for="email">
-                                        <i class="fas fa-envelope"></i> Correo Electrónico
-                                    </label>
-                                    <input type="email" id="email" name="email" placeholder="correo@ejemplo.com"
-                                        required>
-                                </div>
+                            <div class="form-group">
+                                <label for="email">
+                                    <i class="fas fa-envelope"></i> Correo Electrónico
+                                </label>
+                                <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required>
+                            </div>
 
-                                <div class="form-group">
-                                    <label for="password">
-                                        <i class="fas fa-lock"></i> Contraseña
-                                    </label>
-                                    <input type="password" id="password" name="password"
-                                        placeholder="Mínimo 8 caracteres" required minlength="8">
-                                </div>
+                            <div class="form-group">
+                                <label for="password">
+                                    <i class="fas fa-lock"></i> Contraseña
+                                </label>
+                                <input type="password" id="password" name="password" placeholder="Mínimo 8 caracteres"
+                                    required minlength="8">
+                            </div>
 
-                                <div class="form-group">
-                                    <label for="confirm_password">
-                                        <i class="fas fa-lock"></i> Confirmar Contraseña
-                                    </label>
-                                    <input type="password" id="confirm_password" name="confirm_password"
-                                        placeholder="Repite la contraseña" required>
-                                </div>
+                            <div class="form-group">
+                                <label for="confirm_password">
+                                    <i class="fas fa-lock"></i> Confirmar Contraseña
+                                </label>
+                                <input type="password" id="confirm_password" name="confirm_password"
+                                    placeholder="Repite la contraseña" required>
+                            </div>
 
-                                <div class="form-actions">
-                                    <button type="button" class="btn-cancel" id="cancelAdminForm">
-                                        Cancelar
-                                    </button>
-                                    <button type="submit" class="btn-create">
-                                        <i class="fas fa-user-plus"></i> Crear Administrador
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn-cancel" id="cancelAdminForm">
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="btn-create">
+                                    <i class="fas fa-user-plus"></i> Crear Administrador
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
+        </div> -->
 
 
-        </div>
+    </div>
     </div>
 
     <script>

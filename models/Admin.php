@@ -23,7 +23,19 @@ class Admin extends Model
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
     }
+public function deleteUser($userId)
+{
+    $userId = (int)$userId;
 
+    // Evitar que el admin se elimine a sí mismo
+    if ($userId === $_SESSION['user_id']) {
+        throw new Exception("No puedes eliminarte a ti mismo");
+    }
+
+    $sql = "DELETE FROM users WHERE id = ?";
+    $stmt = $this->db->prepare($sql);
+    return $stmt->execute([$userId]);
+}
     public function getAllSongs()
     {
         $sql = "SELECT * FROM canciones ORDER BY title ASC";

@@ -1,9 +1,7 @@
 <?php
-namespace App\Controllers;
 
-use Models\User;
-use Models\Admin;
 
+require_once __DIR__ . '/Controller.php';
 class AdminController extends Controller {
     
     // Verificar si es administrador
@@ -160,49 +158,22 @@ class AdminController extends Controller {
         $this->redirect('/admin/users');
     }
     
+  
+
     // Eliminar usuario
-  public function deleteUser($id) {
-    session_start(); // Asegurarse de que la sesión está iniciada
-
-    // Validar sesión y rol admin
-    if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-        $_SESSION['error'] = "Acceso denegado. Solo admins pueden eliminar usuarios.";
-        header("Location: /public/admin/users");
-        exit;
+ public function deleteUser($id)
+    {
+        try {
+            if ($this->model->deleteUser($id)) {
+                header("Location: /public/admin/users");
+                exit;
+            } else {
+                echo "Error al eliminar el usuario";
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
     }
-
-    // Evitar eliminarse a sí mismo
-    if ($id == $_SESSION['user_id']) {
-        $_SESSION['error'] = "No puedes eliminarte a ti mismo.";
-        header("Location: /public/admin/users");
-        exit;
-    }
-
-    // Validar que $id sea numérico
-    if (!is_numeric($id)) {
-        $_SESSION['error'] = "ID de usuario inválido";
-        header("Location: /public/admin/users");
-        exit;
-    }
-
-    // Instanciar modelo User
-    require_once BASE_PATH . '/models/User.php';
-    $userModel = new User();
-
-    // Intentar eliminar
-    $deleted = $userModel->delete((int)$id);
-
-    if ($deleted) {
-        $_SESSION['success'] = "Usuario eliminado correctamente.";
-    } else {
-        $_SESSION['error'] = "Error al eliminar usuario.";
-    }
-
-    // Redirigir al listado
-    header("Location: /public/admin/users");
-    exit;
-}
-    
     // Eliminar review
     public function deleteReview($id) {
         if (!$this->checkAdmin()) return;
