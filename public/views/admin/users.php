@@ -141,12 +141,15 @@ if ($orden == 'asc') {
         width: 75%;
         height: 600px;
         overflow-y: auto;
-         scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
     }
-.contenedorTablas::-webkit-scrollbar {
-    display: none;
-}
+
+    .contenedorTablas::-webkit-scrollbar {
+        display: none;
+    }
+
     .stats-container {
         display: flex;
         gap: 20px;
@@ -517,7 +520,7 @@ if ($orden == 'asc') {
         transition: all 0.3s;
     }
 
-   
+
 
     /* Body del modal */
     .modal-body {
@@ -710,13 +713,13 @@ if ($orden == 'asc') {
 
     .estadisticas {
         display: flex;
-             flex-direction: column;
-                gap: 30px;
+        flex-direction: column;
+        gap: 30px;
     }
 
     .estadistica-info {
         display: flex;
-   
+
         gap: 30px;
         align-items: center;
         padding-left: 15px;
@@ -799,10 +802,11 @@ if ($orden == 'asc') {
                                             <a href="/admin/users/edit/<?php echo $usuario['id']; ?>" class="action-btn edit-btn">
                                                 <i class="fas fa-edit"></i> Editar
                                             </a>
-                                            <button class="action-btn delete-btn"
-                                                onclick="deleteUser(<?php echo $usuario['id']; ?>)">
+                                         <a href="<?= '/public/admin/users/delete/' . $user['id'] ?>"
+                                                class="action-btn delete-btn"
+                                                onclick="return confirm('¿Estás seguro de eliminar este usuario?')">
                                                 <i class="fas fa-trash"></i> Eliminar
-                                            </button>
+                                            </a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -845,10 +849,10 @@ if ($orden == 'asc') {
                                         <td><?php echo htmlspecialchars(substr($review['comment'], 0, 50)); ?></td>
                                         <td><?php echo date('d/m/Y', strtotime($review['created_at'])); ?></td>
                                         <td>
-                                            <button class="action-btn delete-btn"
-                                                onclick="deleteReview(<?php echo $review['id']; ?>)">
+                                            <a href="<?php echo BASE_URL; ?>admin/reviews/delete/<?php echo $review['id']; ?>"
+                                                class="action-btn delete-btn" onclick="return confirm('¿Eliminar esta review?')">
                                                 <i class="fas fa-trash"></i> Eliminar
-                                            </button>
+                                            </a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -885,10 +889,11 @@ if ($orden == 'asc') {
                                         <td><?php echo htmlspecialchars($cancion['album']); ?></td>
                                         <td><?php echo htmlspecialchars($cancion['genre']); ?></td>
                                         <td><?php echo $cancion['release_year']; ?></td>
-                                        <td><button class="action-btn delete-btn"
-                                                onclick="deleteSong(<?php echo $cancion['id']; ?>)">
+                                        <td>
+                                            <a href="<?php echo BASE_URL; ?>admin/songs/delete/<?php echo $cancion['id']; ?>"
+                                                class="action-btn delete-btn" onclick="return confirm('¿Eliminar esta canción?')">
                                                 <i class="fas fa-trash"></i> Eliminar
-                                            </button>
+                                            </a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -909,7 +914,7 @@ if ($orden == 'asc') {
             <div class="infoDetallada">
                 <div class="tituloinfo">
                     <p>Detailed Info
-                     
+
                     </p>
                     <i class="fas fa-ellipsis-v" id="dropdownToggle"></i>
 
@@ -1052,62 +1057,44 @@ if ($orden == 'asc') {
             window.location.search = urlParams.toString();
         }
 
-        function deleteUser(id) {
-            if (confirm('¿Estás seguro de eliminar este usuario?')) {
-                // AJAX para eliminar usuario
-                fetch(`/admin/users/delete/${id}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            location.reload();
-                        } else {
-                            alert('Error: ' + data.message);
-                        }
-                    })
-                    .catch(error => {
-                        alert('Error al eliminar usuario');
-                        console.error(error);
-                    });
-            }
-        }
 
-        function deleteReview(id) {
-            if (confirm('¿Estás seguro de eliminar esta review?')) {
-                // AJAX para eliminar review
-                fetch(`/admin/reviews/delete/${id}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            location.reload();
-                        } else {
-                            alert('Error: ' + data.message);
-                        }
-                    })
-                    .catch(error => {
-                        alert('Error al eliminar review');
-                        console.error(error);
-                    });
-            }
-        }
+        // function deleteReview(id) {
+        //     if (confirm('¿Estás seguro de eliminar esta review?')) {
+        //         // AJAX para eliminar review
+        //         fetch(`/admin/reviews/delete/${id}`)
+        //             .then(response => response.json())
+        //             .then(data => {
+        //                 if (data.success) {
+        //                     location.reload();
+        //                 } else {
+        //                     alert('Error: ' + data.message);
+        //                 }
+        //             })
+        //             .catch(error => {
+        //                 alert('Error al eliminar review');
+        //                 console.error(error);
+        //             });
+        //     }
+        // }
 
-        function deleteSong(id) {
-            if (confirm('¿Estás seguro de eliminar esta canción?')) {
-                // AJAX para eliminar canción
-                fetch(`/admin/songs/delete/${id}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            location.reload();
-                        } else {
-                            alert('Error: ' + data.message);
-                        }
-                    })
-                    .catch(error => {
-                        alert('Error al eliminar canción');
-                        console.error(error);
-                    });
-            }
-        }
+        // function deleteSong(id) {
+        //     if (confirm('¿Estás seguro de eliminar esta canción?')) {
+        //         // AJAX para eliminar canción
+        //         fetch(`/admin/songs/delete/${id}`)
+        //             .then(response => response.json())
+        //             .then(data => {
+        //                 if (data.success) {
+        //                     location.reload();
+        //                 } else {
+        //                     alert('Error: ' + data.message);
+        //                 }
+        //             })
+        //             .catch(error => {
+        //                 alert('Error al eliminar canción');
+        //                 console.error(error);
+        //             });
+        //     }
+        // }
 
         document.addEventListener('DOMContentLoaded', function () {
             const openModalBtn = document.getElementById('openAdminModal');

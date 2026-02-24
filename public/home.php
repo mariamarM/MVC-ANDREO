@@ -300,7 +300,7 @@ $base_url = $protocol . "://" . $host . "/";
 
         /* Estilos para el contenido dentro del contenedor de scroll */
         .songs-wrapper {
-            margin-top: 2%;
+            margin-top: -2%;
             width: 50%;
             display: flex;
             flex-direction: row;

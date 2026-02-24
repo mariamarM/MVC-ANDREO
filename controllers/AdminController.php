@@ -161,26 +161,47 @@ class AdminController extends Controller {
     }
     
     // Eliminar usuario
-    public function deleteUser($id) {
-        if (!$this->checkAdmin()) return;
-        
-        // No permitir eliminarse a sí mismo
-        if ($id == $_SESSION['user_id']) {
-            $_SESSION['error'] = "No puedes eliminarte a ti mismo";
-            $this->redirect('/admin/users');
-            return;
-        }
-        
-        $userModel = new User();
-        
-        if ($userModel->delete($id)) {
-            $_SESSION['success'] = "Usuario eliminado correctamente";
-        } else {
-            $_SESSION['error'] = "Error al eliminar usuario";
-        }
-        
-        $this->redirect('/admin/users');
+  public function deleteUser($id) {
+    session_start(); // Asegurarse de que la sesión está iniciada
+
+    // Validar sesión y rol admin
+    if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+        $_SESSION['error'] = "Acceso denegado. Solo admins pueden eliminar usuarios.";
+        header("Location: /public/admin/users");
+        exit;
     }
+
+    // Evitar eliminarse a sí mismo
+    if ($id == $_SESSION['user_id']) {
+        $_SESSION['error'] = "No puedes eliminarte a ti mismo.";
+        header("Location: /public/admin/users");
+        exit;
+    }
+
+    // Validar que $id sea numérico
+    if (!is_numeric($id)) {
+        $_SESSION['error'] = "ID de usuario inválido";
+        header("Location: /public/admin/users");
+        exit;
+    }
+
+    // Instanciar modelo User
+    require_once BASE_PATH . '/models/User.php';
+    $userModel = new User();
+
+    // Intentar eliminar
+    $deleted = $userModel->delete((int)$id);
+
+    if ($deleted) {
+        $_SESSION['success'] = "Usuario eliminado correctamente.";
+    } else {
+        $_SESSION['error'] = "Error al eliminar usuario.";
+    }
+
+    // Redirigir al listado
+    header("Location: /public/admin/users");
+    exit;
+}
     
     // Eliminar review
     public function deleteReview($id) {

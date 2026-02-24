@@ -1,18 +1,19 @@
 <?php
-// routes.php en /var/www/html/
-
-// Ajustar las rutas según tu estructura
+var_dump("ROUTES.PHP EJECUTADO");
+exit;
+// Cargar controladores
 require_once __DIR__ . '/controllers/MusicController.php';
 require_once __DIR__ . '/controllers/UserController.php';
+require_once __DIR__ . '/controllers/AdminController.php';
 
+// Obtener path limpio
 $request_uri = $_SERVER['REQUEST_URI'];
 $script_name = $_SERVER['SCRIPT_NAME'];
-
-// Eliminar la parte del directorio del script si está en /public/
 $path = str_replace('/public', '', $request_uri);
 $path = parse_url($path, PHP_URL_PATH);
 $path = trim($path, '/');
 
+// --- Rutas normales (usuario) ---
 switch ($path) {
     case '':
     case 'home':
@@ -20,20 +21,11 @@ switch ($path) {
         require_once __DIR__ . '/models/Cancion.php';
 
         $cancionModel = new Cancion();
-        $allSongs = $cancionModel->getAll();  // Cambia el nombre
+        $allSongs = $cancionModel->getAll();
         $featuredSongs = !empty($allSongs) ? array_slice($allSongs, 0, 4) : [];
 
-
-
-        // Pasar a home.php usando extract o variable global
-        $songs = $featuredSongs;  // Esto no funciona bien
-
-        // En su lugar, usa EXTRACT o GLOBALS
         $data = ['songs' => $featuredSongs];
-        extract($data);  // Esto crea $songs en el scope actual
-
-        // O también
-        $GLOBALS['songs'] = $featuredSongs;
+        extract($data);
 
         require_once __DIR__ . '/public/home.php';
         break;
@@ -72,31 +64,48 @@ switch ($path) {
         $controller->logout();
         break;
 
-    case 'rag/ask':
-        require_once __DIR__ . '/controllers/RagController.php';
-        $controller = new RagController();
-        $controller->ask();
-        break;
-
-    case 'rag/answer':
-        // Para el formulario POST tradicional
-        require_once __DIR__ . '/controllers/RagController.php';
-        $controller = new RagController();
-        $controller->answer();
-        break;
-    case 'rag/answer-api':
-    require_once __DIR__ . '/controllers/RagController.php';
-    $controller = new RagController();
-    $controller->answerApi();
-    break;
     case 'aboutus':
-        // Páginas pendientes de implementar
         echo "Página en construcción";
         break;
 
     default:
+if (str_starts_with($path, 'admin/')) {
+            $segments = explode('/', $path);
+            $controller = new AdminController();
+
+          if ($segments[1] === 'users' && ($segments[2] ?? '') === 'delete') {
+    $id = $segments[3] ?? null;
+    if ($id) {
+        (new AdminController())->deleteUser($id);
+    } else {
+        header("Location: /public/admin/users");
+        exit;
+    }
+}
+
+            if ($segments[1] === 'reviews' && ($segments[2] ?? '') === 'delete') {
+                $id = $segments[3] ?? null;
+                if ($id) $controller->deleteReview($id);
+                exit;
+            }
+
+            if ($segments[1] === 'songs' && ($segments[2] ?? '') === 'delete') {
+                $id = $segments[3] ?? null;
+                if ($id) $controller->deleteSong($id);
+                exit;
+            }
+        
+
+    if (($segments[1] ?? '') === 'songs' && ($segments[2] ?? '') === 'delete') {
+        $id = $segments[3] ?? null;
+        if ($id && is_numeric($id))
+            $controller->deleteSong($id);
+        exit;
+    }
+}else{
+        // --- Default 404 ---
         http_response_code(404);
-        echo "Página no encontrada: " . htmlspecialchars($path);
+        echo "Página no encontrada: " . htmlspecialchars($path);}
         break;
 }
 ?>

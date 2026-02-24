@@ -3,7 +3,7 @@ session_start();
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../models/Cancion.php';
 require_once __DIR__ . '/../models/Review.php';
-require_once __DIR__ . '/../models/UserModel.php'; // Si tienes modelo User
+require_once __DIR__ . '/../models/UserModel.php';
 
 // Inicializar variables
 $error = null;
@@ -27,7 +27,7 @@ $highlightSongId = isset($_GET['song_id']) ? (int)$_GET['song_id'] : null;
 $isLoggedIn = isset($_SESSION['user_id']);
 if ($isLoggedIn) {
     $userModel = new User(); // Si tienes modelo User
-    $currentUser = $userModel->getById($_SESSION['user_id']);
+    $currentUser = $userModel->findById($_SESSION['user_id']);
 }
 
 // Validar que tenemos nombre de álbum

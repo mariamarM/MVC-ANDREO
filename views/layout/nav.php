@@ -12,33 +12,17 @@ if (!defined('BASE_URL')) {
             <li><a href="<?php echo BASE_URL; ?>buscadorCanciones.php">songs</a></li>
             <li><a href="<?php echo BASE_URL; ?>dashboardUser.php">playlists</a></li>
             <li><a href="<?php echo BASE_URL; ?>aboutus.php">about us</a></li>
-
-
         </ul>
     </div>
-    <li  class="nav-link" >
-        <a href="#" onclick="openRagAssistant(event)">
-            Get assistance
-        </a>
-    </li>
-</nav>
-
-<script>
-
-    // Función de respaldo si algo falla
-    if (typeof openRagAssistant === 'undefined') {
-        console.log("⚠️  openRagAssistant no definida, creando versión de emergencia");
-
-        window.openRagAssistant = function (event) {
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-
-            console.log("🆘 Usando función de emergencia");
-            alert("Asistente Musical\n\nAcceso libre - Puedes preguntar sobre música sin login.\n\nRedirigiendo a la página completa...");
-            window.location.href = '/rag/ask';
-            return false;
-        };
-    }
-</script>
+    
+    <?php if (isset($_SESSION['user_id'])): ?>
+    <ul class="userCon">
+        <li>
+            <a href="<?= BASE_URL ?>logout.php" title="Cerrar sesión">
+                <i class="fas fa-power-off"></i>
+            </a>
+        </li>
+    </ul>
+    <?php endif; ?> 
+    
+</nav> 
