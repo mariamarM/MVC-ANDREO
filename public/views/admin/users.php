@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/../../../config/config.php';
-
 // Si no tienes session_start() en config.php, añádelo aquí
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -103,6 +102,28 @@ if ($orden == 'asc') {
 
 </head>
 <style>
+    
+
+.mensaje-exito {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.action-btn.delete-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
     body {
         background: linear-gradient(236deg, #220808 63.05%, #940B0B 90.6%, #FF1717 102.38%);
         min-height: 100vh;
@@ -799,12 +820,10 @@ if ($orden == 'asc') {
                                         </td>
                                         <td><?php echo date('d/m/Y', strtotime($usuario['created_at'])); ?></td>
                                         <td>
-
-                                            <a href="/public/admin/users/delete/<?= $user['id'] ?>"
-                                                class="action-btn delete-btn"
-                                                onclick="return confirm('¿Estás seguro de eliminar este usuario?')">
+                                            <button class="action-btn delete-btn"
+                                                onclick="eliminarUsuario(<?php echo $usuario['id']; ?>, this)">
                                                 <i class="fas fa-trash"></i> Eliminar
-                                            </a>
+                                            </button>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -945,78 +964,87 @@ if ($orden == 'asc') {
                 </div>
             </div>
 
-            <!-- <div class="generarLyrcs">
-        </div> -->
 
-            <!-- <div class="crearadmin">
-                <!-- Botón para abrir modal -->
-            <!-- <button class="add-admin-btn" id="openAdminModal">
-                    <i class="fas fa-plus"></i> Crear Administrador
-                </button> -->
-
-            <!-- Modal para crear administrador -->
-            <div class="modal-overlay" id="adminModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2><i class="fas fa-user-shield"></i> Crear Nuevo Administrador</h2>
-                        <button class="close-modal" id="closeAdminModal">&times;</button>
-                    </div>
-
-                    <div class="modal-body">
-                        <form id="createAdminForm">
-                            <div class="form-group">
-                                <label for="username">
-                                    <i class="fas fa-user"></i> Nombre de Usuario
-                                </label>
-                                <input type="text" id="username" name="username"
-                                    placeholder="Ingresa el nombre de usuario" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="email">
-                                    <i class="fas fa-envelope"></i> Correo Electrónico
-                                </label>
-                                <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="password">
-                                    <i class="fas fa-lock"></i> Contraseña
-                                </label>
-                                <input type="password" id="password" name="password" placeholder="Mínimo 8 caracteres"
-                                    required minlength="8">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="confirm_password">
-                                    <i class="fas fa-lock"></i> Confirmar Contraseña
-                                </label>
-                                <input type="password" id="confirm_password" name="confirm_password"
-                                    placeholder="Repite la contraseña" required>
-                            </div>
-
-                            <div class="form-actions">
-                                <button type="button" class="btn-cancel" id="cancelAdminForm">
-                                    Cancelar
-                                </button>
-                                <button type="submit" class="btn-create">
-                                    <i class="fas fa-user-plus"></i> Crear Administrador
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-
-
-    </div>
+        </div>
     </div>
 
     <script>
-        // Añadir dentro de tu script existente, al final del document.addEventListener('DOMContentLoaded')
+function eliminarUsuario(userId, boton) {
+    if (!confirm('¿Estás seguro de eliminar este usuario?')) {
+        return;
+    }
+    
+    const textoOriginal = boton.innerHTML;
+    boton.disabled = true;
+    boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando...';
+    
+    // 🔍 DEBUG: Ver qué URL se está usando
+    const url = 'posts.php'; // Cambia esta línea según la opción que elijas
+    console.log('🔍 URL a la que se envía:', url);
+    console.log('🔍 Ubicación actual:', window.location.href);
+    console.log('🔍 ID de usuario a eliminar:', userId);
+    
+    const formData = new FormData();
+    formData.append('action', 'delete-user');
+    formData.append('user_id', userId);
+    
+    fetch(url, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.log('🔍 Status de respuesta:', response.status);
+        console.log('🔍 Headers:', response.headers);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text(); // Primero como texto para ver si es HTML o JSON
+    })
+    .then(text => {
+        console.log('🔍 Respuesta RAW (texto):', text.substring(0, 200)); // Primeros 200 caracteres
+        
+        try {
+            const data = JSON.parse(text);
+            console.log('🔍 Respuesta JSON parseada:', data);
+            
+            if (data.success) {
+                const fila = boton.closest('tr');
+                if (fila) {
+                    fila.style.backgroundColor = '#d4edda';
+                    setTimeout(() => fila.remove(), 300);
+                }
+                alert('✅ Usuario eliminado correctamente');
+            } else {
+                alert('❌ ' + (data.message || 'Error al eliminar'));
+                boton.disabled = false;
+                boton.innerHTML = textoOriginal;
+            }
+        } catch (e) {
+            console.error('🔍 Error al parsear JSON:', e);
+            console.error('🔍 La respuesta no es JSON válido. Es HTML:');
+            console.error(text.substring(0, 500));
+            
+            // Si es HTML, probablemente es un error de PHP
+            if (text.includes('<b>') || text.includes('<br')) {
+                alert('❌ Error del servidor. Revisa la consola (F12) para más detalles.');
+            } else {
+                alert('❌ Error inesperado. Revisa la consola (F12).');
+            }
+            
+            boton.disabled = false;
+            boton.innerHTML = textoOriginal;
+        }
+    })
+    .catch(error => {
+        console.error('🔍 Error de conexión:', error);
+        alert('❌ Error de conexión: ' + error.message);
+        boton.disabled = false;
+        boton.innerHTML = textoOriginal;
+    });
+}
 
-        // Añade este script para manejar el menú desplegable
+// Añade este script para manejar el menú desplegable
         const dropdownToggle = document.getElementById('dropdownToggle');
         const dropdownMenu = document.getElementById('dropdownMenu');
 

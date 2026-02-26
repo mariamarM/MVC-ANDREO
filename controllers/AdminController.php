@@ -161,19 +161,60 @@ class AdminController extends Controller {
   
 
     // Eliminar usuario
- public function deleteUser($id)
-    {
-        try {
-            if ($this->model->deleteUser($id)) {
-                header("Location: /public/admin/users");
-                exit;
-            } else {
-                echo "Error al eliminar el usuario";
-            }
-        } catch (Exception $e) {
-            echo $e->getMessage();
-        }
+public function deleteUser($id)
+{
+    // Verificar si es admin
+    if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+        header('Location: ' . BASE_URL . 'login.php');
+        exit;
     }
+    
+    // Verificar que el ID sea válido
+    $id = (int)$id;
+    if ($id <= 0) {
+        $_SESSION['error'] = "ID de usuario inválido";
+        header('Location: ' . BASE_URL . 'admin/users?filtro=usuarios');
+        exit;
+    }
+    
+    // Verificar que no se elimine a sí mismo
+    if ($id == $_SESSION['user_id']) {
+        $_SESSION['error'] = "No puedes eliminarte a ti mismo";
+        header('Location: ' . BASE_URL . 'admin/users?filtro=usuarios');
+        exit;
+    }
+    
+    try {
+        // Crear conexión directa a la base de datos (sin modelo)
+        $db = new PDO('mysql:host=localhost;dbname=tu_bd', 'usuario', 'contraseña');
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        // SQL directo para eliminar
+        $sql = "DELETE FROM users WHERE id = ?";
+        $stmt = $db->prepare($sql);
+        $result = $stmt->execute([$id]);
+        
+        if ($result && $stmt->rowCount() > 0) {
+            $_SESSION['success'] = "Usuario eliminado correctamente";
+        } else {
+            $_SESSION['error'] = "No se pudo eliminar el usuario (puede que ya no exista)";
+        }
+        
+    } catch (PDOException $e) {
+        $_SESSION['error'] = "Error de base de datos: " . $e->getMessage();
+    }
+    
+    // Siempre redirigir de vuelta
+    header('Location: ' . BASE_URL . 'admin/users?filtro=usuarios');
+    exit;
+}
+
+// Método auxiliar para respuestas JSON
+private function jsonResponse($data) {
+    header('Content-Type: application/json');
+    echo json_encode($data);
+    exit;
+}
     // Eliminar review
     public function deleteReview($id) {
         if (!$this->checkAdmin()) return;

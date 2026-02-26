@@ -23,18 +23,100 @@ class Admin extends Model
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
     }
+    /**
+ * Verificar si un usuario existe por ID
+ */
+public function getUserById($userId) {
+    $sql = "SELECT id, username, email, role FROM users WHERE id = ?";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([$userId]);
+    return $stmt->fetch();
+}
 public function deleteUser($userId)
 {
-    $userId = (int)$userId;
-
-    // Evitar que el admin se elimine a sí mismo
-    if ($userId === $_SESSION['user_id']) {
-        throw new Exception("No puedes eliminarte a ti mismo");
+    try {
+        $userId = (int)$userId;
+        error_log("Modelo - Iniciando deleteUser para ID: $userId");
+        
+        // Verificar la conexión a la base de datos
+        if (!$this->db) {
+            error_log("ERROR: No hay conexión a la base de datos");
+            return false;
+        }
+        
+        // Primero, verificar si el usuario existe
+        $checkSql = "SELECT id, username, role FROM users WHERE id = ?";
+        $checkStmt = $this->db->prepare($checkSql);
+        $checkStmt->execute([$userId]);
+        $user = $checkStmt->fetch();
+        
+        if (!$user) {
+            error_log("ERROR: Usuario con ID $userId no existe en la base de datos");
+            return false;
+        }
+        
+        error_log("Usuario encontrado: " . $user['username'] . " con rol: " . $user['role']);
+        
+        // Verificar si tiene reviews asociadas (para mantener integridad referencial)
+        $checkReviewsSql = "SELECT COUNT(*) as total FROM reviews WHERE user_id = ?";
+        $checkReviewsStmt = $this->db->prepare($checkReviewsSql);
+        $checkReviewsStmt->execute([$userId]);
+        $reviewsCount = $checkReviewsStmt->fetch()['total'];
+        error_log("El usuario tiene $reviewsCount reviews asociadas");
+        
+        // Iniciar transacción para asegurar consistencia
+        $this->db->beginTransaction();
+        error_log("Transacción iniciada");
+        
+        // Eliminar reviews asociadas primero (si existen)
+        if ($reviewsCount > 0) {
+            $deleteReviewsSql = "DELETE FROM reviews WHERE user_id = ?";
+            $deleteReviewsStmt = $this->db->prepare($deleteReviewsSql);
+            $reviewsDeleted = $deleteReviewsStmt->execute([$userId]);
+            error_log("Reviews eliminadas: " . ($reviewsDeleted ? "sí" : "no"));
+            
+            if (!$reviewsDeleted) {
+                throw new Exception("Error al eliminar reviews asociadas");
+            }
+        }
+        
+        // Eliminar el usuario
+        $deleteUserSql = "DELETE FROM users WHERE id = ?";
+        $deleteUserStmt = $this->db->prepare($deleteUserSql);
+        $userDeleted = $deleteUserStmt->execute([$userId]);
+        error_log("Usuario eliminado: " . ($userDeleted ? "sí" : "no"));
+        
+        if (!$userDeleted) {
+            throw new Exception("Error al eliminar el usuario");
+        }
+        
+        // Confirmar transacción
+        $this->db->commit();
+        error_log("Transacción confirmada - USUARIO ELIMINADO CORRECTAMENTE");
+        
+        return true;
+        
+    } catch (PDOException $e) {
+        // Revertir transacción en caso de error
+        if ($this->db->inTransaction()) {
+            $this->db->rollBack();
+            error_log("Transacción revertida por error");
+        }
+        
+        error_log("ERROR PDO en deleteUser: " . $e->getMessage());
+        error_log("Código de error: " . $e->getCode());
+        return false;
+        
+    } catch (Exception $e) {
+        // Revertir transacción en caso de error
+        if ($this->db->inTransaction()) {
+            $this->db->rollBack();
+            error_log("Transacción revertida por error");
+        }
+        
+        error_log("ERROR GENERAL en deleteUser: " . $e->getMessage());
+        return false;
     }
-
-    $sql = "DELETE FROM users WHERE id = ?";
-    $stmt = $this->db->prepare($sql);
-    return $stmt->execute([$userId]);
 }
     public function getAllSongs()
     {
