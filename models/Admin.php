@@ -3,7 +3,6 @@ require_once 'Model.php';
 
 class Admin extends Model
 {
-    // Métodos existentes
     public function getAllUsers()
     {
         $sql = "SELECT id, username, email, role, created_at 
@@ -23,18 +22,13 @@ class Admin extends Model
         $stmt = $this->db->query($sql);
         return $stmt->fetchAll();
     }
-    /**
- * Verificar si un usuario existe por ID
- */
+
 public function getUserById($userId) {
     $sql = "SELECT id, username, email, role FROM users WHERE id = ?";
     $stmt = $this->db->prepare($sql);
     $stmt->execute([$userId]);
     return $stmt->fetch();
 }
-/**
- * Eliminar una review por su ID
- */
 public function deleteReview($reviewId) {
     try {
         $sql = "DELETE FROM reviews WHERE id = ?";
@@ -46,9 +40,7 @@ public function deleteReview($reviewId) {
     }
 }
 
-/**
- * Obtener una review por su ID
- */
+
 public function getReviewById($reviewId) {
     try {
         $sql = "SELECT r.*, u.username, c.title as song_title 
@@ -206,8 +198,7 @@ public function deleteUser($userId)
         return $stmt->fetch();
     }
     
-    // Nuevos métodos optimizados
-    
+   
     public function getUsersForSelect()
     {
         $sql = "SELECT id, username, email, role FROM users ORDER BY username ASC";

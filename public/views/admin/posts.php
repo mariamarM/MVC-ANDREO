@@ -63,12 +63,7 @@ switch ($action) {
         break;
 }
 
-// ============================================
-// FUNCIONES DE PROCESAMIENTO
-// ============================================
-/**
- * Procesar eliminación de review
- */
+
 function processDeleteReview($adminModel) {
     $reviewId = isset($_POST['review_id']) ? (int)$_POST['review_id'] : 0;
     
@@ -109,9 +104,7 @@ function processDeleteReview($adminModel) {
         ]);
     }
 }
-/**
- * Procesar creación de nueva canción
- */
+
 function processCreateSong($adminModel)
 {
     // Validar campos requeridos
@@ -196,9 +189,7 @@ function processDeleteSong($adminModel) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
 }
-/**
- * Procesar actualización de canción existente
- */
+
 function processUpdateSong($adminModel)
 {
     $errors = [];
@@ -260,9 +251,7 @@ function processUpdateSong($adminModel)
     }
 }
 
-/**
- * Procesar creación de nuevo usuario (rol: user)
- */
+
 function processCreateUser($adminModel)
 {
     $errors = [];
@@ -322,9 +311,7 @@ function processCreateUser($adminModel)
     }
 }
 
-/**
- * Procesar creación de nuevo administrador (rol: admin)
- */
+
 function processCreateAdmin($adminModel)
 {
     $errors = [];
@@ -385,9 +372,7 @@ function processCreateAdmin($adminModel)
     }
 }
 
-/**
- * Procesar edición de usuario existente
- */
+
 function processEditUser($adminModel)
 {
     $errors = [];
@@ -449,9 +434,6 @@ function processEditUser($adminModel)
     }
 }
 
-/**
- * Procesar cambio de rol de usuario
- */
 function processChangeRole($adminModel)
 {
     $errors = [];
@@ -492,9 +474,7 @@ function processChangeRole($adminModel)
     }
 }
 
-/**
- * Manejar subida de archivos
- */
+
 function handleFileUpload($file, $subdirectory = 'uploads/')
 {
     $uploadDir = __DIR__ . '/../../../' . $subdirectory;
@@ -529,7 +509,6 @@ function handleFileUpload($file, $subdirectory = 'uploads/')
     return ['success' => false, 'message' => 'Error al subir el archivo'];
 }
 
-// Método auxiliar para obtener último ID insertado (añadir al modelo si no existe)
 if (!method_exists($adminModel, 'getLastInsertId')) {
     // Podrías añadir este método a tu clase Admin
     // Por ahora usamos una solución temporal
@@ -539,9 +518,7 @@ if (!method_exists($adminModel, 'getLastInsertId')) {
         return $adminModel->db->lastInsertId();
     }
 }
-/**
- * Procesar eliminación de usuario
- */
+
 function processDeleteUser($adminModel) {
     $userId = isset($_POST['user_id']) ? (int)$_POST['user_id'] : 0;
     
