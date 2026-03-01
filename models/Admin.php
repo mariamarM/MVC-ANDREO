@@ -369,7 +369,12 @@ public function deleteUser($userId)
         $userData['role'] = 'user';
         return $this->createUser($userData);
     }
-    
+
+
+public function deleteSong($id) {
+    $stmt = $this->db->prepare("DELETE FROM canciones WHERE id = ?");
+    return $stmt->execute([$id]);
+}
     
 }
 ?>

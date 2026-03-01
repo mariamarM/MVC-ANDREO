@@ -102,27 +102,26 @@ if ($orden == 'asc') {
 
 </head>
 <style>
-    
-
-.mensaje-exito {
-    animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
+    .mensaje-exito {
+        animation: slideIn 0.3s ease;
     }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
 
-.action-btn.delete-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .action-btn.delete-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
 
     body {
         background: linear-gradient(236deg, #220808 63.05%, #940B0B 90.6%, #FF1717 102.38%);
@@ -866,10 +865,10 @@ if ($orden == 'asc') {
                                         <td><?php echo htmlspecialchars(substr($review['comment'], 0, 50)); ?></td>
                                         <td><?php echo date('d/m/Y', strtotime($review['created_at'])); ?></td>
                                         <td>
-                                            <a href="<?php echo BASE_URL; ?>admin/reviews/delete/<?php echo $review['id']; ?>"
-                                                class="action-btn delete-btn" onclick="return confirm('¿Eliminar esta review?')">
-                                                <i class="fas fa-trash"></i> Eliminar
-                                            </a>
+                                           <button class="action-btn delete-btn"
+    onclick="eliminarReview(<?php echo $review['id']; ?>, this)">
+    <i class="fas fa-trash"></i> Eliminar
+</button>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -907,10 +906,10 @@ if ($orden == 'asc') {
                                         <td><?php echo htmlspecialchars($cancion['genre']); ?></td>
                                         <td><?php echo $cancion['release_year']; ?></td>
                                         <td>
-                                            <a href="<?php echo BASE_URL; ?>admin/songs/delete/<?php echo $cancion['id']; ?>"
-                                                class="action-btn delete-btn" onclick="return confirm('¿Eliminar esta canción?')">
+                                            <button class="action-btn delete-btn"
+                                                onclick="eliminarCancion(<?php echo $cancion['id']; ?>, this)">
                                                 <i class="fas fa-trash"></i> Eliminar
-                                            </a>
+                                            </button>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -969,82 +968,134 @@ if ($orden == 'asc') {
     </div>
 
     <script>
-function eliminarUsuario(userId, boton) {
-    if (!confirm('¿Estás seguro de eliminar este usuario?')) {
-        return;
-    }
-    
-    const textoOriginal = boton.innerHTML;
-    boton.disabled = true;
-    boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando...';
-    
-    // 🔍 DEBUG: Ver qué URL se está usando
-    const url = 'posts.php'; // Cambia esta línea según la opción que elijas
-    console.log('🔍 URL a la que se envía:', url);
-    console.log('🔍 Ubicación actual:', window.location.href);
-    console.log('🔍 ID de usuario a eliminar:', userId);
-    
-    const formData = new FormData();
-    formData.append('action', 'delete-user');
-    formData.append('user_id', userId);
-    
-    fetch(url, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        console.log('🔍 Status de respuesta:', response.status);
-        console.log('🔍 Headers:', response.headers);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.text(); // Primero como texto para ver si es HTML o JSON
-    })
-    .then(text => {
-        console.log('🔍 Respuesta RAW (texto):', text.substring(0, 200)); // Primeros 200 caracteres
-        
-        try {
-            const data = JSON.parse(text);
-            console.log('🔍 Respuesta JSON parseada:', data);
-            
-            if (data.success) {
-                const fila = boton.closest('tr');
-                if (fila) {
-                    fila.style.backgroundColor = '#d4edda';
-                    setTimeout(() => fila.remove(), 300);
-                }
-                alert('✅ Usuario eliminado correctamente');
-            } else {
-                alert('❌ ' + (data.message || 'Error al eliminar'));
-                boton.disabled = false;
-                boton.innerHTML = textoOriginal;
-            }
-        } catch (e) {
-            console.error('🔍 Error al parsear JSON:', e);
-            console.error('🔍 La respuesta no es JSON válido. Es HTML:');
-            console.error(text.substring(0, 500));
-            
-            // Si es HTML, probablemente es un error de PHP
-            if (text.includes('<b>') || text.includes('<br')) {
-                alert('❌ Error del servidor. Revisa la consola (F12) para más detalles.');
-            } else {
-                alert('❌ Error inesperado. Revisa la consola (F12).');
-            }
-            
-            boton.disabled = false;
-            boton.innerHTML = textoOriginal;
-        }
-    })
-    .catch(error => {
-        console.error('🔍 Error de conexión:', error);
-        alert('❌ Error de conexión: ' + error.message);
-        boton.disabled = false;
-        boton.innerHTML = textoOriginal;
-    });
-}
+        function eliminarReview(id, boton) {
+            if (!confirm('¿Eliminar esta review?')) return;
 
-// Añade este script para manejar el menú desplegable
+            const formData = new FormData();
+            formData.append('action', 'delete-review');
+            formData.append('review_id', id);
+
+            fetch('posts.php', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        boton.closest('tr').remove();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        }
+
+        function eliminarCancion(songId, boton) {
+            if (!confirm('¿Eliminar esta canción?')) return;
+
+            const original = boton.innerHTML;
+            boton.disabled = true;
+            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando...';
+
+            const formData = new FormData();
+            formData.append('action', 'delete-song');
+            formData.append('song_id', songId);
+
+            fetch('posts.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        boton.closest('tr').remove();
+                        alert('✅ Canción eliminada');
+                    } else {
+                        alert('❌ ' + data.message);
+                        boton.disabled = false;
+                        boton.innerHTML = original;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('❌ Error de conexión');
+                    boton.disabled = false;
+                    boton.innerHTML = original;
+                });
+        }
+
+        function eliminarUsuario(userId, boton) {
+            if (!confirm('¿Estás seguro de eliminar este usuario?')) {
+                return;
+            }
+
+            const textoOriginal = boton.innerHTML;
+            boton.disabled = true;
+            boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando...';
+
+            // 🔍 DEBUG: Ver qué URL se está usando
+            const url = 'posts.php'; // Cambia esta línea según la opción que elijas
+            console.log('🔍 URL a la que se envía:', url);
+            console.log('🔍 Ubicación actual:', window.location.href);
+            console.log('🔍 ID de usuario a eliminar:', userId);
+
+            const formData = new FormData();
+            formData.append('action', 'delete-user');
+            formData.append('user_id', userId);
+
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    console.log('🔍 Status de respuesta:', response.status);
+                    console.log('🔍 Headers:', response.headers);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text(); // Primero como texto para ver si es HTML o JSON
+                })
+                .then(text => {
+                    console.log('🔍 Respuesta RAW (texto):', text.substring(0, 200)); // Primeros 200 caracteres
+
+                    try {
+                        const data = JSON.parse(text);
+                        console.log('🔍 Respuesta JSON parseada:', data);
+
+                        if (data.success) {
+                            const fila = boton.closest('tr');
+                            if (fila) {
+                                fila.style.backgroundColor = '#d4edda';
+                                setTimeout(() => fila.remove(), 300);
+                            }
+                            alert('✅ Usuario eliminado correctamente');
+                        } else {
+                            alert('❌ ' + (data.message || 'Error al eliminar'));
+                            boton.disabled = false;
+                            boton.innerHTML = textoOriginal;
+                        }
+                    } catch (e) {
+                        console.error('🔍 Error al parsear JSON:', e);
+                        console.error('🔍 La respuesta no es JSON válido. Es HTML:');
+                        console.error(text.substring(0, 500));
+
+                        // Si es HTML, probablemente es un error de PHP
+                        if (text.includes('<b>') || text.includes('<br')) {
+                            alert('❌ Error del servidor. Revisa la consola (F12) para más detalles.');
+                        } else {
+                            alert('❌ Error inesperado. Revisa la consola (F12).');
+                        }
+
+                        boton.disabled = false;
+                        boton.innerHTML = textoOriginal;
+                    }
+                })
+                .catch(error => {
+                    console.error('🔍 Error de conexión:', error);
+                    alert('❌ Error de conexión: ' + error.message);
+                    boton.disabled = false;
+                    boton.innerHTML = textoOriginal;
+                });
+        }
+
+        // Añade este script para manejar el menú desplegable
         const dropdownToggle = document.getElementById('dropdownToggle');
         const dropdownMenu = document.getElementById('dropdownMenu');
 

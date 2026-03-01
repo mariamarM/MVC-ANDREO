@@ -55,6 +55,9 @@ switch ($action) {
      case 'delete-review':
         processDeleteReview($adminModel);
         break;
+    case 'delete-song':
+    processDeleteSong($adminModel);
+    break;
     default:
         echo json_encode(['success' => false, 'message' => 'Acción no válida']);
         break;
@@ -126,7 +129,31 @@ function processCreateSong($adminModel)
         echo json_encode(['success' => false, 'message' => 'Error en la base de datos: ' . $e->getMessage()]);
     }
 }
+function processDeleteSong($adminModel) {
+    $songId = (int)($_POST['song_id'] ?? 0);
 
+    if ($songId <= 0) {
+        echo json_encode(['success' => false, 'message' => 'ID inválido']);
+        return;
+    }
+
+    try {
+        $song = $adminModel->getSongById($songId);
+        if (!$song) {
+            echo json_encode(['success' => false, 'message' => 'La canción no existe']);
+            return;
+        }
+
+        $ok = $adminModel->deleteSong($songId);
+
+        echo json_encode([
+            'success' => $ok,
+            'message' => $ok ? 'Canción eliminada' : 'No se pudo eliminar'
+        ]);
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
 /**
  * Procesar actualización de canción existente
  */
