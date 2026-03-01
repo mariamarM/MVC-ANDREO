@@ -66,7 +66,49 @@ switch ($action) {
 // ============================================
 // FUNCIONES DE PROCESAMIENTO
 // ============================================
-
+/**
+ * Procesar eliminación de review
+ */
+function processDeleteReview($adminModel) {
+    $reviewId = isset($_POST['review_id']) ? (int)$_POST['review_id'] : 0;
+    
+    if ($reviewId <= 0) {
+        echo json_encode(['success' => false, 'message' => 'ID de review inválido']);
+        return;
+    }
+    
+    try {
+        // Verificar si la review existe
+        $review = $adminModel->getReviewById($reviewId);
+        
+        if (!$review) {
+            echo json_encode(['success' => false, 'message' => 'La review no existe']);
+            return;
+        }
+        
+        // Llamar al método para eliminar la review
+        // NOTA: Asegúrate de que este método existe en tu modelo Admin
+        $result = $adminModel->deleteReview($reviewId);
+        
+        if ($result) {
+            echo json_encode([
+                'success' => true, 
+                'message' => 'Review eliminada correctamente'
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'No se pudo eliminar la review'
+            ]);
+        }
+        
+    } catch (Exception $e) {
+        echo json_encode([
+            'success' => false, 
+            'message' => 'Error: ' . $e->getMessage()
+        ]);
+    }
+}
 /**
  * Procesar creación de nueva canción
  */

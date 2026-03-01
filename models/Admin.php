@@ -32,6 +32,38 @@ public function getUserById($userId) {
     $stmt->execute([$userId]);
     return $stmt->fetch();
 }
+/**
+ * Eliminar una review por su ID
+ */
+public function deleteReview($reviewId) {
+    try {
+        $sql = "DELETE FROM reviews WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([$reviewId]);
+    } catch (PDOException $e) {
+        error_log("Error al eliminar review: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Obtener una review por su ID
+ */
+public function getReviewById($reviewId) {
+    try {
+        $sql = "SELECT r.*, u.username, c.title as song_title 
+                FROM reviews r 
+                LEFT JOIN users u ON r.user_id = u.id 
+                LEFT JOIN canciones c ON r.song_id = c.id 
+                WHERE r.id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$reviewId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error al obtener review: " . $e->getMessage());
+        return null;
+    }
+}
 public function deleteUser($userId)
 {
     try {
