@@ -52,6 +52,9 @@ switch ($action) {
     case 'delete-user':
         processDeleteUser($adminModel);
         break;
+     case 'delete-review':
+        processDeleteReview($adminModel);
+        break;
     default:
         echo json_encode(['success' => false, 'message' => 'Acción no válida']);
         break;

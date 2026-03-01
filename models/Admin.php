@@ -345,7 +345,7 @@ public function deleteUser($userId)
             return false;
         }
         
-        $fields[] = "updated_at = CURRENT_TIMESTAMP";
+        $fields[] = "created_at = CURRENT_TIMESTAMP";
         $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = ?";
         $params[] = $userId;
         
