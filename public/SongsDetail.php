@@ -1165,7 +1165,7 @@ body {
                                 
                                 <div class="review-date">
                                     <?php echo date('F j, Y', strtotime($review['created_at'])); ?>
-                                    <?php if ($review['updated_at'] != $review['created_at']): ?>
+                                    <?php if ($review['created_at'] != $review['created_at']): ?>
                                         <span style="color: #777; font-size: 10px; margin-left: 5px;">(edited)</span>
                                     <?php endif; ?>
                                 </div>
